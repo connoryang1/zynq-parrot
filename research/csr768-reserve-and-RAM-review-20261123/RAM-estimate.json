@@ -1,0 +1,49 @@
+{
+  "state": "PLANNING ARITHMETIC ONLY; no new mapping or whole-fit bound",
+  "existing_mapping": {
+    "path": "/home/coyang/zynq-parrot-linux-host-observer/research/retained-sp-ram-packing-review-20261121/verification.json",
+    "bytes": 42194,
+    "sha256": "ceebff7331285d892532b80deabc6ab29183907ed06e1043ef06b5f88b677457"
+  },
+  "existing_scope": "RAM-only SP source bank slices, Default mapping;50ns clocks applied after synthesis, not production timing; counts not additive wholeCPU",
+  "actual_old_cases": {
+    "1280": {
+      "payload_tiles": 37,
+      "tag_tiles": 4,
+      "total_tiles": 41,
+      "primitive_counts": {
+        "lane0/payload/RAMB36E1": 18,
+        "lane0/payload/RAMB18E1": 1,
+        "lane0/tag/RAMB36E1": 2,
+        "lane1/payload/RAMB36E1": 18,
+        "lane1/payload/RAMB18E1": 1,
+        "lane1/tag/RAMB36E1": 2
+      }
+    },
+    "1536": {
+      "payload_tiles": 44,
+      "tag_tiles": 4,
+      "total_tiles": 48,
+      "primitive_counts": {
+        "lane0/payload/RAMB36E1": 21,
+        "lane0/payload/RAMB18E1": 2,
+        "lane0/tag/RAMB36E1": 2,
+        "lane1/payload/RAMB36E1": 21,
+        "lane1/payload/RAMB18E1": 2,
+        "lane1/tag/RAMB36E1": 2
+      }
+    }
+  },
+  "ROOT_reported_current1280_whole_BRAM": 125.5,
+  "ROOT_reported_current1280_backend_BRAM": 41,
+  "fixed_residual_arithmetic": 84.5,
+  "prospective_768_lines_each": 768,
+  "total_actual_payload_bytes": 98304,
+  "payload_only_raw_bit_capacity_minimum_BRAM36": 22,
+  "parent_backend25_planning_estimate": 25,
+  "conditional_whole_estimate": 109.5,
+  "conditional_margin_to140": 30.5,
+  "actual_768_backend_mapping": null,
+  "exact25_formula_verified": false,
+  "conclusion": "84.5+25=109.5 is conditional arithmetic. Existing37payload+4tags at1280 and44+4 at1536 establish non-rawbit mapping/rounding. Exact768 decomposition and whole-device timing/placement remain unknown. Cell36-packed layout is not selected; no new mapping, fit or maximum claim."
+}

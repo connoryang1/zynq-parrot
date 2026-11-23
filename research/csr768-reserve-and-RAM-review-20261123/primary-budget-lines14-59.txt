@@ -1,0 +1,46 @@
+SOURCE=Path('/home/coyang/zynq-parrot-linux-borrow256-profile')
+TOP='1008854d30e5d923c86c3232fc22af039467d552'
+BP='bb575a764c200f07c6f3259a179bdc861dd7593f'
+PREVIOUS=Path('/home/coyang/zynq-parrot-linux-host-observer/research/retained256-qualification-20261122')
+SOURCE_CAP=4*1024**2;HELPER_CAP=8*1024**2;FLOOR=2560*1024**2
+V1=HERE.parent/'retained-borrow-trace0-preparation-20261122'
+V2=HERE.parent/'retained-borrow-trace0-preparation02-20261122'
+INHERITED=Path('/home/coyang/zynq-parrot-linux-host-observer/research/scratch-trace-profile-preparation02-20261122')
+INHERITED_V1=INHERITED.parent/'scratch-trace-profile-preparation-20261122'
+
+
+def require(ok,message):
+    if not ok:raise ValueError(message)
+
+def size(path):return sum(p.stat().st_size for p in Path(path).rglob('*') if p.is_file()) if Path(path).exists() else 0
+def bind(path):
+    p=Path(path);raw=p.read_bytes();return dict(path=str(p.resolve()),bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
+
+def git(repo,*args):
+    repo=Path(repo);marker=repo/'.git';require(marker.is_file() or marker.is_dir(),'initialized .git before Git invocation')
+    admin=Path(marker.read_text().strip().split(': ',1)[1]) if marker.is_file() else marker
+    if not admin.is_absolute():admin=(repo/admin).resolve()
+    env={k:v for k,v in os.environ.items() if not k.startswith('GIT_')};env.update(GIT_DIR=str(admin),GIT_WORK_TREE=str(repo.resolve()))
+    return subprocess.check_output(['git','-c','core.sparseCheckout=true','-c','core.sparseCheckoutCone=false',*args],cwd=repo,env=env,timeout=60)
+
+def budget():
+    used,helpers=size(SOURCE),size(HERE)
+    require(used<=SOURCE_CAP and helpers<=HELPER_CAP,'new source4MiB/helpers8MiB caps')
+    # Preserve the existing matched256 HOME reservations as well as new ones.
+    oldsource=Path('/home/coyang/zp-retained256-source-20261122');durable=Path('/home/coyang/fpga-artifacts/context-resume/retained256-qualification-20261122')
+    old_remaining=max(0,SOURCE_CAP-size(oldsource))+max(0,HELPER_CAP-size(PREVIOUS))+reservations.control()['remaining_growth']
+    # Existing scratch source/helpers/durable are frozen but their original
+    # reserved allocation remains explicitly priced rather than borrowed.
+    closed=closed_scratch.verify()
+    # Occupied bytes remain in actual filesystem/free-space and immutable
+    # footprint checks. ROOT released ONLY the closed archive's unused cap.
+    old_remaining+=max(0,SOURCE_CAP-size(Path('/home/coyang/zynq-parrot-linux-scratch-profile')))+max(0,HELPER_CAP-size(INHERITED)-size(INHERITED_V1))
+    require(closed['original_allocation_bytes']-closed['occupied_bytes']==closed['unused_reservation_released_bytes'],'exact closed unused reservation release')
+    old_borrow_source=Path('/home/coyang/zynq-parrot-linux-borrow-profile')
+    old_borrow_helpers=[HERE.parent/n for n in ('retained-borrow-trace0-preparation-20261122','retained-borrow-trace0-preparation02-20261122','retained-borrow-trace0-preparation03-20261122','retained-borrow-trace0-closure-preparation-20261122')]
+    old_borrow_durable=Path('/home/coyang/fpga-artifacts/context-resume/retained-borrow-trace0-fullcore-20261122')
+    old_remaining+=max(0,SOURCE_CAP-size(old_borrow_source))+max(0,HELPER_CAP-sum(size(p)for p in old_borrow_helpers))+0 # ROOT borrow61d1 closure releases ONLY unused reserve
+    reservations.borrow();active_cad=reservations.cad();old_remaining+=active_cad['remaining_evidence']
+    need=FLOOR+SOURCE_CAP-used+HELPER_CAP-helpers+old_remaining
+    require(shutil.disk_usage(HERE).free>=need,'NEWsmall HOME2.5GiB plus ALL own/old/CAD remaining allocations')
+    return dict(source_bytes=used,helper_bytes=helpers,old_remaining_bytes=old_remaining,closed_archive=closed,closed_borrow=reservations.borrow(),old_control=reservations.control(),active_CAD=active_cad,required_free_bytes=need,free_bytes=shutil.disk_usage(HERE).free)
