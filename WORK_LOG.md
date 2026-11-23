@@ -864,3 +864,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **Semantic constructor prequalification passes:** corrected metadata workerba281564 exits0 in1.93s with no children; all6 target-map comparisons match completedCSR256/old1792 proofs,256 expected vectors match recorded native/FST words, and both1536 joint target payload sets match196,608 actual linkedELF bytes (result30fb7c3e). Fix is ROOT precheck conversion8-byte packed words only; oldfailure and exact source/result exports remain in `research/csr1536-semantic-metadata-prequal-20261123`. No new model, trace, dynamic1536/joint or physical result is claimed; CAD remains active with unchanged guards.
+
+
+**Clean192KiB synthesis completes; real RAM estimate confirmed:** job20261122T231917Z-a8fbd5fa6 completes synth_design in77:11 with54441 LUT(50436logic+4005memory),26943FF,132.5BRAM(128B36+9B18),11DSP and0errors. Cross/area ends58:23 and timing optimization72:50; these are observed times, not a controlled speedup. Actual7flags/3contexts/20-8/source and ExploreArea config/property/XPR/child gates pass. Bind the closed report and rawSYN checkpoint in `research/csr1536-clean-fit-20261123`; implementation is active, so no fit/routed/physical/app or maximum-capacity claim.

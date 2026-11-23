@@ -1,0 +1,5 @@
+This retains the first completed synthesis result for the clean192KiB retained-payload candidate. It binds exact hardware/source identity, actual configuration gates and the synthesized checkpoint while implementation continues. It is not a fitted-capacity, routed-timing, FPGA-correctness or application-performance result.
+
+The completed synthesis uses54441 LUTs,26943 registers,132.5 block-RAM tiles and11 DSPs, with zero errors. BRAM equals128 RAMB36 plus9 RAMB18, matching the conditional capacity estimate; the observed SYN stage took77:11. Initial LUT use exceeds53200, so the actual ExploreArea optimization and physical implementation remain necessary. Its configuration/property/XPR/child gate passed before this snapshot.
+
+The ordinary caches remain32KiB I/32KiB D/16KiB L2 with20MHz,2resident/4logical, native memory delay and1536 full64B retained lines on each side. All original source/work/log/evidence is preserved; complete external closure remains pending. Later terminal reports must be kept separately from this immutable synthesis snapshot. The existing tag-clock coverage limitation remains explicit.
