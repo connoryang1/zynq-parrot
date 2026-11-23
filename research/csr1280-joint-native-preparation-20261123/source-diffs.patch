@@ -1,0 +1,188 @@
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation02-20261123/bridge.py
++++ bridge.py
+@@ -7 +7 @@
+-COHORT=Path('/run/user/1001/zp-csr1280-allslots-native-20261123-02')
++COHORT=Path('/run/user/1001/zp-csr1280-joint-native-20261123-01')
+@@ -34 +34 @@
+-    require(a['schema']=='csr1280-allslots-root-authority-v1' and a['ROOT_approved']is True,'UNADMITTED source-only packet')
++    require(a['schema']=='csr1280-joint-root-authority-v1' and a['ROOT_approved']is True,'UNADMITTED source-only packet')
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation02-20261123/fixed_shared.py
++++ fixed_shared.py
+@@ -7 +7 @@
+-LIMITS=dict(pool_cap_bytes=128*1024**2,cohort_inside_pool_bytes=128*1024**2,delta_HOME_cap_bytes=0,helper_cap_bytes=128*1024,RUN_floor_bytes=1024**3,HOME_floor_bytes=1792*1024**2,SHM_floor_bytes=512*1024**2)
++LIMITS=dict(pool_cap_bytes=96*1024**2,cohort_inside_pool_bytes=96*1024**2,delta_HOME_cap_bytes=0,helper_cap_bytes=128*1024,RUN_floor_bytes=1024**3,HOME_floor_bytes=1792*1024**2,SHM_floor_bytes=512*1024**2)
+@@ -13,2 +13,2 @@
+-    b.require(p['schema']=='csr1280-standalone-allslots-resources-v1' and p['ROOT_approved']is True,'no allocation/execution authority in DRAFT')
+-    b.require(p['limits']==LIMITS and p['pool']==str(b.POOL) and p['cohort']==str(b.COHORT) and p['base_durable']==str(b.DURABLE),'exact fresh128MiB namespace; no closed pool growth')
++    b.require(p['schema']=='csr1280-standalone-joint-resources-v1' and p['ROOT_approved']is True,'no allocation/execution authority in DRAFT')
++    b.require(p['limits']==LIMITS and p['pool']==str(b.POOL) and p['cohort']==str(b.COHORT) and p['base_durable']==str(b.DURABLE),'exact fresh96MiB joint namespace; no closed pool growth')
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation02-20261123/ledger.py
++++ ledger.py
+@@ -67 +67 @@
+-    c.require(whole-used+c.CAPS['stage_total']<=snapshot['policy']['limits']['pool_cap_bytes'],'standalone128MiB cohort; original sealed pool remains separate')
++    c.require(whole-used+c.CAPS['stage_total']<=snapshot['policy']['limits']['pool_cap_bytes'],'standalone96MiB joint; original sealed pool remains separate')
+@@ -82 +82 @@
+-        self.roots=dict(pool=self.stage,original_pool=c.bridge.ORIGINAL_POOL,helpers=c.HERE,durable=c.bridge.DURABLE)
++        self.roots=dict(pool=self.stage,original_pool=c.bridge.ORIGINAL_POOL,prior_cohort=c.PRIOR_STAGE,helpers=c.HERE,durable=c.bridge.DURABLE)
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation02-20261123/contract.py
++++ contract.py
+@@ -1 +1 @@
+-"""New1280 source-bound native/stream contract; no historical producer imports."""
++"""Joint1280 source-bound native/stream contract; no historical producer imports."""
+@@ -11,2 +11,4 @@
+-ORDER=('d-enabled','d-off','i-enabled')
+-CAPS=dict(raw_per_case=24*1024**2,raw_total=72*1024**2,audit_per_case=8*1024**2,audit_total=24*1024**2,other_total=24*1024**2,stage_total=128*1024**2,preparation=128*1024,HOME_reserve=1792*1024**2,reader_s=3600,audit_outer_s=3665)
++ORDER=('joint',)
++PRIOR_ORDER=('d-enabled','d-off','i-enabled')
++PRIOR_STAGE=Path('/run/user/1001/zp-csr1280-allslots-native-20261123-02')
++CAPS=dict(raw_per_case=48*1024**2,raw_total=48*1024**2,audit_per_case=16*1024**2,audit_total=16*1024**2,other_total=24*1024**2,stage_total=96*1024**2,preparation=128*1024,HOME_reserve=1792*1024**2,reader_s=3600,audit_outer_s=3665)
+@@ -72 +74 @@
+-def Validator(program,role):
++def Validator(program,role='joint'):
+@@ -74 +76,2 @@
+-    return CONTEXT.sem.Validator(program,role,CONTEXT.profile,CONTEXT.ctx)
++    require(role=='joint','one joint case only')
++    return CONTEXT.sem.JointValidator(program,CONTEXT.profile,CONTEXT.ctx)
+@@ -80 +83 @@
+-    require(p['schema']=='csr1280-complete-allslots-v1' and p['state']=='ROOT-PREPARED new1280 actual model; native/audit only after explicit execution','DRAFT cannot run')
++    require(p['schema']=='csr1280-complete-joint-v1' and p['state']=='ROOT-PREPARED new1280 JOINT actual model; native/audit only after explicit execution','DRAFT cannot run')
+@@ -102 +105 @@
+-    require(p['program']==ctx.ctx.anchors['programs']['single']['manifest'],'exact immutable MAX1792 manifest')
++    require(p['program']==ctx.ctx.anchors['programs']['joint']['manifest'],'exact immutable MAX1792 manifest')
+@@ -104,2 +107,8 @@
+-    require(program['elf']['sha256']=='062a3dd884d64bc1fdf7f0048f312cc5efc84280eb89006c21ef6b60f1f43ed6' and program['max_lines']==1792 and program['max_sets']==256,'same runtime-geometry program')
+-    for row in program['sources']+[program['elf'],program['compiler'],program['converter']]+[program['cases'][role]['nbf']for role in ORDER]:verify(row)
++    require(program['joint_schema']=='retained-joint-capacity-program-v1' and program['elf']['sha256']=='cd562863f1758922ee7f55ce5e24410a5060a18fc64eff5c98d25b32de213062' and program['nbf']['sha256']=='11721c8556d0ffe309d986c9c4413cb43bb7a12f05f3c56565cd2de00d002869','unchanged linked joint ELF/NBF; no program changes')
++    require(program['max_lines']==1792 and program['max_sets']==256 and program['i_lines']==program['d_lines']==program['sets']==256,'preserve historical joint metadata; actual1280 profile separate')
++    for row in program['sources']+[program['elf'],program['compiler'],program['converter'],program['nbf']]:verify(row)
++    static=ctx.ctx.anchors['programs']['joint']['compile_static_session'];verify(static)
++    proof=json.loads(Path(static['path']).read_text())
++    require(proof['state']=='PASS one NEW joint guest software/static proof only; no model/audit/board' and proof['program']==p['program'] and proof['source_endcheck']=='PASS' and proof['owned_group_remaining']is False,'actual original linked/static joint completion, not metadata alone')
++    require(len(proof['commands'])==6 and all(row['owned']['returncode']==0 and row['owned']['owned_group_remaining']is False for row in proof['commands']),'all original compile/static tool phases closed')
++    verify_prior(authority)
+@@ -127,4 +136,4 @@
+-def counters_for(role):return [0,1280,0,1280,0,10240] if role=='d-enabled' else [1280,0,1280,0,10240,0] if role=='i-enabled' else [0]*6
+-
+-
+-def semantic_check_native(stage, role, p, preparation_path, expected_sha):
++def counters_for(role):return [1280,1280,1280,1280,10240,10240] if role=='joint' else [0,1280,0,1280,0,10240] if role=='d-enabled' else [1280,0,1280,0,10240,0] if role=='i-enabled' else [0]*6
++
++
++def prior_semantic_check_native(stage, role, p, preparation_path, expected_sha):
+@@ -149,2 +158,2 @@
+-def check_native(stage,role,p,preparation_path,expected_sha):
+-    run=semantic_check_native(stage,role,p,preparation_path,expected_sha)
++def prior_check_native(stage,role,p,preparation_path,expected_sha):
++    run=prior_semantic_check_native(stage,role,p,preparation_path,expected_sha)
+@@ -164 +173 @@
+-def semantic_verify_audit(stage, role, p, preparation_path, expected_sha):
++def prior_semantic_verify_audit(stage, role, p, preparation_path, expected_sha):
+@@ -170 +179 @@
+-    run=check_native(stage,role,p,preparation_path,receipt['native_sha256'])
++    run=prior_check_native(stage,role,p,preparation_path,receipt['native_sha256'])
+@@ -189,2 +198,2 @@
+-def verify_audit(stage,role,p,preparation_path,expected_sha):
+-    receipt=semantic_verify_audit(stage,role,p,preparation_path,expected_sha)
++def prior_verify_audit(stage,role,p,preparation_path,expected_sha):
++    receipt=prior_semantic_verify_audit(stage,role,p,preparation_path,expected_sha)
+@@ -194,0 +204,62 @@
++
++
++def verify_prior(authority):
++    require(authority['ROOT_reviewed_prior_three_role_completion']is True,'all1280 three-role completion pending')
++    row=authority['prior_preparation'];require(row['path']==str(PRIOR_STAGE/'preparation.json'),'exact predecessor namespace02');verify(row)
++    p=json.loads(Path(row['path']).read_text())
++    require(p['schema']=='csr1280-complete-allslots-v1' and p['schedule']==list(PRIOR_ORDER),'same three-role schedule')
++    require(p['model']==CONTEXT.ctx.anchors['model'] and p['geometry']==CONTEXT.ctx.anchors['actual_geometry17'],'same actual qualified1280 model/geometry')
++    require(set(authority['prior_roles'])==set(PRIOR_ORDER),'all and only three predecessor native/audit anchors')
++    for role in PRIOR_ORDER:
++        pins=authority['prior_roles'][role]
++        require(set(pins)=={'native','audit'},'two exact terminal anchors per predecessor')
++        require(pins['native']['path']==str(PRIOR_STAGE/role/'verification.json') and pins['audit']['path']==str(PRIOR_STAGE/(role+'-audit')/'acceptance.json'),'fixed previous outputs')
++        verify(pins['native']);verify(pins['audit'])
++        prior_check_native(PRIOR_STAGE,role,p,Path(row['path']),pins['native']['sha256'])
++        proof=prior_verify_audit(PRIOR_STAGE,role,p,Path(row['path']),pins['audit']['sha256'])
++        require(proof['native_sha256']==pins['native']['sha256'],'same native accepted by previous full167 audit')
++    for source in p['runtime_sources']:verify(source)
++
++
++def check_native(stage,p,preparation_path,expected_sha):
++    case=Path(stage)/'joint';proof=case/'verification.json';require(bind(proof)['sha256']==expected_sha,'joint native external SHA')
++    run=json.loads(proof.read_text());ad=json.loads((case/'admission.json').read_text())
++    require(run['state']=='PASS joint1280 checked execution/primary counters; full167 per-address audit pending' and run['role']=='joint','actual complete joint native')
++    require(run['counters']==counters_for('joint') and run['admission']==bind(case/'admission.json'),'exact nonsaturated both-lane GP0')
++    require(ad['schema']=='csr1280-joint-capacity-stream-native-v1' and ad['preparation']==bind(preparation_path) and ad['model']==p['model'] and ad['program']==p['program'],'new joint exact input chain')
++    require(ad['compiled_sources']==p['compiled_sources'] and ad['reader']==p['reader'] and ad['native_runtime_ms']==1800000 and ad['outer_timeout_s']==1980 and ad['fst_cap_bytes']==CAPS['raw_per_case'],'same source/reader/unchanged prospective deadlines')
++    program=json.loads(Path(p['program']['path']).read_text())
++    require(ad['elf']==bind(case/'prog.riscv') and ad['nbf']==bind(case/'prog.nbf') and ad['elf']['sha256']==program['elf']['sha256'] and ad['nbf']['sha256']==program['nbf']['sha256'],'exact unchanged joint loaded software')
++    require(run['files']==[bind(case/name)for name in ('prog.riscv','prog.nbf','run.log','process.json','trace.fst','run.owned.json')],'all fixed closed native files')
++    require(ad['runtime_sources']==bind(Path(stage)/'runtime-sources.json') and json.loads(Path(ad['runtime_sources']['path']).read_text())==p['runtime_sources'],'literal actual executed source set')
++    life=json.loads((case/'run.owned.json').read_text());require(life['failure']is None and life['owned_group_remaining']is False and life['returncode']==run['actual_returncode'],'native actual owned return and cleanup')
++    require(run['resource_phase']==bind(case/'resource-phase.json') and run['sealed_inputs']==bind(case/'sealed-exit.json'),'actual native phase/seal closure');check_phase_receipts(case)
++    return run
++
++
++def verify_audit(stage,p,preparation_path,expected_sha):
++    out=Path(stage)/'joint-audit';accepted=out/'acceptance.json';require(bind(accepted)['sha256']==expected_sha,'external joint audit SHA')
++    receipt=json.loads(accepted.read_text());require(receipt['schema']=='csr1280-joint-stream-acceptance-v1' and receipt['role']=='joint' and receipt['preparation']==bind(preparation_path) and receipt['sources']==p['runtime_sources'],'exact joint audit admission/source chain')
++    run=check_native(stage,p,preparation_path,receipt['native_sha256'])
++    names=('verification.json','selection.tsv','gp0-counter-projection.tsv.gz','counter-check-input/verification.json','counter-words.json','counter-checker.log','counter-checker.owned.json','reader.stderr','reader.owned.json')
++    require(receipt['files']==[bind(out/name)for name in names],'fixed complete audit output membership')
++    full=json.loads((out/'verification.json').read_text());reference=full['reference_semantic_result']
++    require(full['schema']=='csr1280-joint-complete167-semantic-v1' and full['state']=='PASS joint1280 reference semantics/full-stream/independent-counter chain pending acceptance','exact new result envelope')
++    require(reference['state']=='PASS joint configured I+D publications/full512 hits/eight real L1 writes/all target execution' and reference['all_publications_before_first_target_lookup']is True,'unchanged joint simultaneous-survival gate')
++    for lane in ('i','d'):
++        proof=reference[lane]
++        require(proof['lines']==1280 and len(proof['targets'])==len(proof['publications'])==len(proof['hits'])==len(proof['retained_bursts'])==1280 and not proof['ordinary_bursts'],'each actual full1280 lane; no metadata-label substitution')
++    require(reference['expected_six_GP0']==[256,256,256,256,2048,2048],'preserve original reference256 diagnostic metadata verbatim')
++    require(full['actual_count_summary']==dict(lines=1280,sets=256,role='joint',expected_six_GP0=counters_for('joint'),D_target_loads=10240,I_target_instructions=20480),'separate actual profile summary')
++    expected=dict(fst=bind(Path(stage)/'joint/trace.fst'),run=bind(Path(stage)/'joint/verification.json'),admission=bind(Path(stage)/'joint/admission.json'),program=p['program'],model=p['model'],reader=p['reader'],selection=bind(out/'selection.tsv'),preparation=bind(preparation_path))
++    require(full['bindings']==expected and expected['selection']['sha256']=='2c38d34248a066f58ed9526784955dab7d0b23b1cc15b240129530ec1f81086c','raw167 and exact current source/model/software provenance')
++    arc=full['archive'];stream=arc['full_stream'];projection=bind(out/'gp0-counter-projection.tsv.gz')
++    require(arc['schema']=='full167-digest-explicit-counter-projection-v1' and arc['counter_projection']==projection and stream['reader_returncode']==0 and stream['exact_end_records']==1 and stream['lines']==stream['events']+169 and stream['bytes']>0 and len(stream['sha256'])==64,'complete full167 EOF/digest; projection never impersonates full stream')
++    adapter_path=out/'counter-check-input/verification.json';adapter=json.loads(adapter_path.read_text());counter=json.loads((out/'counter-words.json').read_text());checker=FOUNDATION[0]
++    require(adapter==dict(schema='counter-projection-input-only-v1',full_audit=bind(out/'verification.json'),bindings=dict(events=projection,run=expected['run'])),'unchanged independent counter adapter chain')
++    require(counter['state']=='PASS final FST counter words equal actual GP0 reads' and counter['values']==run['counters'] and counter['auditor']==checker and counter['audit']==bind(adapter_path) and counter['run']==expected['run'] and counter['events']==projection,'actual six counters, unchanged checker and exact source trace chain')
++    for name in ('reader','counter-checker'):
++        life=json.loads((out/(name+'.owned.json')).read_text());require(life['returncode']==0 and life['failure']is None and life['owned_group_remaining']is False,'actual owned closed '+name)
++    reader_life=json.loads((out/'reader.owned.json').read_text());require(reader_life['argv']==[p['reader']['path'],str(Path(stage)/'joint/trace.fst'),str(out/'selection.tsv')],'exact complete joint FST reader invocation')
++    require(receipt['resource_phase']==bind(out/'resource-phase.json') and receipt['sealed_inputs']==bind(out/'sealed-exit.json'),'audit phase and all immutable input seals');check_phase_receipts(out)
++    return receipt
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation02-20261123/audit_full.py
++++ audit_full.py
+@@ -20 +19,0 @@
+-    parser.add_argument('--role',choices=c.ORDER,required=True)
+@@ -26 +25 @@
+-    stage=Path(p['stage']);case=stage/args.role;out=stage/(args.role+'-audit')
++    stage=Path(p['stage']);case=stage/'joint';out=stage/'joint-audit'
+@@ -37 +36 @@
+-                run=c.check_native(stage,args.role,p,args.preparation,args.native_sha256)
++                run=c.check_native(stage,p,args.preparation,args.native_sha256)
+@@ -54 +53 @@
+-                            selected,c.Validator(program,args.role),c.original.audit.edges,completion,guard)
++                            selected,c.Validator(program),c.original.audit.edges,completion,guard)
+@@ -56 +55 @@
+-                result['actual_count_summary']=dict(lines=1280,sets=256,role=args.role,expected_six_GP0=c.counters_for(args.role),D_target_loads=10240 if args.role[0]=='d' else 0,I_target_instructions=20480 if args.role[0]=='i' else 0)
++                result=dict(schema='csr1280-joint-complete167-semantic-v1',state='PASS joint1280 reference semantics/full-stream/independent-counter chain pending acceptance',reference_semantic_result=result,actual_count_summary=dict(lines=1280,sets=256,role='joint',expected_six_GP0=c.counters_for('joint'),D_target_loads=10240,I_target_instructions=20480))
+@@ -73 +72 @@
+-                c.check_native(stage,args.role,p,args.preparation,args.native_sha256)
++                c.check_native(stage,p,args.preparation,args.native_sha256)
+@@ -75 +74 @@
+-            c.archive.write_json(out/'acceptance.json',dict(schema='csr-unmasked1280-stream-acceptance-v1',role=args.role,
++            c.archive.write_json(out/'acceptance.json',dict(schema='csr1280-joint-stream-acceptance-v1',role='joint',
+@@ -79 +78 @@
+-            c.verify_audit(stage,args.role,p,args.preparation,c.bind(out/'acceptance.json')['sha256'])
++            c.verify_audit(stage,p,args.preparation,c.bind(out/'acceptance.json')['sha256'])
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation02-20261123/prepare.py
++++ prepare.py
+@@ -2 +2 @@
+-"""Prepare only the fresh128MiB native stage after exact ROOT funding/source review."""
++"""Prepare only the fresh96MiB joint native stage after exact ROOT funding/source review."""
+@@ -19,0 +20 @@
++    c.verify_prior(authority)
+@@ -31 +32 @@
+-        p=dict(schema='csr1280-complete-allslots-v1',state='ROOT-PREPARED new1280 actual model; native/audit only after explicit execution',stage=str(c.BASE),stage_identity=dict(path=str(c.BASE),device=st.st_dev,inode=st.st_ino),caps=c.CAPS,schedule=list(c.ORDER),source_plan=c.bind(c.HERE/'source-plan.json'),runtime_sources=sources,semantic_context=rows['context'],ROOT_authority=rows['authority'],fixed_reservations=rows['profile'],model=ctx.ctx.anchors['model'],geometry=ctx.ctx.anchors['actual_geometry17'],program=ctx.ctx.anchors['programs']['single']['manifest'],compiled_sources=c.bind(compiled),environment=proposal['environment'],linked_libraries=proposal['linked_libraries'],reader=proposal['reader'])
++        p=dict(schema='csr1280-complete-joint-v1',state='ROOT-PREPARED new1280 JOINT actual model; native/audit only after explicit execution',stage=str(c.BASE),stage_identity=dict(path=str(c.BASE),device=st.st_dev,inode=st.st_ino),caps=c.CAPS,schedule=list(c.ORDER),source_plan=c.bind(c.HERE/'source-plan.json'),runtime_sources=sources,semantic_context=rows['context'],ROOT_authority=rows['authority'],fixed_reservations=rows['profile'],model=ctx.ctx.anchors['model'],geometry=ctx.ctx.anchors['actual_geometry17'],program=ctx.ctx.anchors['programs']['joint']['manifest'],compiled_sources=c.bind(compiled),environment=proposal['environment'],linked_libraries=proposal['linked_libraries'],reader=proposal['reader'])
+@@ -34 +35 @@
+-        c.archive.write_json(c.BASE/'prepared.json',dict(state='PASS separately funded preparation; all1280 execution/audit pending',preparation=c.bind(dest)))
++        c.archive.write_json(c.BASE/'prepared.json',dict(state='PASS separately funded JOINT preparation; both1280-lane execution/audit pending',preparation=c.bind(dest)))
