@@ -1,0 +1,57 @@
+
+Time (s): cpu = 00:12:24 ; elapsed = 00:05:39 . Memory (MB): peak = 3406.340 ; gain = 276.895 ; free physical = 14155 ; free virtual = 101456
+
+Phase 3.6 Small Shape Detail Placement
+Phase 3.6 Small Shape Detail Placement | Checksum: 2468c36b1
+
+Time (s): cpu = 00:12:43 ; elapsed = 00:05:56 . Memory (MB): peak = 3406.340 ; gain = 276.895 ; free physical = 14155 ; free virtual = 101456
+Phase 3 Detail Placement | Checksum: 2468c36b1
+
+Time (s): cpu = 00:12:44 ; elapsed = 00:05:57 . Memory (MB): peak = 3406.340 ; gain = 276.895 ; free physical = 14155 ; free virtual = 101456
+ERROR: [Place 30-487] The packing of instances into the device could not be obeyed. There are a total of 13300 slices in the device, of which 10857 slices are available, however, the unplaced instances require 11109 slices. Please analyze your design to determine if the number of LUTs, FFs, and/or control sets can be reduced.
+
+Number of control sets and instances constrained to the design
+	Control sets: 1158
+	Luts: 56916 (combined) 65788 (total), available capacity: 53200 
+	Flip flops: 26947, available capacity: 106400
+	NOTE: each slice can only accommodate 1 unique control set so FFs cannot be packed to fully fill every slice
+
+
+ERROR: [Place 30-99] Placer failed with error: 'Detail Placement failed please check previous errors for details.'
+Please review all ERROR, CRITICAL WARNING, and WARNING messages during placement to understand the cause for failure.
+
+Phase 4 Add Constraints
+
+Phase 4.1 Add User PBlocks
+Phase 4.1 Add User PBlocks | Checksum: 1772f8d27
+
+Time (s): cpu = 00:12:44 ; elapsed = 00:05:57 . Memory (MB): peak = 3406.340 ; gain = 276.895 ; free physical = 14155 ; free virtual = 101456
+Phase 4 Add Constraints | Checksum: 1772f8d27
+
+Time (s): cpu = 00:12:44 ; elapsed = 00:05:57 . Memory (MB): peak = 3406.340 ; gain = 276.895 ; free physical = 14155 ; free virtual = 101456
+Ending Placer Task | Checksum: 1120be22e
+
+Time (s): cpu = 00:12:44 ; elapsed = 00:05:57 . Memory (MB): peak = 3406.340 ; gain = 276.895 ; free physical = 14155 ; free virtual = 101456
+143 Infos, 1 Warnings, 1 Critical Warnings and 3 Errors encountered.
+place_design failed
+ERROR: [Common 17-69] Command failed: Placer could not place all instances
+INFO: [Common 17-206] Exiting Vivado at Sun Nov 22 19:51:58 2026...
+[Sun Nov 22 19:52:04 2026] impl_1 finished
+ERROR: [Vivado 12-13638] Failed runs(s) : 'impl_1'
+wait_on_runs: Time (s): cpu = 00:00:02 ; elapsed = 00:09:22 . Memory (MB): peak = 4253.445 ; gain = 0.000 ; free physical = 16430 ; free virtual = 103731
+ERROR: [Common 17-39] 'wait_on_runs' failed due to earlier errors.
+
+    while executing
+"wait_on_run impl_1"
+    invoked from within
+"if {${do_impl}} {
+        # See vivado_synth_wrap: implementation is likewise a single run.
+        set_param general.maxThreads ${threads}
+        se..."
+    (procedure "vivado_impl_wrap" line 2)
+    invoked from within
+"vivado_impl_wrap ${do_impl} ${threads}"
+    (file "/run/user/1001/zp-linux-csr-opt1536-trace0-cad-20261122-03/zynq-parrot-fpga-20261122T231917Z-a8fbd5fa6/cosim/tcl/vivado-build-bd.tcl" line 24)
+INFO: [Common 17-206] Exiting Vivado at Sun Nov 22 19:52:04 2026...
+make: *** [/run/user/1001/zp-linux-csr-opt1536-trace0-cad-20261122-03/zynq-parrot-fpga-20261122T231917Z-a8fbd5fa6/cosim/mk/Makefile.vivado:100: black_parrot_bd_1.bit] Error 1
+make: Leaving directory '/run/user/1001/zp-linux-csr-opt1536-trace0-cad-20261122-03/zynq-parrot-fpga-20261122T231917Z-a8fbd5fa6/cosim/black-parrot-example/vivado'
