@@ -9,7 +9,7 @@ HERE=Path(__file__).resolve().parent
 BASE,SOURCE=bridge.COHORT,bridge.SOURCE
 require,bind,verify=bridge.require,bridge.bind,bridge.verify
 ORDER=('d-enabled','d-off','i-enabled')
-CAPS=dict(raw_per_case=24*1024**2,raw_total=72*1024**2,audit_per_case=8*1024**2,audit_total=24*1024**2,other_total=24*1024**2,stage_total=128*1024**2,preparation=128*1024,HOME_reserve=2*1024**3,reader_s=3600,audit_outer_s=3665)
+CAPS=dict(raw_per_case=24*1024**2,raw_total=72*1024**2,audit_per_case=8*1024**2,audit_total=24*1024**2,other_total=24*1024**2,stage_total=128*1024**2,preparation=128*1024,HOME_reserve=1792*1024**2,reader_s=3600,audit_outer_s=3665)
 ACTIVE_GUARD=None
 CONTEXT=None
 

@@ -10,20 +10,22 @@ The proposed stage is `/run/user/1001/zp-csr1280-allslots-native-20261123-01`, o
 
 The proposed 128 MiB artifact envelope is 72 MiB raw FSTs (24 per role), 24 MiB audit outputs (8 per role), 24 MiB other files, and 8 MiB unassigned margin. Old canonical1792 measured raw traces 14,060,330/14,192,591/14,804,990 bytes and per-address JSON 3,292,608/2,887,190/3,780,030 bytes, with projections under 86 KB. Completed CSR256 used 43,979,878 bytes total, including 30,198,207 raw-FST bytes. Three exact ELF/NBF copies cost 10,918,920 bytes inside the 24 MiB other cap; source/preparation copies, seal manifests, logs and lifecycle receipts share the remainder. This is an evidence-based prospective bound, not a demonstrated new1280 size. File and aggregate guards stop on exhaustion. Hundreds of MB of canonical stream text are never materialized.
 
-`ROOT-resource-profile.DRAFT.json` is deliberately unlaunchable. ROOT must retain the full historic RUN BASE 1,156,926,898 bytes, explicitly price active CAD's remaining work/evidence and all other allocations, and check both the existing CAD guard and new cohort guard. The helper cap is 128 KiB logical bytes for this entire prefix including later ROOT metadata; actual allocated space is accounted by real filesystem free space. The proposed RUN/HOME/SHM floors are 1 GiB/2 GiB/512 MiB, subject to ROOT's explicit source/admission review; no active authority is changed. Only declared fresh files `ROOT-authority.json` and `ROOT-resource-profile.json` may be promoted, with their DRAFT originals preserved.
+`ROOT-resource-profile.DRAFT.json` is deliberately unlaunchable. ROOT must retain the full historic RUN BASE 1,156,926,898 bytes, explicitly price active CAD's remaining work/evidence and all other allocations, and satisfy the union of existing CAD and new cohort reservations. Each live check reads only allocated sizes under the SOURCE, WORK and shared evidence roots bound by immutable CAD admission `bc473480db6890a8602d28cc25d258b46be93415825871a9edbed63f64cb96b4`; it subtracts actual consumed allocation from each unchanged CAD cap. On each actual filesystem it sums all remaining CAD allocations, the full fixed BASE/OTHER reserves, and the new SELF remaining allocation, using the maximum applicable floor. Source evidence is already inside the shared evidence roots and is not added again. No active CAD helper is imported or modified. The helper cap is 128 KiB logical bytes for this entire prefix including later ROOT metadata; actual allocated space is accounted by real filesystem free space. The proposed RUN/HOME/SHM floors are 1 GiB/1792 MiB/512 MiB, subject to ROOT's explicit source/admission review; no active authority is changed. Only declared fresh files `ROOT-authority.json` and `ROOT-resource-profile.json` may be promoted, with their DRAFT originals preserved.
 
 After funding, ROOT's minimal CLI is:
 
 ```bash
 H=/home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation-20261123
 P=/run/user/1001/zp-csr1280-allslots-native-20261123-01/preparation.json
-python3 "$H/prepare.py" --authority "$H/ROOT-authority.json" --authority-sha256 AUTH_SHA --context /home/coyang/fpga-artifacts/context-resume/csr1280-semantic-authority-20261123/ROOT-anchors.json --context-sha256 55afbe1369bb4ca4ab7797cef4d77757963173964324a795bea903ecc280d75e --profile "$H/ROOT-resource-profile.json" --profile-sha256 PROFILE_SHA --execute
-python3 "$H/run_native.py" --preparation "$P" --preparation-sha256 PREP_SHA --role d-enabled --execute
-python3 "$H/audit_full.py" --preparation "$P" --preparation-sha256 PREP_SHA --role d-enabled --native-sha256 DON_NATIVE_SHA --execute
-python3 "$H/run_native.py" --preparation "$P" --preparation-sha256 PREP_SHA --role d-off --prior-audit-sha256 DON_AUDIT_SHA --execute
-python3 "$H/audit_full.py" --preparation "$P" --preparation-sha256 PREP_SHA --role d-off --native-sha256 DOFF_NATIVE_SHA --execute
-python3 "$H/run_native.py" --preparation "$P" --preparation-sha256 PREP_SHA --role i-enabled --prior-audit-sha256 DON_AUDIT_SHA --prior-audit-sha256 DOFF_AUDIT_SHA --execute
-python3 "$H/audit_full.py" --preparation "$P" --preparation-sha256 PREP_SHA --role i-enabled --native-sha256 ION_NATIVE_SHA --execute
+python3 -B "$H/prepare.py" --authority "$H/ROOT-authority.json" --authority-sha256 AUTH_SHA --context /home/coyang/fpga-artifacts/context-resume/csr1280-semantic-authority-20261123/ROOT-anchors.json --context-sha256 55afbe1369bb4ca4ab7797cef4d77757963173964324a795bea903ecc280d75e --profile "$H/ROOT-resource-profile.json" --profile-sha256 PROFILE_SHA --execute
+python3 -B "$H/run_native.py" --preparation "$P" --preparation-sha256 PREP_SHA --role d-enabled --execute
+python3 -B "$H/audit_full.py" --preparation "$P" --preparation-sha256 PREP_SHA --role d-enabled --native-sha256 DON_NATIVE_SHA --execute
+python3 -B "$H/run_native.py" --preparation "$P" --preparation-sha256 PREP_SHA --role d-off --prior-audit-sha256 DON_AUDIT_SHA --execute
+python3 -B "$H/audit_full.py" --preparation "$P" --preparation-sha256 PREP_SHA --role d-off --native-sha256 DOFF_NATIVE_SHA --execute
+python3 -B "$H/run_native.py" --preparation "$P" --preparation-sha256 PREP_SHA --role i-enabled --prior-audit-sha256 DON_AUDIT_SHA --prior-audit-sha256 DOFF_AUDIT_SHA --execute
+python3 -B "$H/audit_full.py" --preparation "$P" --preparation-sha256 PREP_SHA --role i-enabled --native-sha256 ION_NATIVE_SHA --execute
 ```
 
 ROOT must replace SHA placeholders only with actual closed receipts. No process is launched by this documentation or the source handoff. Model synthesis/fit, physical FPGA capacity, joint I/D occupancy, and application performance are outside these three-role checks.
+
+The original unexecuted 17-file source proposal is preserved at checkpoint `630effac0`, including its static CAD snapshots and proposed 2 GiB floor. ROOT review replaced those with the already admitted 1792 MiB floor and live CAD remaining-allocation accounting before any consumer import or execution. Both new entrypoints disable bytecode before their first local import; the CLI also uses `python3 -B`. No old runtime authority or cap was changed.

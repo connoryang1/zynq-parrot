@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import signal
 import sys
+sys.dont_write_bytecode=True
 import contract as c
 
 

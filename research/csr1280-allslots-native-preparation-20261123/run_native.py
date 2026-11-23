@@ -9,6 +9,8 @@ from pathlib import Path
 import re
 import resource
 import shutil
+import sys
+sys.dont_write_bytecode=True
 import contract as c
 
 bind,require=c.bind,c.require
