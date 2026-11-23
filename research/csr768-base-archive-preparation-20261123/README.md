@@ -1,0 +1,25 @@
+This packet prepares complete standalone preservation of the new768 clean fullcore, qualified observation clone and four architectural regressions. It is a narrow successor of the accepted1280 base32 archive method, with the same representation, collector and owned compression/readback workflow. Actual new qualification/STD/recovery bindings and resource funding must be supplied by ROOT before inventory or compression; no new runtime is authorized by this source packet.
+
+The known original model is `8762ddb27740970892245ca7c067fcfff4c89da8dbbce392f2407979dbc5f964`; the known clean eleven-phase session is `c230d6a38cad5d152b2b588af93a0b354ce52daaeade2be8cf3562c4ddc789da`. TOP is `1b24c915ed628f6d47a382b3aa89fb662884e1a1`, BP remains `1e7aa2fdc94a56373a26f95b145aff361d4d0aaa`. Other result hashes stay NULL until ROOT independently binds the actual five-domain qualification, fourSTD, ownership and Git-recovery receipts. Neither old1280 approval nor a build-only768 result can substitute.
+
+BASE is `/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01`. The inventory records under `archive32-records01`; durable output is `/home/coyang/fpga-artifacts/context-resume/csr-unmasked768-fullcore-20261123/base-full-clone-std-closed01`. Everything remains inside the ONE already admitted1GiB RUN/32MiB durable family, with a separately priced64KiB archive-helper/metadata envelope. No second32MiB allowance, old reserve discount, cleanup or source/model change is introduced. Native helper128KiB and observation+STD160KiB caps are unchanged; this64KiB cap is only the new closure recipe. ROOT must fund current full OTHER/floors and encoder headroom before running either phase.
+
+Payload is the entire current BASE plus all current native/authority helpers, observation02/STD02 and their actual bindings, this recipe, and the original unlaunched observation01/STD01 bound source/history. All original raw FSTs, both actual model binaries, generated C++/headers, source/private Git administration, programs, logs, loader/ingestion/stamp/geometry/ownership/checker receipts are preserved. ROOT supplies the exact final raw-FST census. Nine actual source repositories and their HEADs must match the recovery receipt; every external common object store must be durably retained by the named recovery ref, and the source-private object store remains archive payload. No Git object omission is inferred merely from a path being shared.
+
+Only the prior explicit exclusions apply: `.o`/`.a`/`.gch` under the two exact generated-object roots are rebuildable caches with complete byte/metadata inventories; the ten known original/clone canonical gzip containers are derived files. Their actual uncompressed hashes/counts/order/selectors/recipe and all backing rawFSTs/parser/reader bytes are retained, so complete canonical data is reproducible. Original gzip headers/container bytes are not claimed reproducible. All excluded originals remain untouched. Unknown canonical containers, unknown/missing bound files, or mismatches outside the precise copied-Syms before/after lineage fail preparation.
+
+Installed rebuildable tools/libraries and historical upstream binary artifacts retain exact path/byte/SHA/version/recipe identity records under the same accepted classification. They are not falsely claimed as copied archive payload; actual current model/program/rawFST/source proof bytes are payload. The collector does not blindly add large installed compiler binaries. The old bound01 source pair and prelaunch source-cap refusal must be recorded separately as history, never as an executed qualification.
+
+The codec and owned API are byte-identical to the accepted method: streaming tar.xz with64MiB dictionary,31.9375MiB compressed ceiling inside32MiB total,600s compression/180s full-member roundtrip/780s total,1GiB encoder address space. The root inventory has120s and512MiB raw/128MiB per-file bounds. ROOT first measures actual member/class/rawFST totals and reviews the inventory, then admits one execution. Every member byte/mode/link is read back and all original metadata/membership remain unchanged. No32MiB fit is assumed from old results; any limit failure preserves outputs without retries, cap changes or member drops.
+
+ROOT uses the unchanged API:
+
+```bash
+H=/home/coyang/zynq-parrot-retained-metadata/research/csr768-base-archive-preparation-20261123
+A=/home/coyang/fpga-artifacts/context-resume/csr768-base-archive-authority-20261123/admission.json
+python3 -B "$H/close.py" --admission "$A" --admission-sha256 ACTUAL_AUTH_SHA --prepare
+# ROOT inspects the measured inventory/class/FST totals before execution.
+python3 -B "$H/close.py" --admission "$A" --admission-sha256 ACTUAL_AUTH_SHA --execute --prepared-sha256 ACTUAL_INVENTORY_SHA
+```
+
+This archive does not release the native pool's unused futures or approve768 all-capacity/I-post-switch/physical/performance work. Any later final freeze or acquisition needs its own exact admission. No source import, inventory/hash scan, codec, FST reader, model, compiler, vendor or board operation was run to prepare this source successor.
