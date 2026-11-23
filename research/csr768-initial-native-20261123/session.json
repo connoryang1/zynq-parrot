@@ -1,0 +1,983 @@
+{
+  "state": "PASS CSR unmasked768 trace0 clean fullcore integrity/cold08 strict512b-eight-real-writes-Iretire-counter-17geometry-source-audits",
+  "selection": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr768-native-authority-20261123/selection768.json",
+    "bytes": 2370,
+    "sha256": "1cc0dff67b8e2e068b4ca29e3db4e5ee1b2a72bd5eda6b03266d75bdea264efe"
+  },
+  "prepared": {
+    "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/prepared01.json",
+    "bytes": 6649,
+    "sha256": "b6075705f1e3b486006d1efc4952399381e843d9d41bcdf711dabafc8a129d78"
+  },
+  "commands": [
+    {
+      "label": "make-preflight",
+      "argv": [
+        "make",
+        "-f",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example/verilator/Makefile",
+        "TOP=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source",
+        "ZP_DIR=/home/coyang/zynq-parrot-linux-research",
+        "COSIM_MK_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/mk",
+        "COSIM_INCLUDE_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/include",
+        "MAIN_PROGRAM=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/src/main.cpp",
+        "BP_RTL_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot",
+        "DESIGN_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg",
+        "BP_AXI_RESPONSE_DELAY=0",
+        "TRACE=1",
+        "EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS",
+        "VERILATOR_SUPPORT_SOURCES=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv /home/coyang/zynq-parrot-linux-capacity/research/csr-unmasked-integration-preparation-20261122/integration-contract.sv",
+        "VERILATOR_BUILD_JOBS=8",
+        "BP_CACHE_MISS_TRACE=0",
+        "ZP_IMPORT_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import",
+        "COSIM_VSRC_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/v",
+        "OBJCACHE=",
+        "VERILATOR=python3 /home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/verilator_no_pch.py --assert",
+        "-n",
+        "build"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator",
+      "timeout_s": 120,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-f",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example/verilator/Makefile",
+          "TOP=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source",
+          "ZP_DIR=/home/coyang/zynq-parrot-linux-research",
+          "COSIM_MK_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/mk",
+          "COSIM_INCLUDE_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/include",
+          "MAIN_PROGRAM=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/src/main.cpp",
+          "BP_RTL_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot",
+          "DESIGN_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example",
+          "TOOL=verilator",
+          "CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg",
+          "BP_AXI_RESPONSE_DELAY=0",
+          "TRACE=1",
+          "EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS",
+          "VERILATOR_SUPPORT_SOURCES=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv /home/coyang/zynq-parrot-linux-capacity/research/csr-unmasked-integration-preparation-20261122/integration-contract.sv",
+          "VERILATOR_BUILD_JOBS=8",
+          "BP_CACHE_MISS_TRACE=0",
+          "ZP_IMPORT_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import",
+          "COSIM_VSRC_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/v",
+          "OBJCACHE=",
+          "VERILATOR=python3 /home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/verilator_no_pch.py --assert",
+          "-n",
+          "build"
+        ],
+        "owned_pgid": 1707139,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.541671228944324
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/make-preflight.log",
+        "bytes": 51065,
+        "sha256": "c8001c150bda0b297543a1a7a7235cd8d6fedf32c92ffe9f585bfcb990c7e114"
+      },
+      "elapsed_seconds": 0.6048324210569263
+    },
+    {
+      "label": "clean",
+      "argv": [
+        "make",
+        "-f",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example/verilator/Makefile",
+        "TOP=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source",
+        "ZP_DIR=/home/coyang/zynq-parrot-linux-research",
+        "COSIM_MK_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/mk",
+        "COSIM_INCLUDE_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/include",
+        "MAIN_PROGRAM=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/src/main.cpp",
+        "BP_RTL_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot",
+        "DESIGN_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg",
+        "BP_AXI_RESPONSE_DELAY=0",
+        "TRACE=1",
+        "EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS",
+        "VERILATOR_SUPPORT_SOURCES=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv /home/coyang/zynq-parrot-linux-capacity/research/csr-unmasked-integration-preparation-20261122/integration-contract.sv",
+        "VERILATOR_BUILD_JOBS=8",
+        "BP_CACHE_MISS_TRACE=0",
+        "ZP_IMPORT_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import",
+        "COSIM_VSRC_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/v",
+        "OBJCACHE=",
+        "VERILATOR=python3 /home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/verilator_no_pch.py --assert",
+        "clean"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator",
+      "timeout_s": 120,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-f",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example/verilator/Makefile",
+          "TOP=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source",
+          "ZP_DIR=/home/coyang/zynq-parrot-linux-research",
+          "COSIM_MK_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/mk",
+          "COSIM_INCLUDE_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/include",
+          "MAIN_PROGRAM=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/src/main.cpp",
+          "BP_RTL_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot",
+          "DESIGN_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example",
+          "TOOL=verilator",
+          "CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg",
+          "BP_AXI_RESPONSE_DELAY=0",
+          "TRACE=1",
+          "EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS",
+          "VERILATOR_SUPPORT_SOURCES=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv /home/coyang/zynq-parrot-linux-capacity/research/csr-unmasked-integration-preparation-20261122/integration-contract.sv",
+          "VERILATOR_BUILD_JOBS=8",
+          "BP_CACHE_MISS_TRACE=0",
+          "ZP_IMPORT_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import",
+          "COSIM_VSRC_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/v",
+          "OBJCACHE=",
+          "VERILATOR=python3 /home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/verilator_no_pch.py --assert",
+          "clean"
+        ],
+        "owned_pgid": 1707231,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.6590934708947316
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/clean.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "elapsed_seconds": 0.7172474039252847
+    },
+    {
+      "label": "build",
+      "argv": [
+        "make",
+        "-f",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example/verilator/Makefile",
+        "TOP=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source",
+        "ZP_DIR=/home/coyang/zynq-parrot-linux-research",
+        "COSIM_MK_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/mk",
+        "COSIM_INCLUDE_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/include",
+        "MAIN_PROGRAM=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/src/main.cpp",
+        "BP_RTL_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot",
+        "DESIGN_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example",
+        "TOOL=verilator",
+        "CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg",
+        "BP_AXI_RESPONSE_DELAY=0",
+        "TRACE=1",
+        "EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS",
+        "VERILATOR_SUPPORT_SOURCES=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv /home/coyang/zynq-parrot-linux-capacity/research/csr-unmasked-integration-preparation-20261122/integration-contract.sv",
+        "VERILATOR_BUILD_JOBS=8",
+        "BP_CACHE_MISS_TRACE=0",
+        "ZP_IMPORT_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import",
+        "COSIM_VSRC_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/v",
+        "OBJCACHE=",
+        "VERILATOR=python3 /home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/verilator_no_pch.py --assert",
+        "build"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator",
+      "timeout_s": 3600,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "make",
+          "-f",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example/verilator/Makefile",
+          "TOP=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source",
+          "ZP_DIR=/home/coyang/zynq-parrot-linux-research",
+          "COSIM_MK_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/mk",
+          "COSIM_INCLUDE_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/include",
+          "MAIN_PROGRAM=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/src/main.cpp",
+          "BP_RTL_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot",
+          "DESIGN_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/black-parrot-example",
+          "TOOL=verilator",
+          "CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg",
+          "BP_AXI_RESPONSE_DELAY=0",
+          "TRACE=1",
+          "EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS",
+          "VERILATOR_SUPPORT_SOURCES=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv /home/coyang/zynq-parrot-linux-capacity/research/csr-unmasked-integration-preparation-20261122/integration-contract.sv",
+          "VERILATOR_BUILD_JOBS=8",
+          "BP_CACHE_MISS_TRACE=0",
+          "ZP_IMPORT_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import",
+          "COSIM_VSRC_DIR=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/cosim/v",
+          "OBJCACHE=",
+          "VERILATOR=python3 /home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/verilator_no_pch.py --assert",
+          "build"
+        ],
+        "owned_pgid": 1707358,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 3600,
+        "teardown_s": 5,
+        "elapsed_s": 153.62956082599703
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/build.log",
+        "bytes": 718344,
+        "sha256": "ed44e09c14cd6ecb0102d35413119e4b615865482435b2410f91a0fb4f4f84ba"
+      },
+      "elapsed_seconds": 153.68925180996303
+    },
+    {
+      "label": "loader",
+      "argv": [
+        "ldd",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01",
+      "timeout_s": 120,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "ldd",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench"
+        ],
+        "owned_pgid": 1708414,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.24031877401284873
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/loader.log",
+        "bytes": 651,
+        "sha256": "7eb53a62f03e55cc657dbad3ba4e9a7f6fa81d00726157b0bd08aaf2b55eaf5d"
+      },
+      "elapsed_seconds": 0.3140156490262598
+    },
+    {
+      "label": "integrity-run",
+      "argv": [
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+        "+c_args=prog.nbf 600000",
+        "+bsg_trace=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/integrity/trace.fst"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/integrity",
+      "timeout_s": 780,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+          "+c_args=prog.nbf 600000",
+          "+bsg_trace=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/integrity/trace.fst"
+        ],
+        "owned_pgid": 1708424,
+        "returncode": -6,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 780,
+        "teardown_s": 5,
+        "elapsed_s": 78.38119529606774
+      },
+      "returncode": -6,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/integrity-run.log",
+        "bytes": 32270,
+        "sha256": "3114cc0c5b1fe685b1188df38ed59205e8ac8b102d428d18c551c7f3ca8c21e7"
+      },
+      "elapsed_seconds": 78.46143900195602
+    },
+    {
+      "label": "integrity-checker",
+      "argv": [
+        "python3",
+        "-B",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/check_run.py",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/integrity/run.log",
+        "--exit-code",
+        "-6",
+        "--test",
+        "mt_large_retained_system_test"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01",
+      "timeout_s": 120,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "python3",
+          "-B",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/check_run.py",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/integrity/run.log",
+          "--exit-code",
+          "-6",
+          "--test",
+          "mt_large_retained_system_test"
+        ],
+        "owned_pgid": 1708475,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.2531117770122364
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/integrity-checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      },
+      "elapsed_seconds": 0.340770639013499
+    },
+    {
+      "label": "advisory-run",
+      "argv": [
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+        "+c_args=prog.nbf 180000",
+        "+bsg_trace=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/trace.fst"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory",
+      "timeout_s": 240,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+          "+c_args=prog.nbf 180000",
+          "+bsg_trace=/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/trace.fst"
+        ],
+        "owned_pgid": 1708476,
+        "returncode": -6,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 240,
+        "teardown_s": 5,
+        "elapsed_s": 56.90397211199161
+      },
+      "returncode": -6,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory-run.log",
+        "bytes": 32243,
+        "sha256": "c5a79288f83f6536d20332c5755973ea093d1cd3bfe9080ba203a3adfa1fc28d"
+      },
+      "elapsed_seconds": 56.977482158108614
+    },
+    {
+      "label": "advisory-checker",
+      "argv": [
+        "python3",
+        "-B",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/check_run.py",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/run.log",
+        "--exit-code",
+        "-6"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01",
+      "timeout_s": 120,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "python3",
+          "-B",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/check_run.py",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/run.log",
+          "--exit-code",
+          "-6"
+        ],
+        "owned_pgid": 1708501,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 120,
+        "teardown_s": 5,
+        "elapsed_s": 0.24290516204200685
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory-checker.log",
+        "bytes": 31,
+        "sha256": "9977c327e50c24cd60716c5a36008c8c07b7673d13b7197aa5a5686414684a9a"
+      },
+      "elapsed_seconds": 0.3184300030115992
+    },
+    {
+      "label": "strict",
+      "argv": [
+        "python3",
+        "-B",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/rtl/retained-advisory-trace/validate.py",
+        "--fst",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/trace.fst",
+        "--reader",
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "--model-source-list",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/actual-source-list.json",
+        "--fixture-manifest",
+        "/home/coyang/zynq-parrot-linux-fit1280/research/retained-control-abi-20261121/advisory-fixture-cold08/manifest.json",
+        "--log",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/run.log",
+        "--exit-code",
+        "-6",
+        "--reader-timeout",
+        "600",
+        "--out",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/strict01"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01",
+      "timeout_s": 660,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "python3",
+          "-B",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/rtl/retained-advisory-trace/validate.py",
+          "--fst",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/trace.fst",
+          "--reader",
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "--model-source-list",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/actual-source-list.json",
+          "--fixture-manifest",
+          "/home/coyang/zynq-parrot-linux-fit1280/research/retained-control-abi-20261121/advisory-fixture-cold08/manifest.json",
+          "--log",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/run.log",
+          "--exit-code",
+          "-6",
+          "--reader-timeout",
+          "600",
+          "--out",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/strict01"
+        ],
+        "owned_pgid": 1708502,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 660,
+        "teardown_s": 5,
+        "elapsed_s": 28.969941081944853
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/strict.log",
+        "bytes": 105,
+        "sha256": "afcb8b0cbdf7fc2c26e587c048331373ec9f08324ec4c93beecf0c77b104ee0c"
+      },
+      "elapsed_seconds": 29.045980788068846
+    },
+    {
+      "label": "counter",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-retained-dense/research/retained-use-observation-20261121/verify_counters.py",
+        "--fst",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/trace.fst",
+        "--reader",
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "--strict-proof",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/strict01/verification.json",
+        "--run-proof",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/verification.json",
+        "--out",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/counter01"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01",
+      "timeout_s": 240,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "python3",
+          "-B",
+          "/home/coyang/zynq-parrot-retained-dense/research/retained-use-observation-20261121/verify_counters.py",
+          "--fst",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/trace.fst",
+          "--reader",
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "--strict-proof",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/strict01/verification.json",
+          "--run-proof",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/verification.json",
+          "--out",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/counter01"
+        ],
+        "owned_pgid": 1708521,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 240,
+        "teardown_s": 5,
+        "elapsed_s": 9.927365727024153
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/counter.log",
+        "bytes": 90,
+        "sha256": "722ba26cc3300d0a52a6736cdca44014583f480dd93211e168b7b30a727d4f37"
+      },
+      "elapsed_seconds": 10.001402147929184
+    },
+    {
+      "label": "parameters",
+      "argv": [
+        "python3",
+        "-B",
+        "/home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/geometry.py",
+        "--fst",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/trace.fst",
+        "--reader",
+        "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+        "--lines",
+        "768",
+        "--out",
+        "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/parameters01"
+      ],
+      "cwd": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01",
+      "timeout_s": 660,
+      "ownership": {
+        "group_states": [
+          {
+            "phase": "normal_parent_exit_before_reap",
+            "members": []
+          },
+          {
+            "phase": "normal_parent_exit_after_reap",
+            "members": []
+          },
+          {
+            "phase": "cleanup_complete",
+            "members": []
+          }
+        ],
+        "reaped_owned_children": [],
+        "argv": [
+          "python3",
+          "-B",
+          "/home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/geometry.py",
+          "--fst",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/advisory/trace.fst",
+          "--reader",
+          "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+          "--lines",
+          "768",
+          "--out",
+          "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/parameters01"
+        ],
+        "owned_pgid": 1708527,
+        "returncode": 0,
+        "failure": null,
+        "owned_group_remaining": false,
+        "timeout_s": 660,
+        "teardown_s": 5,
+        "elapsed_s": 0.5686898329295218
+      },
+      "returncode": 0,
+      "log": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/parameters.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "elapsed_seconds": 0.6453829910606146
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/prepare_programs02.py",
+      "bytes": 8119,
+      "sha256": "173e709d5886a5e5ee6925724f6745cc740de1edb114867a475382b3f01b71ff"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/geometry.py",
+      "bytes": 301,
+      "sha256": "dd845079c02c8eced33683891f55a89458c5e12e7e02467a143b11953eb2e524"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/verilator_no_pch.py",
+      "bytes": 1243,
+      "sha256": "7f3c86c49d8e8f5416ea3fb56f314eb2c3e913899d2b6e7456ed9882beae303e"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/run_full.py",
+      "bytes": 23603,
+      "sha256": "5b841db8dd12240e3d1b97157c07f96e17e8c7f536761de4491ec6aaa7803e8c"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/materialize.py",
+      "bytes": 8646,
+      "sha256": "a4e4a22453972268f072f28411851843e7889cf134c97fbfa5d969603142509b"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/dryrun.py",
+      "bytes": 3991,
+      "sha256": "064537ddf021120015d7a5cab039f7a72afe28b5775cc38c92b61302abcec863"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/budget.py",
+      "bytes": 3824,
+      "sha256": "e5ab0c37ecfae0ce233bda70181eb95b99b58fa595cf003ea2c1f145f2058241"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr768-native-preparation-20261123/no-pch.mk",
+      "bytes": 231,
+      "sha256": "cb2dfcff230d1a5b2088664bc44155505f992b1d625ab0dc2cb0448f39e17461"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/research/csr-unmasked-integration-preparation-20261122/integration-contract.sv",
+      "bytes": 5738,
+      "sha256": "1754071b0512ab5974219a7c9c7d0d834e20ec008405388b16efeeed3f17b3ec"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-dense/research/retained-use-observation-20261121/verify_counters.py",
+      "bytes": 7132,
+      "sha256": "291b97fc35df8f4b4b5d64531b024ac341e280095dc87e121036b64a9c785aa0"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-dense/research/retained-use-observation-20261121/build_full.py",
+      "bytes": 4556,
+      "sha256": "7e8873dad73ce7ff931b8dea9f803dafa1e01121051d580f13c322d8bc4eafb0"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-retained-dense/research/retained-maintenance-acyclic-20261121/bind_geometry.py",
+      "bytes": 5357,
+      "sha256": "6dd735aa8e91d2e736c19edab86043dbe220ccf5db30b41244de409cb816482b"
+    },
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/rtl/retained-advisory-trace/validate.py",
+      "bytes": 25559,
+      "sha256": "53eaca9a63bb31efa5571b6eb12279e1779339d4d3821f50488e7846f19d5d21"
+    },
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/testing/check_run.py",
+      "bytes": 9559,
+      "sha256": "cefcaf956f638e2c7534c6743fc7ba4d3fad184e6556610b22393500fb971985"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-fit1280/research/retained-control-abi-20261121/advisory-fixture-cold08/manifest.json",
+      "bytes": 3710,
+      "sha256": "977bfe0c4502d36fb367137e96c56e6db50c024ad634a63ee06ef3cb94ee3e0d"
+    }
+  ],
+  "source_tree_baseline": "1b24c915ed628f6d47a382b3aa89fb662884e1a1",
+  "source_bp": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+  "source_repositories": [
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source",
+      "head": "1b24c915ed628f6d47a382b3aa89fb662884e1a1",
+      "private_git_dir": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/.git",
+      "optional_alternates": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/.git/objects/info/alternates",
+        "bytes": 38,
+        "sha256": "e091f5e54c799c39b22f2ea8ca201502b5ccaa6a2f323d0d7b798f9673343769"
+      }
+    },
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/basejump_stl",
+      "head": "6cd7d830b732079ab7316c6288e2e819e3fab474",
+      "private_git_dir": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/basejump_stl/.git",
+      "optional_alternates": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/basejump_stl/.git/objects/info/alternates",
+        "bytes": 96,
+        "sha256": "c8884fa06ce635d5c1cf581a15957e920e3d37d353601f02a2aec9a712067bf2"
+      }
+    },
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot",
+      "head": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+      "private_git_dir": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/.git",
+      "optional_alternates": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/.git/objects/info/alternates",
+        "bytes": 96,
+        "sha256": "e62f9a7a2fcae73e8f5e0da35855b5a071bf8682ea4ee946d3a6426d8d18829f"
+      }
+    },
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/external/basejump_stl",
+      "head": "3dff9f43af8e1bb850da0b41696514396fa0fa7e",
+      "private_git_dir": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/external/basejump_stl/.git",
+      "optional_alternates": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/external/basejump_stl/.git/objects/info/alternates",
+        "bytes": 118,
+        "sha256": "296e8c5ac88d77b46ac4d4206d54cae78035ccac72cd54f29b41b27083ae869c"
+      }
+    },
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/external/HardFloat",
+      "head": "5b7d5fe2df7e297b5ba095b3eb8a9517dc2e9d88",
+      "private_git_dir": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/external/HardFloat/.git",
+      "optional_alternates": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/external/HardFloat/.git/objects/info/alternates",
+        "bytes": 115,
+        "sha256": "3a170ab591d9acd2f06d3cbd0cded988c39b8473ccac55a7510386d61c13b32d"
+      }
+    },
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/external/bedrock",
+      "head": "ed68e749079df57afa4b2e153184bf9301137bf2",
+      "private_git_dir": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/external/bedrock/.git",
+      "optional_alternates": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot/external/bedrock/.git/objects/info/alternates",
+        "bytes": 113,
+        "sha256": "cb6c64d0201cbd47f45db7e14edfd099ff30b418985da8f57a4fcd2c895e1e7c"
+      }
+    },
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot-subsystems",
+      "head": "f6ce99ea7ebdcb97a46f73c296505071e9fb22ab",
+      "private_git_dir": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot-subsystems/.git",
+      "optional_alternates": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot-subsystems/.git/objects/info/alternates",
+        "bytes": 107,
+        "sha256": "f4e6639cebb7c42b9dc97c2c5dbd049440d9c78fc4e9f8bbe886348dd4246608"
+      }
+    },
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot-subsystems/import/riscv-dbg",
+      "head": "618ee6e0e2610ef47e0dcc4df6748af3dffff731",
+      "private_git_dir": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/black-parrot-subsystems/import/riscv-dbg/.git",
+      "optional_alternates": null
+    },
+    {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/bsg_replicant",
+      "head": "83e2441b3bab646a69159fa9dee80de2af9b24ae",
+      "private_git_dir": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/bsg_replicant/.git",
+      "optional_alternates": {
+        "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source/import/bsg_replicant/.git/objects/info/alternates",
+        "bytes": 97,
+        "sha256": "c4e002e9e1e61c1fe16e304fc91d09a55facd584fff6aa83b490a98a02000070"
+      }
+    }
+  ],
+  "source_preparation": {
+    "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source-preparation.json",
+    "bytes": 35509,
+    "sha256": "c6696297ee557dc2beaebebac77b34fa6ca82602f154bf2ae3e52e78966dcd65"
+  },
+  "software_proof": {
+    "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/program01/program-proof.json",
+    "bytes": 26075,
+    "sha256": "583a3c2fec4e6728666ef45aabc4fabd1e2b516fe2029682d4333679810216c0"
+  },
+  "geometry": {
+    "i_lines": 768,
+    "d_lines": 768,
+    "sets": 256,
+    "epoch": 8,
+    "line_bytes": 64,
+    "observe": 1,
+    "cache_miss_trace": 0,
+    "delay": 0,
+    "resident": 2,
+    "logical": 4,
+    "l2_bytes": 16384,
+    "aclk_mhz": 20
+  },
+  "environment": {
+    "LD_LIBRARY_PATH": "/home/coyang/zynq-parrot-linux-research/install/lib",
+    "CCACHE_DISABLE": "1",
+    "SCCACHE_DISABLE": "1",
+    "OBJCACHE": "",
+    "TMPDIR": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/tmp"
+  },
+  "model": {
+    "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench",
+    "bytes": 15839528,
+    "sha256": "8762ddb27740970892245ca7c067fcfff4c89da8dbbce392f2407979dbc5f964",
+    "inode": 122594,
+    "mtime_ns": 1795408467829085009,
+    "ctime_ns": 1795408467829085009
+  },
+  "model_stamp": {
+    "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/verilator/obj_dir/.build_config-nt-nc-cfge_bp_unicore_zynqparrot_prefetch16k_cfg-trace1-BP_AXI_RESPONSE_DELAY_0-BP_RETAINED_BUFFER_1-BP_RETAINED_I_LINES_768-BP_RETAINED_D_LINES_768-BP_RETAINED_SETS_256-BP_RETAINED_OBSERVE_1-miss-trace0-assert-bsgsimhidden-support",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "actual_source_list": {
+    "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/actual-source-list.json",
+    "bytes": 195087,
+    "sha256": "4a89b6d3eaeecca5594fc9165e2d12db32e4620df826fef33b47e6d4b2906e55"
+  },
+  "input_directory_policy": "Directory inode/device/mode/membership checked; directory mtime/ctime intentionally excluded because pinned FST reader creates/unlinks .hier; every regular file byte/ID/mode/mtime/ctime remains exact",
+  "protected_native_inputs": {
+    "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/protected-native-inputs.json",
+    "bytes": 509489,
+    "sha256": "cc4d2031f89b812125b5599ca9c654ba23a59f87cf5200fd7f3bcb8505db6d1a"
+  },
+  "closed_audits": {
+    "strict": {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/strict01/verification.json",
+      "bytes": 11951,
+      "sha256": "699e9520db6d31a9b9c1af82f88a265cc710c0204e78a78359c8196c59129e4e"
+    },
+    "counter": {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/counter01/verification.json",
+      "bytes": 5885,
+      "sha256": "a472c7bad37a5e53438b09586e1ccfae36d5c36da856d1fba4c2550e4d32e139"
+    },
+    "parameters": {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/parameters01/verification.json",
+      "bytes": 2075,
+      "sha256": "8c121d96bf06b5a3f990333c7fd913f64530801c4ede2e91bd5c987c3315e28a"
+    },
+    "generated_l2": {
+      "path": "/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/full01/generated-geometry.json",
+      "bytes": 3969,
+      "sha256": "08a39c3f53c74fc859df2761a2c0dae2ef71f5d83ee207b30aeb3018f226cc0d"
+    }
+  },
+  "scope": "Synthetic correctness only; no area/fit/FPGA/application or all-slot claim; preserve all original generated objects/PCH for qualified clone.",
+  "source_endcheck": "PASS",
+  "released_reservations_endcheck": {
+    "obsolete_profile": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow256-trace0-fullcore-20261122/obsolete-profile-closed01/reservation-complete.json",
+      "bytes": 1011,
+      "sha256": "65fd0aeebfbaa12f821f852319f4c22b3c3c5b5313685ce0cde419a1c34aaec3"
+    }
+  },
+  "closed_archive_endcheck": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-borrow256-trace0-fullcore-20261122/obsolete-profile-closed01/reservation-complete.json",
+    "bytes": 1011,
+    "sha256": "65fd0aeebfbaa12f821f852319f4c22b3c3c5b5313685ce0cde419a1c34aaec3"
+  }
+}
