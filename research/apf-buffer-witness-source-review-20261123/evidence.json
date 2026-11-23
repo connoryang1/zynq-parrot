@@ -1,0 +1,92 @@
+{
+  "scope": "SOURCE/RETAINED_REPORTS_ONLY; no runtime or remote probe executed",
+  "primary_manifest": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf-source-manifest.json",
+    "bytes": 4877,
+    "sha256": "3907e11fc7bf5c0ddb038d63ff01da5fc70b2c562202df34961799f112b6a52d"
+  },
+  "primary_driver": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/xlnk.c",
+    "bytes": 35985,
+    "sha256": "1297415955e17c2d325f244aed90a543ee38fb635689f73dd6fb917dc8086ffb"
+  },
+  "primary_ABI": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/xlnk-sysdef.h",
+    "bytes": 697,
+    "sha256": "d991c24be132ba288342cb766d420693092294ab705418593f0a8a2dc61290d8"
+  },
+  "primary_ioctl": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/xlnk-ioctl.h",
+    "bytes": 1603,
+    "sha256": "a1749035bcaff52a1d37194fafeedb74ad5d42f33782818bd87bfbfa38c71e49"
+  },
+  "source_only_binary_equivalence": false,
+  "retained_disassembly": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver03-20261123/disassembly/0.log",
+      "bytes": 3158,
+      "sha256": "596cff8e16cb54fc67066a601c1da6d4d28a10cf9c6163baf601e9c4aecbc50d"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver03-20261123/disassembly/1.log",
+      "bytes": 13837,
+      "sha256": "42bd6c8554170e9a1954577d18b1c70e2ef5b6f3c73bd05882ade8b516f7f415"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver04-20261123/extracted/1.log",
+      "bytes": 27063,
+      "sha256": "cfe07162c877f6f9294aefa4091b0bdbf58c04e103662b26ab96d469ad05a1cb"
+    }
+  ],
+  "configured_kernel_apf": true,
+  "configured_KALLSYMS_ALL": false,
+  "configured_CMA_DEBUGFS": false,
+  "actual_default_allocation_request": {
+    "bytes": 48234496,
+    "cacheable": 0,
+    "code_address": "old2dd3430",
+    "native_allocation_or_lifetime_observed_by_this_review": false
+  },
+  "minimal_required_tuple": [
+    "kernel slot",
+    "nonzero kernel allocation pointer",
+    "xlnk_buflen",
+    "xlnk_phyaddr DMA anchor",
+    "cacheable",
+    "process PID",
+    "user mapping VA",
+    "exact user VMA extent",
+    "libcma table slot/kernelID/VA/len/DMA/flags",
+    "identity and no-free/reset lifetime interval"
+  ],
+  "no_public_buffer_query_in_primary_source": true,
+  "library_table_ELF_virtual_candidates_NOT_runtime_addresses": {
+    "source": "Exact retained libcma ARM disassembly; ARM PC=instruction address+8; ELF PT_LOAD/bss and runtime load-bias validation STILL REQUIRED before any memory read",
+    "element_candidate_bytes": 4,
+    "lookup_scan_slots": 8192,
+    "allocation_scan_slots": 4096,
+    "virtual_table": {
+      "ELF_VA": "0x000fcfe0",
+      "derivation": "0x51a8+0x000f7e38 from add at51a0"
+    },
+    "length_table": {
+      "ELF_VA": "0x000f4fe0",
+      "derivation": "0x51ac+0x000efe34 from add at51a4"
+    },
+    "DMA_anchor_table": {
+      "ELF_VA": "0x000ecfe0",
+      "derivation": "0x51e4+0x000e7dfc from add at51dc"
+    },
+    "kernel_ID_table": {
+      "ELF_VA": "0x00024fdc",
+      "derivation": "0x5070+0x0001ff6c from add at5068"
+    },
+    "flags_table": {
+      "ELF_VA": "0x0001cfdc",
+      "derivation": "0x503c+0x00017fa0 from add at5034; cacheable input ->2, noncacheable ->0 in this default branch"
+    },
+    "read_authority": false,
+    "actual_table_contents": null,
+    "actual_PID_load_bias": null
+  }
+}
