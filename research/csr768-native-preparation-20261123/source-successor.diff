@@ -1,0 +1,206 @@
+--- old/budget.py
++++ new/budget.py
+@@ -1,9 +1,9 @@
+-"""New1280 prospective budget only; never imports/changes frozen256 accounting."""
++"""New768 prospective budget only; never imports/changes frozen256 accounting."""
+ from pathlib import Path
+ import hashlib,json,shutil
+ HERE=Path(__file__).resolve().parent
+-BASE=Path('/run/user/1001/zp-csr-unmasked1280-fullcore-20261122-01')
+-DURABLE=Path('/home/coyang/fpga-artifacts/context-resume/csr-unmasked1280-fullcore-20261122')
++BASE=Path('/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01')
++DURABLE=Path('/home/coyang/fpga-artifacts/context-resume/csr-unmasked768-fullcore-20261123')
+ OWN_CAP=1024**3;DURABLE_CAP=32*1024**2;HELPER_CAP=128*1024
+ A=None
+ def require(v,m):
+@@ -18,18 +18,18 @@
+  global A
+  row=bind(path);require(row['sha256']==sha,'exact ROOT prospective admission');a=json.loads(Path(path).read_text());require(a['ROOT_approved'] is True,'DRAFT nonlaunchable')
+  for r in a['inputs']:require(bind(r['path'])==r,'bound source/helper drift')
+- qrow=a['ROOT_resource_profile'];require(bind(qrow['path'])==qrow,'fresh ROOT profile');q=json.loads(Path(qrow['path']).read_text());require(q['schema']=='csr1280-native-resource-profile-v1' and q['ROOT_approved'] is True and q['all_other_charged_reserves_included'] is True,'all oldOTHER/currentCAD/native charges explicitly ROOT priced')
++ qrow=a['ROOT_resource_profile'];require(bind(qrow['path'])==qrow,'fresh ROOT profile');q=json.loads(Path(qrow['path']).read_text());require(q['schema']=='csr768-native-resource-profile-v1' and q['ROOT_approved'] is True and q['all_other_charged_reserves_included'] is True,'all oldOTHER/currentCAD/native charges explicitly ROOT priced')
+  require(q['caps']==dict(RUN=OWN_CAP,base_HOME=DURABLE_CAP,helper_HOME=HELPER_CAP,program_inside_RUN=8*1024**2),'exact fresh1GiB/32MiB/128KiB scope')
+- require(q['TOP']=='88ab04dfcc508176cc977096ca0c132299a8a460' and q['BP']=='1e7aa2fdc94a56373a26f95b145aff361d4d0aaa','fresh1280 resource/source scope')
++ require(q['TOP']=='1b24c915ed628f6d47a382b3aa89fb662884e1a1' and q['BP']=='1e7aa2fdc94a56373a26f95b145aff361d4d0aaa','fresh768 resource/source scope')
+  require(q['RUN_floor_bytes']>=1024**3 and q['HOME_floor_bytes']>=1792*1024**2 and q['SHM_floor_bytes']>=512*1024**2 and q['required_MemAvailable_bytes']>=8*1024**3,'preserve established floors/8worker physical headroom')
+  require(all(type(q[k]) is int and q[k]>=0 for k in ('other_RUN_bytes','other_HOME_bytes','other_SHM_bytes')),'explicit ALL_OTHER prospective charges')
+  for basis_row in q['basis_records']:require(bind(basis_row['path'])==basis_row,'actual ROOT resource basis/terminal/native freeze')
+- decision=a['ROOT_capacity_selection'];require(bind(decision['path'])==decision,'actual ROOT capacity decision');d=json.loads(Path(decision['path']).read_text());require(d['ROOT_verified'] is True and d['proceed_1280_native_validation'] is True and d['TOP']==q['TOP'] and d['BP']==q['BP'],'ROOT selected fixed1280 validation, no automatic execution from old fit')
++ decision=a['ROOT_capacity_selection'];require(bind(decision['path'])==decision,'actual ROOT capacity decision');d=json.loads(Path(decision['path']).read_text());require(d['ROOT_verified'] is True and d['proceed_768_native_validation'] is True and d['TOP']==q['TOP'] and d['BP']==q['BP'],'ROOT selected fixed768 validation, no automatic execution from old fit')
+  A=(Path(path),row,a,q);return a
+ def check():
+  require(A is not None,'no ROOT authority configured');p,row,a,q=A;require(bind(p)==row and bind(a['ROOT_resource_profile']['path'])==a['ROOT_resource_profile'],'immutable ROOT authority/profile')
+  run,home,helper=size(BASE),size(DURABLE),size(HERE);require(run<=OWN_CAP and home<=DURABLE_CAP and helper<=HELPER_CAP,'entire source/run/proof/helper caps')
+- require(size(DURABLE)<=32*1024**2,'base-only32MiB; future all1280 delta64MiB UNADMITTED separately')
++ require(size(DURABLE)<=32*1024**2,'base-only32MiB; future all768 delta64MiB UNADMITTED separately')
+  require(shutil.disk_usage(BASE.parent).free>=q['RUN_floor_bytes']+OWN_CAP-run+q['other_RUN_bytes'],'new source/run1GiB remaining +ALL old/native/CAD future')
+  require(shutil.disk_usage(HERE).free>=q['HOME_floor_bytes']+DURABLE_CAP-home+q['other_HOME_bytes'],'new32MiB base proof remaining +ALL old/native/CAD/logging charges; helper inside logging envelope')
+  require(shutil.disk_usage('/dev/shm').free>=q['SHM_floor_bytes']+q['other_SHM_bytes'],'other SOURCE/SHM reservations')
+--- old/dryrun.py
++++ new/dryrun.py
+@@ -60,4 +60,4 @@
+     return source.bind(out/'verification.json')
+ 
+ if __name__=='__main__':
+-    raise SystemExit('Use run_full.py --prepare-only with the fresh1280 ROOT selection/admission; this module does not provide an alternate launch path.')
++    raise SystemExit('Use run_full.py --prepare-only with the fresh768 ROOT selection/admission; this module does not provide an alternate launch path.')
+--- old/materialize.py
++++ new/materialize.py
+@@ -5,11 +5,13 @@
+ sys.dont_write_bytecode=True
+ import budget
+ HERE=Path(__file__).resolve().parent;SOURCE=budget.BASE/'source';PREVIOUS=Path('/home/coyang/fpga-artifacts/context-resume/csr-unmasked256-fullcore-preparation-20261122/preparation02')
+-TOP='88ab04dfcc508176cc977096ca0c132299a8a460'
++TOP='1b24c915ed628f6d47a382b3aa89fb662884e1a1'
++PARENT1280='88ab04dfcc508176cc977096ca0c132299a8a460'
+ PARENT1536='a8fbd5fa6911160ab0845d75c6096549806af7b7'
++REFERENCE_SOURCE=Path('/run/user/1001/zp-csr-unmasked1280-fullcore-20261122-01/source')
+ FLOW_BASE='59ee4cb119c8eacc364a0e88a949a1b3df70a4bf'
+ BASE256='a44c03bb7bc520a3b5727c2bb619a055a7ed5acd';BP='1e7aa2fdc94a56373a26f95b145aff361d4d0aaa'
+-TOP_SEED=Path('/home/coyang/zynq-parrot-csr-opt-area1280-20261122')
++TOP_SEED=Path('/home/coyang/zynq-parrot-csr-opt-area768-20261123')
+ GHOST=Path('/home/coyang/zynq-parrot-linux-capacity/research/csr-unmasked-integration-preparation-20261122/integration-contract.sv')
+ FLOOR=2*1024**3;require=budget.require;bind=budget.bind;size=budget.size
+ sys.path.insert(0,str(PREVIOUS));import software_owned_v2 as owned
+@@ -24,15 +26,17 @@
+  p=json.loads((PREVIOUS/'source-plan.json').read_text())
+  flow_names=git(TOP_SEED,'diff','--name-only',BASE256,FLOW_BASE).decode().splitlines()
+  require(flow_names==['cosim/mk/Makefile.vivado','cosim/tcl/vivado-utils.tcl'],'exact two opt-only selector files')
+- require(git(TOP_SEED,'rev-parse',TOP+'^').decode().strip()==PARENT1536 and git(TOP_SEED,'rev-parse',PARENT1536+'^').decode().strip()==FLOW_BASE and git(TOP_SEED,'rev-parse',FLOW_BASE+'^').decode().strip()==BASE256,'exact source parent chain')
++ require(git(TOP_SEED,'rev-parse',TOP+'^').decode().strip()==PARENT1280 and git(TOP_SEED,'rev-parse',PARENT1280+'^').decode().strip()==PARENT1536 and git(TOP_SEED,'rev-parse',PARENT1536+'^').decode().strip()==FLOW_BASE and git(TOP_SEED,'rev-parse',FLOW_BASE+'^').decode().strip()==BASE256,'exact source parent chain')
+  names=git(TOP_SEED,'diff','--name-only',FLOW_BASE,TOP).decode().splitlines()
+  require(names==['cosim/black-parrot-example/Makefile.design'],'ONLY two capacity default lines after opt selector')
+- before=git(TOP_SEED,'show',FLOW_BASE+':'+names[0]);after=git(TOP_SEED,'show',TOP+':'+names[0]);require(after==before.replace(b'BP_RETAINED_I_LINES ?= 256',b'BP_RETAINED_I_LINES ?= 1280').replace(b'BP_RETAINED_D_LINES ?= 256',b'BP_RETAINED_D_LINES ?= 1280'),'exact two1280 substitutions')
+- require(git(TOP_SEED,'diff','--name-only',PARENT1536,TOP).decode().splitlines()==names,'1280 child changes only two capacity defaults')
+- parent=git(TOP_SEED,'show',PARENT1536+':'+names[0]);require(after==parent.replace(b'BP_RETAINED_I_LINES ?= 1536',b'BP_RETAINED_I_LINES ?= 1280').replace(b'BP_RETAINED_D_LINES ?= 1536',b'BP_RETAINED_D_LINES ?= 1280'),'exact1536-to1280 child bytes')
+- for ref in (BASE256,FLOW_BASE,PARENT1536,TOP):require(git(TOP_SEED,'ls-tree',ref,'--','import/black-parrot').decode().split()[:3]==['160000','commit',BP],'unchanged exact BP1e7 gitlink')
++ before=git(TOP_SEED,'show',FLOW_BASE+':'+names[0]);after=git(TOP_SEED,'show',TOP+':'+names[0]);require(after==before.replace(b'BP_RETAINED_I_LINES ?= 256',b'BP_RETAINED_I_LINES ?= 768').replace(b'BP_RETAINED_D_LINES ?= 256',b'BP_RETAINED_D_LINES ?= 768'),'exact two768 substitutions')
++ require(git(TOP_SEED,'diff','--name-only',PARENT1280,TOP).decode().splitlines()==names,'768 child changes only two capacity defaults')
++ parent=git(TOP_SEED,'show',PARENT1280+':'+names[0]);require(after==parent.replace(b'BP_RETAINED_I_LINES ?= 1280',b'BP_RETAINED_I_LINES ?= 768').replace(b'BP_RETAINED_D_LINES ?= 1280',b'BP_RETAINED_D_LINES ?= 768'),'exact1280-to768 child bytes')
++ for ref in (BASE256,FLOW_BASE,PARENT1536,PARENT1280,TOP):require(git(TOP_SEED,'ls-tree',ref,'--','import/black-parrot').decode().split()[:3]==['160000','commit',BP],'unchanged exact BP1e7 gitlink')
+  require(git(TOP_SEED,'diff','--name-only',BASE256,TOP).decode().splitlines()==sorted(names+flow_names),'no HDL/source/fileset changes beyond exact three files')
+  p.update(source=str(SOURCE),TOP=TOP,BP=BP)
++ for previous in p['repositories']:
++  if previous['relative']:previous['reference']=str(REFERENCE_SOURCE/previous['relative'])
+  r=p['repositories'][0];r.update(reference=str(TOP_SEED),commit=TOP)
+  for path in names+flow_names:
+   line=git(TOP_SEED,'ls-tree','-l',TOP,'--',path).decode().split();r['files'][path]=dict(mode=line[0],blob=line[2],bytes=int(line[3]))
+@@ -47,8 +51,8 @@
+  require(bind(GHOST)['sha256']=='1754071b0512ab5974219a7c9c7d0d834e20ec008405388b16efeeed3f17b3ec','same executed simulation-only contract')
+  return r
+ def main():
+- a=argparse.ArgumentParser(description=__doc__);a.add_argument('--admission',type=Path,required=True);a.add_argument('--admission-sha256',required=True);a.add_argument('--prepare-source',action='store_true',required=True);x=a.parse_args();authority=budget.configure(x.admission,x.admission_sha256);require('source-materialization' in authority['actions'],'ROOT source action');budget.check();p=plan();require(not budget.BASE.exists(),'fresh new1280 source; no256 mutation')
+- require(Path('/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/full01/session.json').is_file(),'ROOT host namespace')
++ a=argparse.ArgumentParser(description=__doc__);a.add_argument('--admission',type=Path,required=True);a.add_argument('--admission-sha256',required=True);a.add_argument('--prepare-source',action='store_true',required=True);x=a.parse_args();authority=budget.configure(x.admission,x.admission_sha256);require('source-materialization' in authority['actions'],'ROOT source action');budget.check();p=plan();require(not budget.BASE.exists(),'fresh new768 source; no256 mutation')
++ require(Path('/run/user/1001/zp-csr-unmasked1280-fullcore-20261122-01/full01/session.json').is_file(),'ROOT host namespace')
+  # Validate parent Gitlink objects before any child clone.
+  for r in p['repositories']:
+   git(Path(r['reference']),'cat-file','-e',r['commit'])
+@@ -74,7 +78,7 @@
+    (admin/'info').mkdir(exist_ok=True);(admin/'info/sparse-checkout').write_text('\n'.join('/'+n for n in list(r['files'])+r['children'])+'\n')
+    run(['git','-c','core.sparseCheckout=true','-c','core.sparseCheckoutCone=false','read-tree','-mu','HEAD'],root,own)
+    require(bind(common/'config')==unchanged,'source common config untouched');alts=admin/'objects/info/alternates';rec['repositories'].append(dict(path=str(root),head=r['commit'],private_git_dir=str(admin),optional_alternates=bind(alts) if alts.is_file() else None))
+-  rec.update(state='PASS private exact1280 source+opt-only selector, no compiler/model/reader',external_inputs=[bind(GHOST)]);save();verify();budget.check()
++  rec.update(state='PASS private exact768 source+opt-only selector, no compiler/model/reader',external_inputs=[bind(GHOST)]);save();verify();budget.check()
+  except BaseException as e:rec.update(state='FAIL source preparation preserved',error=repr(e));save();raise
+  print(budget.BASE/'source-preparation.json')
+ if __name__=='__main__':main()
+--- old/prepare_programs02.py
++++ new/prepare_programs02.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Fresh1280 integrity software only; immutable cold08 reuse, no model execution."""
++"""Fresh768 integrity software only; immutable cold08 reuse, no model execution."""
+ import argparse
+ import gzip
+ import hashlib
+@@ -43,7 +43,7 @@
+  assert before[0]['sha256']=='8d7d447d2d8d500361b89a4a7ddd356f0dba01dff017129418cf3571bf9dd03c','unchanged accepted integrity C'
+  assert before[1]['sha256']=='e76712c343a5bb2486caeda82d27e22726864339db9deabd447035cae29c16ef','same maintained compile rule'
+  for p in inputs:shutil.copyfile(p,out/'source'/p.name)
+- record=dict(state='running',sources=before,commands=[],topology=dict(resident=2,logical=4),expected=dict(i_lines=1280,d_lines=1280,sets=256),scope='Software preparation only; no target/model execution.')
++ record=dict(state='running',sources=before,commands=[],topology=dict(resident=2,logical=4),expected=dict(i_lines=768,d_lines=768,sets=256),scope='Software preparation only; no target/model execution.')
+  def run(label,argv,timeout=60):
+   row=dict(label=label,argv=list(map(str,argv)));record['commands'].append(row)
+   with (out/(label+'.log')).open('wb') as f:
+@@ -53,10 +53,10 @@
+  try:
+   cc=INSTALL/'bin/riscv64-unknown-elf-gcc';objcopy=INSTALL/'bin/riscv64-unknown-elf-objcopy';objdump=INSTALL/'bin/riscv64-unknown-elf-objdump';readelf=INSTALL/'bin/riscv64-unknown-elf-readelf'
+   elf=out/'bp-tests/mt_large_retained_system_test.riscv'
+-  opts=['TOP='+str(ROOT),'ZP_INSTALL_DIR='+str(INSTALL),'ZP_RISCV_DIR='+str(out),'NUM_THREADS=2','NUM_CONTEXTS=4','BP_RETAINED_I_LINES=1280','BP_RETAINED_D_LINES=1280','BP_RETAINED_SETS=256']
++  opts=['TOP='+str(ROOT),'ZP_INSTALL_DIR='+str(INSTALL),'ZP_RISCV_DIR='+str(out),'NUM_THREADS=2','NUM_CONTEXTS=4','BP_RETAINED_I_LINES=768','BP_RETAINED_D_LINES=768','BP_RETAINED_SETS=256']
+   make=['make','-f',str(ROOT/'testing/Makefile'),str(elf)]+opts
+   run('compile-dry',make[:1]+['-n']+make[1:])
+-  flags=['-O2','-I'+str(ROOT/'software/include'),'-I'+str(INSTALL/'riscv64-unknown-elf/include'),'--specs='+str(INSTALL/'riscv64-unknown-elf/lib/dramfs.specs'),'--specs='+str(INSTALL/'riscv64-unknown-elf/lib/perch.specs'),'-DNUM_THREADS=2','-DBP_NUM_THREADS=2','-DBP_NUM_CONTEXTS=4','-DBENCH_DIAGNOSTIC=0','-DBENCH_BARRIER=0','-I'+str(ROOT/'testing'),'-DBP_EXPECT_I_LINES=1280','-DBP_EXPECT_D_LINES=1280','-DBP_EXPECT_RETAINED_SETS=256']
++  flags=['-O2','-I'+str(ROOT/'software/include'),'-I'+str(INSTALL/'riscv64-unknown-elf/include'),'--specs='+str(INSTALL/'riscv64-unknown-elf/lib/dramfs.specs'),'--specs='+str(INSTALL/'riscv64-unknown-elf/lib/perch.specs'),'-DNUM_THREADS=2','-DBP_NUM_THREADS=2','-DBP_NUM_CONTEXTS=4','-DBENCH_DIAGNOSTIC=0','-DBENCH_BARRIER=0','-I'+str(ROOT/'testing'),'-DBP_EXPECT_I_LINES=768','-DBP_EXPECT_D_LINES=768','-DBP_EXPECT_RETAINED_SETS=256']
+   line=next(l for l in (out/'compile-dry.log').read_text().splitlines() if str(cc) in l and ' -o ' in l)
+   parsed=shlex.split(line);redirect=parsed.index('>>');actual=parsed[:redirect];expected=[str(cc),'-o',str(elf),str(inputs[0])]+flags;assert actual==expected,'actual maintained rule flags differ'
+   run('compile',make)
+@@ -88,7 +88,7 @@
+   for kind in programs:
+    for ext in ('riscv','nbf'):(out/(kind+'-prog.'+ext+'.gz')).write_bytes(gzip.compress((out/(kind+'-prog.'+ext)).read_bytes(),mtime=0))
+   assert before==[bind(p) for p in inputs]
+-  record.update(state='PASS-fresh1280-integrity-accepted-flags-CRT-and-byteidentical-cold08-preparation-only',programs=programs,actual_gcc_argv=actual,nbf_script=bind(nbf_script),cold08_fixture=bind(fixture),cold08_source=f['source'],cold08_capacity_guard='nonzero I/D capacities only',accepted_compiler_comment_match=True,resources=check())
++  record.update(state='PASS-fresh768-integrity-accepted-flags-CRT-and-byteidentical-cold08-preparation-only',programs=programs,actual_gcc_argv=actual,nbf_script=bind(nbf_script),cold08_fixture=bind(fixture),cold08_source=f['source'],cold08_capacity_guard='nonzero I/D capacities only',accepted_compiler_comment_match=True,resources=check())
+  except BaseException as e:record.update(state='FAIL-preserved-no-retry',error=repr(e));raise
+  finally:(out/'program-proof.json').write_text(json.dumps(record,indent=2)+'\n');print(record['state'],flush=True)
+ 
+--- old/run_full.py
++++ new/run_full.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Fresh CSR unmasked1280 eleven-phase fullcore gate; ROOT-reviewed source/resources required."""
++"""Fresh CSR unmasked768 eleven-phase fullcore gate; ROOT-reviewed source/resources required."""
+ import argparse
+ import importlib.util
+ import json
+@@ -26,7 +26,7 @@
+ FIXTURE=Path('/home/coyang/zynq-parrot-linux-fit1280/research/retained-control-abi-20261121/advisory-fixture-cold08/manifest.json')
+ FST_CAP=150*1024**2
+ EXPECTED_PARAMETERS={'retained_store.storage.epoch_width_p':8,'retained_store.storage.sets_p':256,
+- 'retained_store.storage.i_lines_p':1280,'retained_store.storage.d_lines_p':1280,
++ 'retained_store.storage.i_lines_p':768,'retained_store.storage.d_lines_p':768,
+  'l2_block_width_p':512,'dcache_block_width_p':512,'icache_block_width_p':512,
+  'core_minimal.cache_miss_trace_p':0,'l2_sets_p':64,'dcache_sets_p':64,'icache_sets_p':64,
+  'l2_assoc_p':2,'l2_banks_p':2,'num_threads_p':2,'num_contexts_p':4,
+@@ -62,16 +62,16 @@
+     return rows
+ 
+ def validate_selection(path,sha):
+-    require(bind(path)['sha256']==sha,'exact new ROOT1280 source/software selection')
++    require(bind(path)['sha256']==sha,'exact new ROOT768 source/software selection')
+     a=json.loads(Path(path).read_text())
+-    require(a['schema']=='csr-unmasked1280-fullcore-v1' and a['ROOT_approved'] is True and a['TOP']==source.TOP and a['BP']==source.BP,'exact new capacity-only selection, no draft execution')
+-    require(a['lines']==1280 and a['geometry']==dict(sets=256,epoch=8,line_bytes=64,l1_i_bytes=32768,l1_d_bytes=32768,l2_bytes=16384,resident=2,logical=4,aclk_mhz=20,delay=0),'ordinary/retained topology unchanged except capacity')
++    require(a['schema']=='csr-unmasked768-fullcore-v1' and a['ROOT_approved'] is True and a['TOP']==source.TOP and a['BP']==source.BP,'exact new capacity-only selection, no draft execution')
++    require(a['lines']==768 and a['geometry']==dict(sets=256,epoch=8,line_bytes=64,l1_i_bytes=32768,l1_d_bytes=32768,l2_bytes=16384,resident=2,logical=4,aclk_mhz=20,delay=0),'ordinary/retained topology unchanged except capacity')
+     require(a['workers']==8 and a['cache']=='off' and a['PCH']=='off' and a['TRACE']==1,'same8workers/cacheoff/noPCH/TRACE1')
+-    source.verify();source.plan();require(bind(budget.BASE/'source-preparation.json')==a['source_preparation'],'actual exact private1280 source')
++    source.verify();source.plan();require(bind(budget.BASE/'source-preparation.json')==a['source_preparation'],'actual exact private768 source')
+     require(bind(a['software_proof']['path'])==a['software_proof'],'fresh exact software proof')
+-    p=json.loads(Path(a['software_proof']['path']).read_text());require(p['state'].startswith('PASS-fresh1280-integrity') and p['expected']==dict(i_lines=1280,d_lines=1280,sets=256) and p['topology']==dict(resident=2,logical=4),'actual macro-bound1280 software')
++    p=json.loads(Path(a['software_proof']['path']).read_text());require(p['state'].startswith('PASS-fresh768-integrity') and p['expected']==dict(i_lines=768,d_lines=768,sets=256) and p['topology']==dict(resident=2,logical=4),'actual macro-bound768 software')
+     require(all(row['returncode']==0 and not row['owned']['owned_group_remaining'] for row in p['commands']),'all software commands owned complete0')
+-    require(all(v in p['actual_gcc_argv']for v in ['-DNUM_THREADS=2','-DBP_NUM_THREADS=2','-DBP_NUM_CONTEXTS=4','-DBP_EXPECT_I_LINES=1280','-DBP_EXPECT_D_LINES=1280','-DBP_EXPECT_RETAINED_SETS=256']),'exact1280 compile flags')
++    require(all(v in p['actual_gcc_argv']for v in ['-DNUM_THREADS=2','-DBP_NUM_THREADS=2','-DBP_NUM_CONTEXTS=4','-DBP_EXPECT_I_LINES=768','-DBP_EXPECT_D_LINES=768','-DBP_EXPECT_RETAINED_SETS=256']),'exact768 compile flags')
+     require(a['programs']==p['programs'],'same fresh integrity and unchanged cold08')
+     for role in ('integrity','advisory'):
+         for key in ('elf','nbf'):require(bind(a['programs'][role][key]['path'])==a['programs'][role][key],'exact prepared guest bytes')
+@@ -217,7 +217,7 @@
+         require(json.loads((out/'strict01/verification.json').read_text())['accepted'] is True,'strict payload/realwrites/Iretire')
+         require(json.loads((out/'counter01/verification.json').read_text())['firsttouch_counts']==dict(i=[1,1,8],d=[1,1,8]),'independent counter transitions')
+         geometry=json.loads((out/'parameters01/verification.json').read_text())['facts']
+-        require(geometry['values']==EXPECTED_PARAMETERS and geometry['clean_eof'] is True,'all17 actual1280/ordinary-cache facts throughEOF')
++        require(geometry['values']==EXPECTED_PARAMETERS and geometry['clean_eof'] is True,'all17 actual768/ordinary-cache facts throughEOF')
+         require([c['label'] for c in record['commands']]==['make-preflight','clean','build','loader','integrity-run','integrity-checker','advisory-run','advisory-checker','strict','counter','parameters'],'one complete source-specific eleven-phase gate')
+         require(all(c['ownership']['failure'] is None and not c['ownership']['owned_group_remaining'] for c in record['commands']),'all eleven owned phases complete and reaped')
+         for row in actual['sources'].values():require(full_bind(row['path'])==row and Path(row['path']).stat().st_mode==compiled_modes[row['path']],'compiled input bytes/IDs/modes/times unchanged')
+@@ -225,7 +225,7 @@
+         for path,rows in protected_static.items():require(role_inventory(Path(path))==rows,'static source/helper/admission file metadata and membership unchanged')
+         require(full_bind(model)==record['model'],'model unchanged')
+         validate_selection(a.selection,a.selection_sha256)
+-        record.update(state='PASS CSR unmasked1280 trace0 clean fullcore integrity/cold08 strict512b-eight-real-writes-Iretire-counter-17geometry-source-audits',
++        record.update(state='PASS CSR unmasked768 trace0 clean fullcore integrity/cold08 strict512b-eight-real-writes-Iretire-counter-17geometry-source-audits',
+             input_directory_policy='Directory inode/device/mode/membership checked; directory mtime/ctime intentionally excluded because pinned FST reader creates/unlinks .hier; every regular file byte/ID/mode/mtime/ctime remains exact',
+             protected_native_inputs=bind(out/'protected-native-inputs.json'),closed_audits={n:bind(out/p) for n,p in [('strict','strict01/verification.json'),('counter','counter01/verification.json'),('parameters','parameters01/verification.json'),('generated_l2','generated-geometry.json')]},scope='Synthetic correctness only; no area/fit/FPGA/application or all-slot claim; preserve all original generated objects/PCH for qualified clone.')
+     except BaseException as error:record.update(state='FAIL preserved, no accepted result',error=repr(error));raise
