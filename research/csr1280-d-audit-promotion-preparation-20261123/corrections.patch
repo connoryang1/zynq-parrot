@@ -1,0 +1,8 @@
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation03-20261123/contract.py:semantic_verify_audit
++++ checks.py:semantic_verify_audit
+@@ -2 +2 @@
+-    out=Path(stage)/(role+'-audit'); accepted=out/'acceptance.json'
++    out=Path(stage)/(role+'-audit'); accepted=out/'FAILED-acceptance.json'
+@@ -11 +11 @@
+-    require(full['state'].startswith('PASS') and full['lane'] == role[0] and full['lines'] == 1280 and full['sets'] == 256 and len(full['targets']) == 1280, 'full configured targets')
++    require(full['state'].startswith('PASS') and full['lane'] == role[0] and full['lines'] == 1280 and full['actual_count_summary']['sets'] == 256 and len(full['targets']) == 1280, 'full configured targets')
