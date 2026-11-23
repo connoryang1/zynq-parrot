@@ -24,6 +24,7 @@ COUNTERS=dict(zip(ROLES,((0,768,0,768,0,6144),(0,0,0,0,0,0),(768,0,768,0,6144,0)
 PARAMETERS=dict(BP_RETAINED_BUFFER=1,BP_RETAINED_I_LINES=768,BP_RETAINED_D_LINES=768,BP_RETAINED_SETS=256,BP_RETAINED_OBSERVE=1,BP_AXI_RESPONSE_DELAY=0,BP_CACHE_MISS_TRACE=0)
 HARDWARE=dict(historical.HARDWARE,retained_i_lines=768,retained_d_lines=768)
 IO,OFFSETS=historical.IO,historical.OFFSETS
+MAP_DEFINES={name:IO[name]for name in ('HP0_ADDR_BASE','GP0_ADDR_BASE','GP1_ADDR_BASE')}
 FIXTURE_CONFIG={}
 SOURCE_PATHS={name:MAIN/name for name in history3.SOURCE_FILES}
 SOURCE_PATHS.update({'csr768-physical/'+name:HERE/name for name in ('protocol.py','collector.py','recovery.py')})
@@ -64,6 +65,28 @@ def verify_programs(a):
         require(audit['bindings']['model']['sha256']==MODEL and audit['bindings']['program']['sha256']==BUILD,'actual same fixture/model audit')
         stream=audit['archive']['full_stream'];require(stream['reader_returncode']==0 and stream['exact_end_records']==1 and stream['lines']==stream['events']+169,'complete167 stream EOF')
 
+def verify_map_defines(text):
+    # Maintained generated MAP contains address bases ONLY. Widths/enables and
+    # clocks belong to independently bound build/HWH/host evidence below.
+    defines={}
+    for token in shlex.split(text):
+        require(token.startswith('-D')and '='in token,'generated address MAP token')
+        name,value=token[2:].split('=',1)
+        require(name in MAP_DEFINES and name not in defines,'unknown or duplicate generated address MAP define')
+        try:defines[name]=int(value,0)
+        except ValueError:raise ValueError('invalid generated address MAP value')
+    require(defines==MAP_DEFINES,'actual generated MAP address bases differ')
+    return defines
+
+
+def verify_io_certificate(cert,artifacts,a):
+    require(set(cert)=={'ROOT_verified','values','build','HWH','host_source','compile_gate','runner'},'independent build/HWH/host I/O certificate membership')
+    require(cert['ROOT_verified']is True and cert['values']==IO,'actual widths/enables/20MHz-8MHz full I/O contract')
+    require(cert['HWH']==artifacts['hwh']and cert['compile_gate']==a['compile_gate']and cert['runner']==a['runner']and cert['runner']['sha256']==RUNNER,'actual selected HWH and exact private host compile/source identity')
+    for key in ('build','HWH','host_source','compile_gate','runner'):verify_binding(cert[key])
+    return cert['values']
+
+
 def verify_route(a):
     candidate=verify_candidate(a)
     artifacts=a['artifacts'];require(set(artifacts)=={'package','bit','hwh','map','fit','elaboration'},'route artifact set')
@@ -89,13 +112,8 @@ def verify_route(a):
     bundle=stage.local_bundle(mini)
     for key in ('bit','map','hwh'):
         require(all(bundle['members'][key][k]==artifacts[key][k] for k in ('bytes','sha256')),'exact package '+key)
-    defines={}
-    for token in shlex.split(Path(artifacts['map']['path']).read_text()):
-        if token.startswith('-D') and '=' in token:
-            name,value=token[2:].split('=',1)
-            if name in IO:
-                require(name not in defines,'duplicate accepted MMIO map define');defines[name]=int(value,0)
-    require(defines==IO,'actual map differs from native runner MMIO/clock definitions')
+    verify_map_defines(Path(artifacts['map']['path']).read_text())
+    verify_io_certificate(elaborated['io_contract'],artifacts,a)
     checked=subprocess.run([str(base.SCRIPTS/'verify_pynq_package.sh'),artifacts['package']['path'],artifacts['bit']['sha256']],
         capture_output=True,text=True,timeout=90)
     require(checked.returncode==0 and 'PACKAGE_OK=1\n' in checked.stdout

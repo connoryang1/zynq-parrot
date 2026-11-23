@@ -75,6 +75,28 @@ class Offline(unittest.TestCase):
             for key,value in [('schema','old-v3'),('host','foreign'),('schedule',list(reversed(p.ROLES))),('runtime_ms',600000),('outer_timeout_s',421),('performance_inference',True),('hardware',dict(p.HARDWARE,retained_i_lines=1280)),('sources',{})]:
                 bad=copy.deepcopy(a);bad[key]=value
                 with self.subTest(key=key),self.assertRaises(ValueError):p.validate(bad)
+    def test_actual_generated_MAP_bytes_and_rejections(self):
+        selected=Path('/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/usable96-image01/ROOT-selected-image.json')
+        record=json.loads(selected.read_text())['artifacts']['map'];self.assertEqual(p.binding(record['path']),record)
+        self.assertEqual(record['bytes'],81);self.assertEqual(record['sha256'],'cc43f4d00b80bf04c4c0050a7f2af1dc64599c330909ae5bcd3117d1564eb2ef')
+        text=Path(record['path']).read_text();self.assertEqual(p.verify_map_defines(text),p.MAP_DEFINES)
+        for bad in (text.replace('0x40000000','0x50000000'),text+' -DUNKNOWN=1',text+' -DACLK_MHZ=20',text+' -DGP0_ADDR_BASE=0x40000000',text.replace('-DGP0_ADDR_BASE=0x40000000',''),text+' stray',text.replace('0x80000000','nonnumeric')):
+            with self.subTest(MAP=bad),self.assertRaises(ValueError):p.verify_map_defines(bad)
+    def test_independent_IO_certificate_preserves_width_clock_source_guards(self):
+        with tempfile.TemporaryDirectory()as tmp:
+            root=Path(tmp);proof=root/'synthetic-evidence.json';proof.write_text('{"test_only":true}\n');e=p.binding(proof)
+            runner=dict(e,sha256=p.RUNNER);a=dict(compile_gate=e,runner=runner);art=dict(hwh=e)
+            cert=dict(ROOT_verified=True,values=dict(p.IO),build=e,HWH=e,host_source=e,compile_gate=e,runner=runner)
+            # Isolate certificate comparisons only. Real binding reads remain
+            # mandatory in production, exercised separately by actualMAP test.
+            with patch.object(p,'verify_binding')as bound:
+                self.assertEqual(p.verify_io_certificate(cert,art,a),p.IO);self.assertEqual(bound.call_count,5)
+                for key,value in [('values',dict(p.IO,GP1_DATA_WIDTH=64)),('values',dict(p.IO,GP0_ENABLE=0)),('values',dict(p.IO,ACLK_MHZ=21)),('values',dict(p.IO,RTCLK_MHZ=4)),('ROOT_verified',False),('HWH',dict(e,sha256='0'*64)),('compile_gate',dict(e,sha256='0'*64)),('runner',dict(runner,sha256='0'*64))]:
+                    bad=copy.deepcopy(cert);bad[key]=value
+                    with self.subTest(field=key),self.assertRaises(ValueError):p.verify_io_certificate(bad,art,a)
+                for key in ('build','HWH','host_source','compile_gate','runner'):
+                    bad=copy.deepcopy(cert);del bad[key]
+                    with self.subTest(missing=key),self.assertRaises(ValueError):p.verify_io_certificate(bad,art,a)
     def test_candidate_approval_identity_and_owned46M_guards(self):
         with tempfile.TemporaryDirectory()as tmp,patch.object(p,'HERE',Path(tmp)):
             root=Path(tmp);proof=root/'synthetic-proof.json';proof.write_text('{"test_only":true}\n')
