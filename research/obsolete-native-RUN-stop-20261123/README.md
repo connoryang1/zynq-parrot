@@ -1,0 +1,5 @@
+This records an operational stop of unused writes to three historical simulation families. All actual files remain in RAM and durable evidence; no physical space is reclaimed. Only the exact old prospective reservations change.
+
+Fresh03 prepare and execute both return0 with empty owned groups. ROOT independently rechecks all1,237 original entries and every482-member uncovered/derived archive payload. The archive is4,666,307B; no derived candidate is excluded. Borrow01/02 are explicitly currently absent, with repeated negative lstat and real-parent identity checks; their historical existence is not inferred.
+
+The fixed future charge drops1,156,926,898→33,554,432B, keeping the unrelated pending I-area32MiB and every current768/canonical allocation. The qualified exact PTY/tmux transport-role assumption and two service exceptions remain explicitly limited; no global all-UID/FD proof is claimed. Source02 failure remains immutable. Exact executed authority, ownership, completion and independent ROOT acceptance are bound by evidence.json.

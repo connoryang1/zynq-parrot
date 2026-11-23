@@ -1,0 +1,5 @@
+This records the fixed-design96KiB midpoint FPGA build. Initial clean native, five-domain observation, four architectural regressions and complete base preservation already passed. Fit, timing, all-capacity controls, physical correctness and application performance remain pending.
+
+TOP1b24c915e/BP1e7 changes only the two capacity defaults from1280 to768 full64-byte lines per side. Ordinary32KiB I/D caches,16KiB L2,2resident/4logical contexts,20MHz/8MHz clocks, policy and ExploreArea implementation are held fixed. The actual source/readiness bridge checks5,256SOURCE files,4,524WORK files and398 consumed native files, with one exact simulation-only exclusion.
+
+ROOT fresh resource profilebc162484 keeps128MiBSOURCE/1536MiBWORK/shared192MiB evidence, all floors and other reservations; the reduced old BASE is permitted only by the completed03 stop and separate ROOT acceptance. Current mapping256MiB/8MiB remains conservatively charged. Final admission8cb0404b launches job20261123T060312Z-1b24c915e; worker1714636/start102960294 is tracked by the owned monitor. The physical board is released and unchanged. Exact source/authority/launch pins are in launch-evidence.json.

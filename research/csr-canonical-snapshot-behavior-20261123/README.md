@@ -1,0 +1,5 @@
+This records behavioral verification of the canonical CSR snapshot experiment and its first mapping failure. It is separate from the fixed BP1e7 capacity bisection. Production source and the physical board remain unchanged.
+
+Canonical storage preserves the1666-bit external interface using741 actual architectural bits. The real two-bank/four-context test passes106,668 comparisons and13,312 walking save/restore sequences, plus all three negative witnesses. The first host-return expectation failure remains preserved; continuation accepts only the exact HDL Fatal and normal Xsim quit. Both original runs and all helpers/compiled simulators are durably archived with full readback.
+
+The paired raw1666/canonical741 mapping stops in the raw arm after580s, before a checkpoint or resource report. This is a deadline failure, not a fit failure or demonstrated area saving. Mapping, mapped functional, full-core and whole-device qualification are still required before integration. Exact receipts are in evidence.json.
