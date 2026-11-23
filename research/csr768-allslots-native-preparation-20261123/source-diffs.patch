@@ -1,0 +1,122 @@
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation03-20261123/audit_full.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-allslots-native-preparation-20261123/audit_full.py
+@@ -56 +56 @@
+-                result['actual_count_summary']=dict(lines=1280,sets=256,role=args.role,expected_six_GP0=c.counters_for(args.role),D_target_loads=10240 if args.role[0]=='d' else 0,I_target_instructions=20480 if args.role[0]=='i' else 0)
++                result['actual_count_summary']=dict(lines=768,sets=256,role=args.role,expected_six_GP0=c.counters_for(args.role),D_target_loads=6144 if args.role[0]=='d' else 0,I_target_instructions=12288 if args.role[0]=='i' else 0)
+@@ -75 +75 @@
+-            c.archive.write_json(out/'acceptance.json',dict(schema='csr-unmasked1280-stream-acceptance-v1',role=args.role,
++            c.archive.write_json(out/'acceptance.json',dict(schema='csr-unmasked768-stream-acceptance-v1',role=args.role,
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation03-20261123/bridge.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-allslots-native-preparation-20261123/bridge.py
+@@ -1 +1 @@
+-"""Current1280 immutable lineage and fresh standalone namespace; no authority by import."""
++"""Current768 immutable lineage and fresh standalone namespace; no authority by import."""
+@@ -5 +5 @@
+-ORIGINAL_POOL=Path('/run/user/1001/zp-csr-unmasked1280-fullcore-20261122-01')
++ORIGINAL_POOL=Path('/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01')
+@@ -7 +7 @@
+-COHORT=Path('/run/user/1001/zp-csr1280-allslots-native-20261123-03')
++COHORT=Path('/run/user/1001/zp-csr768-allslots-native-20261123-01')
+@@ -9 +9 @@
+-DURABLE=Path('/home/coyang/fpga-artifacts/context-resume/csr-unmasked1280-fullcore-20261122')
++DURABLE=Path('/home/coyang/fpga-artifacts/context-resume/csr-unmasked768-fullcore-20261123')
+@@ -12,5 +12,5 @@
+-ORIGINAL_SHA='95699e2ab8c4b3ef7fa8999688d2908dffa65a396c51f63aee522bbf4156a742'
+-SCOPED_SHA='bc6f17f4be2140071df2a23b9efcbdc75b30ce41d48b39c76b80019942e1e445'
+-BASE_MANIFEST_SHA='bdbb63471a8b5ee735d72ad9dd0b0769f31275b6f9f26018ea3e401ac4e460ff'
+-BASE_ARCHIVE_SHA='344536b19857b239210e358406048c420598d65db8b0d4ff60a98d74b7dff320'
+-FREEZE_SHA='743fac7665a8748ebcb07a34b971650ac80a35491607b3f86873f9c1d93a9798'
++ORIGINAL_SHA='8762ddb27740970892245ca7c067fcfff4c89da8dbbce392f2407979dbc5f964'
++SCOPED_SHA='1f192b69fb95fce8919d7fbbe6a4c2c594fc8983982e7e2822821e74f2b75fef'
++BASE_MANIFEST_SHA='5fd654e008fd9311ff4f3d3dd022233765612fb1d03fa62ade8bcacb24d5be33'
++BASE_ARCHIVE_SHA='bd5cfd6aad726b3c91c529c967a50c2f7b4aa887368b4c725c3a8aa6b92ff4b5'
++FREEZE_SHA='4714a03cbc1e4694d514439f3b23c6247a372ae6ffbe003dd8a5d243e218227c'
+@@ -35 +35 @@
+-    require(a['schema']=='csr1280-allslots-root-authority-v1' and a['ROOT_approved']is True,'UNADMITTED source-only packet')
++    require(a['schema']=='csr768-allslots-root-authority-v1' and a['ROOT_approved']is True,'UNADMITTED source-only packet')
+@@ -40 +40 @@
+-    require(a['base_closure']['sha256']==BASE_MANIFEST_SHA and a['base_archive']['sha256']==BASE_ARCHIVE_SHA,'actual complete1280 base closure/archive')
++    require(a['base_closure']['sha256']==BASE_MANIFEST_SHA and a['base_archive']['sha256']==BASE_ARCHIVE_SHA,'actual complete768 base closure/archive')
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation03-20261123/contract.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-allslots-native-preparation-20261123/contract.py
+@@ -1 +1 @@
+-"""New1280 source-bound native/stream contract; no historical producer imports."""
++"""New768 source-bound native/stream contract; no historical producer imports."""
+@@ -24,2 +24,2 @@
+-OWNER=module('/home/coyang/zynq-parrot-linux-host-observer/research/retained256-qualification-20261122/software_owned_v2.py','csr1280_owned','52c89d489177fdee6f2c941c5744f86433f320201b9588547cc23c3f22810bc5')
+-archive=module('/home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/archive_stream.py','csr1280_fullstream','15a7aa77dc67c42a3c9c30e1c5ae317b23a643b9fae086977166bf1e19e63a0e')
++OWNER=module('/home/coyang/zynq-parrot-linux-host-observer/research/retained256-qualification-20261122/software_owned_v2.py','csr768_owned','52c89d489177fdee6f2c941c5744f86433f320201b9588547cc23c3f22810bc5')
++archive=module('/home/coyang/zynq-parrot-linux-host-observer/research/retained-stream-archive-20261121/archive_stream.py','csr768_fullstream','15a7aa77dc67c42a3c9c30e1c5ae317b23a643b9fae086977166bf1e19e63a0e')
+@@ -63 +63 @@
+-    sem=module(root/'csr1280_profile.py','csr1280_explicit_semantics',plan['semantic_profile_sha256'])
++    sem=module(root/'csr768_profile.py','csr768_explicit_semantics',plan['semantic_profile_sha256'])
+@@ -65,2 +65,2 @@
+-    require(ctx.anchors['model']['sha256']==bridge.SCOPED_SHA,'current qualified bc6f, no historical replacement')
+-    CONTEXT=SimpleNamespace(sem=sem,ctx=ctx,profile=sem.geometry(1280,256))
++    require(ctx.anchors['model']['sha256']==bridge.SCOPED_SHA,'current qualified1f192, no historical replacement')
++    CONTEXT=SimpleNamespace(sem=sem,ctx=ctx,profile=sem.geometry(768,256))
+@@ -80 +80 @@
+-    require(p['schema']=='csr1280-complete-allslots-v1' and p['state']=='ROOT-PREPARED new1280 actual model; native/audit only after explicit execution','DRAFT cannot run')
++    require(p['schema']=='csr768-complete-allslots-v1' and p['state']=='ROOT-PREPARED new768 actual model; native/audit only after explicit execution','DRAFT cannot run')
+@@ -89 +89 @@
+-    require(p['geometry']==ctx.ctx.anchors['actual_geometry17'],'actual17fields1280/sets256/epoch8/trace0')
++    require(p['geometry']==ctx.ctx.anchors['actual_geometry17'],'actual17fields768/sets256/epoch8/trace0')
+@@ -128 +128 @@
+-def counters_for(role):return [0,1280,0,1280,0,10240] if role=='d-enabled' else [1280,0,1280,0,10240,0] if role=='i-enabled' else [0]*6
++def counters_for(role):return [0,768,0,768,0,6144] if role=='d-enabled' else [768,0,768,0,6144,0] if role=='i-enabled' else [0]*6
+@@ -139 +139 @@
+-    require(ad['schema'] == 'csr-unmasked1280-capacity-stream-native-v1' and ad['role'] == role, 'new native schema')
++    require(ad['schema'] == 'csr-unmasked768-capacity-stream-native-v1' and ad['role'] == role, 'new native schema')
+@@ -169 +169 @@
+-    require(receipt['schema'] == 'csr-unmasked1280-stream-acceptance-v1' and receipt['role'] == role, 'new exact audit role')
++    require(receipt['schema'] == 'csr-unmasked768-stream-acceptance-v1' and receipt['role'] == role, 'new exact audit role')
+@@ -175 +175 @@
+-    require(full['state'].startswith('PASS') and full['lane'] == role[0] and full['lines'] == 1280 and full['sets'] == 256 and len(full['targets']) == 1280, 'full configured targets')
++    require(full['state'].startswith('PASS') and full['lane'] == role[0] and full['lines'] == 768 and full['actual_count_summary']['sets'] == 256 and len(full['targets']) == 768, 'full configured targets')
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation03-20261123/fixed_shared.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-allslots-native-preparation-20261123/fixed_shared.py
+@@ -6 +6 @@
+-CAD_ADMISSION=dict(path='/home/coyang/fpga-artifacts/context-resume/csr-opt1280-fpga-preparation-20261123/preparation01/admission.FINAL.json',bytes=2218630,sha256='bc473480db6890a8602d28cc25d258b46be93415825871a9edbed63f64cb96b4')
++CAD_ADMISSION={'path': '/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/admission.FINAL.json', 'bytes': 2218979, 'sha256': '8cb0404b90965f209b702c84e5de02df333ea8a975399a3ba00d342c718f44fb'}
+@@ -13 +13 @@
+-    b.require(p['schema']=='csr1280-standalone-allslots-resources-v1' and p['ROOT_approved']is True,'no allocation/execution authority in DRAFT')
++    b.require(p['schema']=='csr768-standalone-allslots-resources-v1' and p['ROOT_approved']is True,'no allocation/execution authority in DRAFT')
+@@ -18,2 +18,2 @@
+-    b.require(p['base_closure']['sha256']==b.BASE_MANIFEST_SHA,'same actual1280 base');b.verify(p['base_closure'])
+-    b.require(type(p['base_closed_logical_bytes'])is int and p['base_closed_logical_bytes']>=25255944,'complete existing durable family charged')
++    b.require(p['base_closure']['sha256']==b.BASE_MANIFEST_SHA,'same actual768 base');b.verify(p['base_closure'])
++    b.require(type(p['base_closed_logical_bytes'])is int and p['base_closed_logical_bytes']>=24914716,'complete existing durable family charged')
+@@ -65 +65 @@
+-    b.require(a['top']=='88ab04dfcc508176cc977096ca0c132299a8a460' and a['bp']=='1e7aa2fdc94a56373a26f95b145aff361d4d0aaa','same active1280 CAD')
++    b.require(a['top']=='1b24c915ed628f6d47a382b3aa89fb662884e1a1' and a['bp']=='1e7aa2fdc94a56373a26f95b145aff361d4d0aaa','same active768 CAD')
+@@ -67 +67 @@
+-    b.require(p['OTHER']['RUN_bytes']>=r['other_work_future_bytes']==1156926898 and p['OTHER']['HOME_bytes']>=r['other_home_future_bytes']==174672220 and p['OTHER']['SHM_bytes']>=r['other_shm_future_bytes']==335544320,'retain FULL historic BASE and other immutable CAD reserves exactly once')
++    b.require(p['OTHER']['RUN_bytes']>=r['other_work_future_bytes']==301989888 and p['OTHER']['HOME_bytes']>=r['other_home_future_bytes']+98304 and r['other_home_future_bytes']==183060828 and p['OTHER']['SHM_bytes']>=r['other_shm_future_bytes']==335544320,'retain FULL historic BASE and other immutable CAD reserves exactly once')
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation03-20261123/prepare.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-allslots-native-preparation-20261123/prepare.py
+@@ -31 +31 @@
+-        p=dict(schema='csr1280-complete-allslots-v1',state='ROOT-PREPARED new1280 actual model; native/audit only after explicit execution',stage=str(c.BASE),stage_identity=dict(path=str(c.BASE),device=st.st_dev,inode=st.st_ino),caps=c.CAPS,host_accounting=c.bridge.HOST_ACCOUNTING,schedule=list(c.ORDER),source_plan=c.bind(c.HERE/'source-plan.json'),runtime_sources=sources,semantic_context=rows['context'],ROOT_authority=rows['authority'],fixed_reservations=rows['profile'],model=ctx.ctx.anchors['model'],geometry=ctx.ctx.anchors['actual_geometry17'],program=ctx.ctx.anchors['programs']['single']['manifest'],compiled_sources=c.bind(compiled),environment=proposal['environment'],linked_libraries=proposal['linked_libraries'],reader=proposal['reader'])
++        p=dict(schema='csr768-complete-allslots-v1',state='ROOT-PREPARED new768 actual model; native/audit only after explicit execution',stage=str(c.BASE),stage_identity=dict(path=str(c.BASE),device=st.st_dev,inode=st.st_ino),caps=c.CAPS,host_accounting=c.bridge.HOST_ACCOUNTING,schedule=list(c.ORDER),source_plan=c.bind(c.HERE/'source-plan.json'),runtime_sources=sources,semantic_context=rows['context'],ROOT_authority=rows['authority'],fixed_reservations=rows['profile'],model=ctx.ctx.anchors['model'],geometry=ctx.ctx.anchors['actual_geometry17'],program=ctx.ctx.anchors['programs']['single']['manifest'],compiled_sources=c.bind(compiled),environment=proposal['environment'],linked_libraries=proposal['linked_libraries'],reader=proposal['reader'])
+@@ -34 +34 @@
+-        c.archive.write_json(c.BASE/'prepared.json',dict(state='PASS separately funded preparation; all1280 execution/audit pending',preparation=c.bind(dest)))
++        c.archive.write_json(c.BASE/'prepared.json',dict(state='PASS separately funded preparation; all768 execution/audit pending',preparation=c.bind(dest)))
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation03-20261123/run_native.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-allslots-native-preparation-20261123/run_native.py
+@@ -2 +2 @@
+-"""Qualified scoped1280 cohort native phase; externally anchored admission required."""
++"""Qualified scoped768 cohort native phase; externally anchored admission required."""
+@@ -56 +56 @@
+-            admission = dict(schema='csr-unmasked1280-capacity-stream-native-v1', role=args.role,
++            admission = dict(schema='csr-unmasked768-capacity-stream-native-v1', role=args.role,
+@@ -91 +91 @@
+-                expected = dict(version='1', lane=lane, active=str(int(active)), lines='1280', sets='256', max_lines='1792', line_bytes='64',
++                expected = dict(version='1', lane=lane, active=str(int(active)), lines='768', sets='256', max_lines='1792', line_bytes='64',
+@@ -99 +99 @@
+-                    primary_counts(lane, 1280, values)
++                    primary_counts(lane, 768, values)
+@@ -103 +103 @@
+-                        primary_counts(lane, 1280, values)
++                        primary_counts(lane, 768, values)
+@@ -111 +111 @@
+-                report = dict(state='PASS primary1280 functional/counter gate; per-address closed trace pending' if active else 'PASS negative checked execution with primary retained-use gate rejected; closed trace pending',
++                report = dict(state='PASS primary768 functional/counter gate; per-address closed trace pending' if active else 'PASS negative checked execution with primary retained-use gate rejected; closed trace pending',

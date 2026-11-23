@@ -1,0 +1,56 @@
+{
+  "schema": "csr768-standalone-allslots-resources-v1",
+  "state": "DRAFT UNADMITTED fixedOTHER/currentCAD/headroom must be priced by ROOT",
+  "ROOT_approved": false,
+  "limits": {
+    "pool_cap_bytes": 134217728,
+    "cohort_inside_pool_bytes": 134217728,
+    "delta_HOME_cap_bytes": 0,
+    "helper_cap_bytes": 131072,
+    "RUN_floor_bytes": 1073741824,
+    "HOME_floor_bytes": 1879048192,
+    "SHM_floor_bytes": 536870912
+  },
+  "pool": "/run/user/1001/zp-csr768-allslots-native-20261123-01",
+  "cohort": "/run/user/1001/zp-csr768-allslots-native-20261123-01",
+  "base_durable": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked768-fullcore-20261123",
+  "source_plan": {
+    "path": "/home/coyang/zynq-parrot-retained-metadata/research/csr768-allslots-native-preparation-20261123/source-plan.json",
+    "bytes": 8452,
+    "sha256": "e62bf8f9918cb7dc23a32ba96e26dfa53daee9c11c74e602df6a9dcbdf8ec4a0"
+  },
+  "base_future_growth_reserved_bytes": 0,
+  "new_writes_to_closed_base_require_new_admission": true,
+  "base_closure_reviewed_complete": true,
+  "base_closure": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked768-fullcore-20261123/base-full-clone-std-closed01/manifest.json",
+    "bytes": 4599,
+    "sha256": "5fd654e008fd9311ff4f3d3dd022233765612fb1d03fa62ade8bcacb24d5be33"
+  },
+  "base_closed_logical_bytes": null,
+  "all_other_charged_reserves_included": false,
+  "OTHER": {
+    "RUN_bytes": null,
+    "HOME_bytes": null,
+    "SHM_bytes": null
+  },
+  "historic_RUN_BASE_minimum": 33554432,
+  "basis_records": [],
+  "active_CAD_admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/admission.FINAL.json",
+    "bytes": 2218979,
+    "sha256": "8cb0404b90965f209b702c84e5de02df333ea8a975399a3ba00d342c718f44fb"
+  },
+  "CAD_remaining_in_OTHER": false,
+  "accounting": "Exact active768 admission prices BASE33MiB plus full mapping256MiB and all current OTHER. Live same-device sum of CADremaining + full admitted OTHER + new SELFremaining; no old reserve reuse.",
+  "host_accounting": {
+    "interval_s": 1,
+    "scan_duration_limit_s": 2,
+    "poll_gap_limit_s": 5,
+    "snapshot_age_limit_s": 5,
+    "initial_snapshot_limit_s": 5,
+    "teardown_bound_s": 5
+  },
+  "prospective_durable_archive_bytes": null,
+  "semantic_helper_prospective_cap_bytes": 98304
+}

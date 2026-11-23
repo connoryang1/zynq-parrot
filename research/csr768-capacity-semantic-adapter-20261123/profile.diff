@@ -1,0 +1,80 @@
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-capacity-semantic-adapter-20261122/csr1280_profile.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-capacity-semantic-adapter-20261123/csr768_profile.py
+@@ -15,7 +15,7 @@
+ 
+ 
+ def geometry(lines,sets=256):
+-    require(type(lines) is int and lines in (256,1280) and type(sets) is int and sets==256,'explicit control256 or candidate1280, same256sets')
++    require(type(lines) is int and lines in (256,768) and type(sets) is int and sets==256,'explicit control256 or candidate768, same256sets')
+     return Geometry(lines,sets)
+ 
+ 
+@@ -27,7 +27,7 @@
+ 
+ def target_index(slot,sets):
+     # At256 this reduces exactly to the established first-way constructor.
+-    # At1280 retain the way bits, covering five complete ways, no address search.
++    # At768 retain the way bits, covering three complete ways, no address search.
+     return (slot&~(sets-1))+((slot*0xaaaaaaaaaaaaaaab)&(sets-1))
+ 
+ 
+@@ -121,23 +121,23 @@
+ 
+ def load_context(anchors_path,expected_sha):
+     """Later explicit ROOT metadata/source import; no implicit old context."""
+-    require(_binding(anchors_path)['sha256']==expected_sha,'exact ROOT reviewed1280 context SHA')
++    require(_binding(anchors_path)['sha256']==expected_sha,'exact ROOT reviewed768 context SHA')
+     a=json.loads(Path(anchors_path).read_text())
+-    require(a['schema']=='csr1280-semantic-current-anchors-v1' and a['state']=='ROOT-BOUND current1280 semantic source context; no run authority' and a['ROOT_reviewed']is True,'pending DRAFT cannot load or approve a context')
+-    require(a['TOP']=='88ab04dfcc508176cc977096ca0c132299a8a460' and a['BP']=='1e7aa2fdc94a56373a26f95b145aff361d4d0aaa','new1280 source only')
+-    require(a['SOURCE']=='/run/user/1001/zp-csr-unmasked1280-fullcore-20261122-01/source','actual new1280 SOURCE namespace')
+-    require(set(a['closed_anchors'])=={'full','flow','proposal','qualification','clone_admission','build','STD','geometry','base','future_freeze'},'all actual1280 full/scoped/STD/base anchors')
++    require(a['schema']=='csr768-semantic-current-anchors-v1' and a['state']=='ROOT-BOUND current768 semantic source context; no run authority' and a['ROOT_reviewed']is True,'pending DRAFT cannot load or approve a context')
++    require(a['TOP']=='1b24c915ed628f6d47a382b3aa89fb662884e1a1' and a['BP']=='1e7aa2fdc94a56373a26f95b145aff361d4d0aaa','new768 source only')
++    require(a['SOURCE']=='/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/source','actual new768 SOURCE namespace')
++    require(set(a['closed_anchors'])=={'full','flow','proposal','qualification','clone_admission','build','STD','geometry','base','future_freeze'},'all actual768 full/scoped/STD/base anchors')
+     for row in a['closed_anchors'].values():_verify(row)
+     _verify(a['model']);_verify(a['original_model']);_verify(a['actual_source_list'])
+     for row in a['critical_ingested'].values():_verify(row)
+-    require(a['original_model']['sha256']=='95699e2ab8c4b3ef7fa8999688d2908dffa65a396c51f63aee522bbf4156a742','actual current1280 original model, not1536/ac3 or historical1280')
++    require(a['original_model']['sha256']=='8762ddb27740970892245ca7c067fcfff4c89da8dbbce392f2407979dbc5f964','actual current768 original model, not historical profiles')
+     full=json.loads(Path(a['closed_anchors']['full']['path']).read_text())
+-    require(full['state']=='PASS CSR unmasked1280 trace0 clean fullcore integrity/cold08 strict512b-eight-real-writes-Iretire-counter-17geometry-source-audits' and full['source_tree_baseline']==a['TOP'] and full['source_bp']==a['BP'] and full['source_endcheck']=='PASS','actual clean11phase1280 producer')
++    require(full['state']=='PASS CSR unmasked768 trace0 clean fullcore integrity/cold08 strict512b-eight-real-writes-Iretire-counter-17geometry-source-audits' and full['source_tree_baseline']==a['TOP'] and full['source_bp']==a['BP'] and full['source_endcheck']=='PASS','actual clean11phase768 producer')
+     require({k:full['model'][k]for k in ('path','bytes','sha256')}==a['original_model'],'original model receipt match')
+-    strict=_module(a['strict'],'csr1280_actual_literal_strict')
++    strict=_module(a['strict'],'csr768_actual_literal_strict')
+     require(strict.ROOT==Path(a['SOURCE']),'literal actual compiled SOURCE; no historical global replacement')
+     strict.source_bindings(Path(a['actual_source_list']['path']))
+-    generator=_module(a['generator'],'csr1280_exact_analytic_generator')
++    generator=_module(a['generator'],'csr768_exact_analytic_generator')
+     _verify(a['schema167']);schema=json.loads(Path(a['schema167']['path']).read_text())
+     selected=dict(strict.selections())
+     selected.update({'mutation':('unicore_lite.dcache_retained_mutation_v',1),
+@@ -148,20 +148,20 @@
+     expected={r['key']:(r['suffix'],r['width'])for r in schema['leaves']}
+     require(len(selected)==167 and selected==expected and list(selected)==list(expected),'exact immutable raw167 key/path/width/order contract')
+     actual=json.loads(Path(a['closed_anchors']['geometry']['path']).read_text())['facts']['values']
+-    require(actual==a['actual_geometry17'] and len(actual)==17 and actual['retained_store.storage.i_lines_p']==actual['retained_store.storage.d_lines_p']==1280 and actual['retained_store.storage.sets_p']==256,'actual17 geometry, candidate1280 only')
++    require(actual==a['actual_geometry17'] and len(actual)==17 and actual['retained_store.storage.i_lines_p']==actual['retained_store.storage.d_lines_p']==768 and actual['retained_store.storage.sets_p']==256,'actual17 geometry, candidate768 only')
+     proposal=json.loads(Path(a['closed_anchors']['proposal']['path']).read_text())
+-    require(len(proposal['writer_leaves'])==415 and proposal['original_TOP']==a['TOP'] and proposal['original_BP']==a['BP'] and proposal['original_model']==a['original_model'],'actual1280 original/415 union/source proof')
++    require(len(proposal['writer_leaves'])==415 and proposal['original_TOP']==a['TOP'] and proposal['original_BP']==a['BP'] and proposal['original_model']==a['original_model'],'actual768 original/415 union/source proof')
+     require(proposal['original_session']==a['closed_anchors']['full'],'same accepted fullsession')
+     for suffix,width in selected.values():
+         found=[r for r in proposal['writer_leaves']if r['path']==suffix or r['path'].endswith('.'+suffix)]
+         require(len(found)==1 and found[0]['width']==width,'one current writer leaf/width '+suffix)
+     build=json.loads(Path(a['closed_anchors']['build']['path']).read_text())
+-    require(build['binary']==a['model'] and build['baseline_relink']['sha256']==a['original_model']['sha256'],'exact new scoped1280 from untouched relink')
+-    require(a['model']['path']=='/run/user/1001/zp-csr-unmasked1280-fullcore-20261122-01/scoped-csr01/build/obj/Vbsg_nonsynth_zynq_testbench','actual new1280 scoped namespace')
++    require(build['binary']==a['model'] and build['baseline_relink']['sha256']==a['original_model']['sha256'],'exact new scoped768 from untouched relink')
++    require(a['model']['path']=='/run/user/1001/zp-csr-unmasked768-fullcore-20261123-01/scoped-csr01/build/obj/Vbsg_nonsynth_zynq_testbench','actual new768 scoped namespace')
+     qualification=json.loads(Path(a['closed_anchors']['qualification']['path']).read_text())
+-    require(qualification['state']=='PASS-matched1280-cold08-five-domain-literal-equivalence-strict-counter-geometry' and len(qualification['domains'])==5 and all(r['literal_bytes_equal']for r in qualification['domains'].values()),'actual current five complete domains')
++    require(qualification['state']=='PASS-matched768-cold08-five-domain-literal-equivalence-strict-counter-geometry' and len(qualification['domains'])==5 and all(r['literal_bytes_equal']for r in qualification['domains'].values()),'actual current five complete domains')
+     std=json.loads(Path(a['closed_anchors']['STD']['path']).read_text())
+-    require(std['model']==a['model'] and std['state']=='PASS four unchanged architectural tests on new CSR-unmasked qualified model; no performance claim','new1280 STD model match; generic label alone insufficient')
++    require(std['model']==a['model'] and std['state']=='PASS four unchanged architectural tests on new CSR-unmasked qualified model; no performance claim','new768 STD model match; generic label alone insufficient')
+     return namedtuple('Context','strict generator selected anchors')(strict,generator,MappingProxyType(selected),a)
+ 
+ 
