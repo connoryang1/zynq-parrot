@@ -879,3 +879,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **Fresh160KiB native gate starts:** TOP88ab04dfc changes exactlyI/D defaults1536→1280 withBP1e7/ordinary32+32+16KiB/20-8MHz/2-4 unchanged. Rootfunds1GiBRUN/32MiBbaseHOME via6ec89996;9 private sourceclones pass, actualmaintainedMake-n and fresh integrityELF2fab9074/NBF7c47ff60 plus unchangedcold08 pass preparation. ActualmodelMake-n164682c2 passes8workers/cacheoff/noPCH/TRACE1, selection34e033e4/executioncc75ebb3 launches oneclean11phase ROOTsession6165 at01:36:28UTC. Buildrunning; no oldmodel, fullcapacity, CAD, FPGA or application acceptance transferred.
+
+
+**Fresh160KiB clean correctness gate passes:** one fresh eleven-phase full-core execution bf2a4ff4 uses model95699e2a, TOP88ab04dfc/BP1e7 and actual1280 lines per side with all17 ordinary/retained geometry facts unchanged. Clean8-worker build149.395s; integrity, cold08 strict512-bit/eight real L1 writes/I retirement and independent I/D[1,1,8] counters all pass, every owned group closes, source endcheck passes. ROOT fe5dcc13 independently checks model/log/proof bytes and fresh no compiler/model/vendor workers; `research/csr1280-initial-native-20261123` preserves exact receipts. Sparse simulation only; scoped observation, standard regressions, full occupancy, routed fit and physical applications remain pending.
