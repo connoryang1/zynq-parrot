@@ -1,0 +1,29 @@
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr768-observation-preparation-20261123/bind_sources.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-observation-preparation02-20261123/bind_sources.py
+@@ -9 +9 @@
+-STD=HERE.parent/'csr768-regression-preparation-20261123'
++STD=HERE.parent/'csr768-regression-preparation02-20261123'
+@@ -38 +38 @@
+-    source=dict(schema='csr768-observation-source-v1',state='SOURCE BOUND after actual new768 eleven-phase PASS; separate ROOT prepare/clone approval required',model_sha=MODEL_SHA,model_bytes=accepted['model']['bytes'],source_TOP=accepted['source_tree_baseline'],source_BP=accepted['source_bp'],fullcore_proof=bind(FULL/'session.json'),model_input=bind(model_input),ROOT_resource_profile=resource,owned=own,inputs=rows,new_source_cap_bytes=128*1024,new_source_inside_existing_logging_envelope=True,whole_pool_bytes=1024**3,whole_durable_bytes=32*1024**2,scope='768 cold08 observation equivalence+unchanged4STD only; no all768/physical/fit/performance')
++    source=dict(schema='csr768-observation-source-v1',state='SOURCE BOUND after actual new768 eleven-phase PASS; separate ROOT prepare/clone approval required',model_sha=MODEL_SHA,model_bytes=accepted['model']['bytes'],source_TOP=accepted['source_tree_baseline'],source_BP=accepted['source_bp'],fullcore_proof=bind(FULL/'session.json'),model_input=bind(model_input),ROOT_resource_profile=resource,owned=own,inputs=rows,new_source_cap_bytes=160*1024,new_source_inside_existing_logging_envelope=True,whole_pool_bytes=1024**3,whole_durable_bytes=32*1024**2,scope='768 cold08 observation equivalence+unchanged4STD only; no all768/physical/fit/performance')
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr768-observation-preparation-20261123/helper/bounded.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-observation-preparation02-20261123/helper/bounded.py
+@@ -7 +7 @@
+-POOL_CAP=1024**3;HOME_CAP=32*1024**2;PACKET_CAP=128*1024
++POOL_CAP=1024**3;HOME_CAP=32*1024**2;PACKET_CAP=160*1024
+@@ -9 +9 @@
+-PACKET_ROOTS=(HERE.parent,HERE.parents[1]/'csr768-regression-preparation-20261123')
++PACKET_ROOTS=(HERE.parent,HERE.parents[1]/'csr768-regression-preparation02-20261123')
+@@ -49 +49 @@
+-        require(s['HOME']<=HOME_CAP and s['helper']<=PACKET_CAP,'whole32MiB durable and new source128KiB inside logging')
++        require(s['HOME']<=HOME_CAP and s['helper']<=PACKET_CAP,'whole32MiB durable and observation+STD source160KiB inside existing metadata reserve')
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr768-regression-preparation-20261123/launch.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-regression-preparation02-20261123/launch.py
+@@ -23 +23 @@
+-    helper=HERE.parent/'csr768-observation-preparation-20261123/helper';sys.path.insert(0,str(helper))
++    helper=HERE.parent/'csr768-observation-preparation02-20261123/helper';sys.path.insert(0,str(helper))
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr768-regression-preparation-20261123/regressions.py
++++ /home/coyang/zynq-parrot-retained-metadata/research/csr768-regression-preparation02-20261123/regressions.py
+@@ -7 +7 @@
+-CLONE_HELPER=STD_ROOT.parent/'csr768-observation-preparation-20261123/helper'
++CLONE_HELPER=STD_ROOT.parent/'csr768-observation-preparation02-20261123/helper'
