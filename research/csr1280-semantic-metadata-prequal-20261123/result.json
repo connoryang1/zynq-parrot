@@ -1,0 +1,109 @@
+{
+  "state": "PASS metadata constructor compatibility and joint linked-ELF payload checks; no new events/native/FPGA",
+  "single_comparisons": [
+    {
+      "group": "control256",
+      "role": "d-enabled",
+      "lines": 256,
+      "targets_exact": true,
+      "comparison": "completed proof target-map metadata; not new trace execution",
+      "proof": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/d-enabled-audit/verification.json",
+        "bytes": 470051,
+        "sha256": "125da337cc09e9a2d2f9755577585dbc92fef54a823789f8f0b5b2dd43242f04"
+      }
+    },
+    {
+      "group": "control256",
+      "role": "d-off",
+      "lines": 256,
+      "targets_exact": true,
+      "comparison": "completed proof target-map metadata; not new trace execution",
+      "proof": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/d-off-audit/verification.json",
+        "bytes": 413177,
+        "sha256": "d1a03248fe3134c1839db4f2fe11cbdb6c3dc2de7062ee4d1a0c033a6b8b2cfb"
+      }
+    },
+    {
+      "group": "control256",
+      "role": "i-enabled",
+      "lines": 256,
+      "targets_exact": true,
+      "comparison": "completed proof target-map metadata; not new trace execution",
+      "proof": {
+        "path": "/run/user/1001/zp-csr-unmasked256-fullcore-20261122-01/all256-csr01/i-enabled-audit/verification.json",
+        "bytes": 539795,
+        "sha256": "53a8d141cd97a00daa5dad51490dc1bde481d5590de927699343e42befde98c9"
+      }
+    },
+    {
+      "group": "previous1792",
+      "role": "d-enabled",
+      "lines": 1280,
+      "targets_exact": true,
+      "comparison": "completed proof target-map metadata; not new trace execution",
+      "proof": {
+        "path": "/dev/shm/zp-retained1792-stream-canonical-20261121-01/d-enabled-audit-attempt2/verification.json",
+        "bytes": 3292608,
+        "sha256": "a38b2f508e05a2fd6732824596252b0f2cd7ae6fb2d894696b9b2bb1c6d688a4"
+      }
+    },
+    {
+      "group": "previous1792",
+      "role": "d-off",
+      "lines": 1280,
+      "targets_exact": true,
+      "comparison": "completed proof target-map metadata; not new trace execution",
+      "proof": {
+        "path": "/dev/shm/zp-retained1792-stream-canonical-20261121-01/d-off-audit/verification.json",
+        "bytes": 2887190,
+        "sha256": "2e198812e12d5612b809a54c5348de621f9960d62f5bb7e60b0149d7cfdecacc"
+      }
+    },
+    {
+      "group": "previous1792",
+      "role": "i-enabled",
+      "lines": 1280,
+      "targets_exact": true,
+      "comparison": "completed proof target-map metadata; not new trace execution",
+      "proof": {
+        "path": "/dev/shm/zp-retained1792-stream-canonical-20261121-01/i-enabled-audit/verification.json",
+        "bytes": 3780030,
+        "sha256": "5cbdb3adaf2a8cfe844b4af74aff216b796ff1b9675460bfc84f03771aa7fbf4"
+      }
+    }
+  ],
+  "joint_linked_payloads": [
+    {
+      "lane": "i",
+      "lines": 1280,
+      "linked_payload_bytes": 81920,
+      "all_bytes_equal": true
+    },
+    {
+      "lane": "d",
+      "lines": 1280,
+      "linked_payload_bytes": 81920,
+      "all_bytes_equal": true
+    }
+  ],
+  "current_expected_joint": [
+    1280,
+    1280,
+    1280,
+    1280,
+    10240,
+    10240
+  ],
+  "geometry_profile": "explicit1280/256",
+  "model_executed": false,
+  "FST_read": false,
+  "board_actions": false,
+  "limits": "Prior dynamic proofs are constructor metadata references only. No new1280 dynamic/complete-stream/counter/EOF/physical acceptance.",
+  "authority": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr1280-semantic-metadata-prequal-20261123/authority.json",
+    "bytes": 8808,
+    "sha256": "a7cb001ec6fca032924c2fcd3dde136a7cb2931bb9122b60f02672130f51a491"
+  }
+}

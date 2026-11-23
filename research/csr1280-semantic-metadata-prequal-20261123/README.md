@@ -1,0 +1,3 @@
+This checks the 1280-line semantic constructors against completed reference metadata and the unchanged linked program. It validates checker inputs without running a model or reading a waveform.
+
+All six instruction/data target-map comparisons pass, with the256-line cases also matching their completed counter metadata. Both1280-line joint target maps match every linked ELF byte:163,840 payload bytes in total. The bounded worker passes in3.222 seconds and closes its group. This establishes constructor/payload compatibility only; dynamic all-slot events, joint behavior, routed fit and application benefit remain pending.

@@ -1,0 +1,5 @@
+This preserves the recovery identities and receipts for compiled-cache cleanup of the unfit 192 KiB native model. Only the 147 rebuildable object/archive files already identified as exclusions in its closed inventory were selected.
+
+The new archive590caef9 stores85,970,984 bytes in6,750,060 bytes, with complete member byte/mode readback and stable-original checks before removal. Two ownership scans inspect references to the old pool and selected descriptors, recording the same exact desktop FD exceptions; unrelated current Vivado make is allowed. The bounded worker completes in10.157 seconds with no remaining owned group. Both old models, generated C++/headers, source/private Git, waveforms and programs remain; current1280 and FPGA files are outside the scope. Every removed cache byte/mode can be restored under the recorded root.
+
+The previous native closure is historical and unchanged; ROOT-layered-disposition.json records the current cache disposition. No fixed BASE reservation is released or reused.
