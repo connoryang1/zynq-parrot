@@ -852,3 +852,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **Later capacity audit can reuse current observation model:** source/closed-report review and ROOT independent unique-suffix/width check prove the qualified415-leaf1536 model contains all167 required raw audit signals; no clone/reader rebuild is needed. Preserve actual older1792/CSR256 FST/stream sizes and roughly1091–1202s/723–762s native role times in `research/csr1536-native-capacity-review-20261122`, along with six-way1536/joint adapter requirements; all1536 and joint dynamics remain unexecuted/unfunded. CurrentCAD03 remains the only active vendor job.
+
+
+**Synthesis time localizes to optimization stages:** read-only extraction of the completed matchedCSR256 log records cumulative cross-boundary/area finish58:35, timing-optimization finish79:42 and synth_design84:16 (`research/csr-build-stage-timing-20261122`). This explains the scale of the active1536 optimization wait without declaring a hang, minimum runtime or transferable speed forecast; current worker/startticks/vendor CPU advancement are independently verified live, with no source/resource/ownership violations. No new vendor/board run was launched.

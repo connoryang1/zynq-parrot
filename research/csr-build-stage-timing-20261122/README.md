@@ -1,0 +1,3 @@
+This records cumulative timestamps from the completed32KiB CSR256 synthesis log to identify where the observed build time was spent. It is a read-only extraction of retained evidence, not a new build, speedup measurement, runtime minimum or completion estimate for the active192KiB candidate.
+
+The historical log finishes cross-boundary/area optimization at58:35, timing optimization at79:42 and synth_design at84:16. These are cumulative tool-reported wall times; they do not identify a removable RTL block or prove that the current process is healthy. Current liveness and CPU advancement are checked independently by the owned job monitor. The bound original full log is preserved in the completed-work archive.
