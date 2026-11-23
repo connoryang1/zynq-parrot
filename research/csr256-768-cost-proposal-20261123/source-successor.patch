@@ -1,0 +1,100 @@
+--- original/csr_pair_context.py
++++ prospective/csr_pair_context.py
+@@ -6,9 +6,9 @@
+ SOURCE_NAMES = ('csr_pair_context.py', 'csr_pair_promotion.py', 'csr_pair_collector.py',
+                 'csr_pair_within.py', 'csr_pair_analysis.py', 'csr_pair_acquire.py')
+ TOP = dict(small='a44c03bb7bc520a3b5727c2bb619a055a7ed5acd',
+-           large='88ab04dfcc508176cc977096ca0c132299a8a460')
++           large='1b24c915ed628f6d47a382b3aa89fb662884e1a1')
+ BP = '1e7aa2fdc94a56373a26f95b145aff361d4d0aaa'
+-LINES = dict(small=256, large=1280)
++LINES = dict(small=256, large=768)
+ PROJECTS = ('top_ip_proj', 'black_parrot_bd_proj', 'tmp_edit_project')
+ # New reviewed SOURCE checkpoints must register actual closed evidence. Empty now.
+ APPROVED_OWNERSHIP = {}
+@@ -24,7 +24,7 @@
+ def image_for(hardware):
+     matches = [image for image, n in LINES.items()
+                if hardware['retained'] == dict(i_lines=n, d_lines=n, set_log2=8)]
+-    require(len(matches) == 1, 'exact matched256/1280 geometry only')
++    require(len(matches) == 1, 'exact matched256/768 geometry only')
+     return matches[0]
+ 
+ 
+@@ -90,9 +90,9 @@
+             'same exact BP/HDL; no new storage/policy change')
+     require(proof['changed_files'] == ['cosim/black-parrot-example/Makefile.design',
+             'cosim/mk/Makefile.vivado', 'cosim/tcl/vivado-utils.tcl']
+-            and proof['capacity_default_changes'] == dict(i_lines=[256,1280], d_lines=[256,1280]),
++            and proof['capacity_default_changes'] == dict(i_lines=[256,768], d_lines=[256,768]),
+             'two capacity defaults plus only reviewed OPT carrier')
+-    require(proof['source_diff']['sha256'] == '37b95fb9293539a80900617f6bbb32cb860f449d80b496c772f3cb7ae314d1b5', 'exact raw source-control diff')
++    require(proof['source_diff']['sha256'] == 'ab1b3531e0150cac90733ace8fc6093bd8b3e15e3c88d7c084bd7525f2bf626f', 'exact raw source-control diff')
+     base.verify_binding(proof['source_diff'])
+     for key in ('consumed_HDL_equality', 'all_gitlink_identity', 'carrier_only_derivation'):
+         base.verify_binding(proof[key])
+--- original/csr_pair_analysis.py
++++ prospective/csr_pair_analysis.py
+@@ -95,13 +95,14 @@
+ 
+ 
+ def validate_declaration(d,approved=False):
+-    require(d['schema']=='bp-retained29-csr256-1280-old2dd-capacity-study-v3','new explicit capacity study')
++    require(d['schema']=='bp-retained29-csr256-768-old2dd-capacity-study-v4','new explicit capacity study')
+     require(d['fixed']==FIXED and d['primary']==PRIMARY and d['schedule']==schedule(),'fixed architecture/estimator/interleaving')
+     require(d['small_lines_per_side']==256 and d['small_total_payload_bytes']==32768,'full first way baseline, not absent controller')
+     require(d['program_sha256']==p.cost.ELF_SHAS and d['visits_per_image']==p.canonical_visits(),'unchanged COST programs/16boot plans')
+     require(d['failure_policy']=='first failed attempt stops study; no retries, subsets or winner selection','fixed failure policy')
+     require(d['source_architecture_TOP']==ARCHITECTURE_TOP and d['small_source_TOP']==SMALL_TOP,'new common architecture and exact small source')
+-    require(d['candidate_large_lines_per_side']==1280 and d['candidate_large_source_TOP']==context.TOP['large'],'exact candidate1280, no fit or selection approval')
++    require(d['candidate_total_payload_bytes']==98304,'balanced768 per side full64B payload accounting')
++    require(d['candidate_large_lines_per_side']==768 and d['candidate_large_source_TOP']==context.TOP['large'],'exact candidate768, no fit or selection approval')
+     common_mechanism(d['common_mechanism_bridge'])
+     actual=source_hashes()
+     require(set(d['sources'])==set(actual) and all(all(d['sources'][name][k]==actual[name][k] for k in ('bytes','sha256')) for name in actual),'exact new analysis source bytes')
+@@ -115,10 +116,10 @@
+     top=d['selected_large_source_TOP']
+     require(type(top) is str and len(top)==40 and all(c in '0123456789abcdef' for c in top),'selected large exact source TOP pending')
+     n=d['selected_large_lines_per_side']
+-    require(type(n) is int and n==1280 and top==context.TOP['large'],'only exact reviewed1280 candidate can be selected after fit/correctness')
++    require(type(n) is int and n==768 and top==context.TOP['large'],'only exact reviewed768 candidate can be selected after fit/correctness')
+     bridge_record=d['source_capacity_bridge'];bridge=within.bound_json(bridge_record)
+     require(APPROVED_CAPACITY_BRIDGES.get(bridge_record['sha256'])==dict(small=256,large=n,BP=BP,trace=0,small_TOP=SMALL_TOP,large_TOP=d['selected_large_source_TOP']),'actual source/fit/correctness selection bridge not registered')
+-    require(bridge['schema']=='bp-retained29-csr256-1280-opt-capacity-bridge-v3' and
++    require(bridge['schema']=='bp-retained29-csr256-768-opt-capacity-bridge-v4' and
+         bridge['state']=='PASS root-reviewed capacity plus explicit nonHDL OPT carrier source fit correctness clock bridge','actual reviewed bridge')
+     require(bridge['fixed']==FIXED and bridge['small_lines_per_side']==256 and bridge['large_lines_per_side']==n,
+         'same BP/capture/sets/epochs/ordinary geometry/clocks; capacity defaults only')
+@@ -180,7 +181,7 @@
+ def verify_study(d,study_record,gates,ledger_record):
+     validate_declaration(d,approved=True)
+     ledger=within.bound_json(ledger_record)
+-    require(ledger['schema']=='bp-retained29-csr256-1280-old2dd-capacity-ledger-v3' and ledger['study']==study_record,'same source-bound study ledger')
++    require(ledger['schema']=='bp-retained29-csr256-768-old2dd-capacity-ledger-v4' and ledger['study']==study_record,'same source-bound study ledger')
+     require(ledger_record['path']==d['attempt_ledger_path'],'fixed declared ledger path')
+     require(len(ledger['entries'])==32 and all(e['state']=='PASS' for e in ledger['entries']),'all32 attempts complete; any failure/pending/subset stops study')
+     require(not ledger.get('failed_attempts',[]),'earlier failed attempt forbids a passing replacement study')
+@@ -272,7 +273,7 @@
+     boots={image:within.sessions_to_boots(gates[image]) for image in IMAGES}
+     estimates=estimate(boots['small'],boots['large'],d['selected_large_lines_per_side'])
+     require(source_hashes()==sources_before,'analysis/verifier sources immutable')
+-    return dict(schema='bp-retained29-csr256-1280-old2dd-capacity-analysis-v3',scope='COMPLETE_TWO_IMAGE_PHYSICAL_STUDY',
++    return dict(schema='bp-retained29-csr256-768-old2dd-capacity-analysis-v4',scope='COMPLETE_TWO_IMAGE_PHYSICAL_STUDY',
+         inputs=dict(study=study_record,complete_gates=records,global_ledger=ledger_record,sources=sources_before),
+         estimates=estimates)
+ 
+--- original/csr_pair_acquire.py
++++ prospective/csr_pair_acquire.py
+@@ -18,9 +18,9 @@
+ 
+ p=analysis.p
+ require=p.require
+-SCHEMA='bp-retained29-csr256-1280-old2dd-capacity-acquisition-v3'
+-LEDGER_SCHEMA='bp-retained29-csr256-1280-old2dd-capacity-ledger-v3'
+-TEMPLATE_SCHEMA='bp-retained29-csr256-1280-old2dd-capacity-slot-template-v3'
++SCHEMA='bp-retained29-csr256-768-old2dd-capacity-acquisition-v4'
++LEDGER_SCHEMA='bp-retained29-csr256-768-old2dd-capacity-ledger-v4'
++TEMPLATE_SCHEMA='bp-retained29-csr256-768-old2dd-capacity-slot-template-v4'
+ 
+ 
+ def sources():
