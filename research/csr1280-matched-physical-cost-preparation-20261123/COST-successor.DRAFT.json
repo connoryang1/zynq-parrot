@@ -1,0 +1,106 @@
+{
+  "schema": "csr256-1280-physical-COST-successor-template-v1",
+  "state": "DRAFT UNLAUNCHABLE",
+  "launchable": false,
+  "frozen_declaration": {
+    "path": "/home/coyang/zynq-parrot-linux-capacity/research/retained29-csr-matched-capacity-20261122/declaration.DRAFT.json",
+    "bytes": 35101,
+    "sha256": "c57b6f7298e6f18deffd0c8131b19f3b8abaccbfc4272301904207bea63a8afe"
+  },
+  "new_declaration": null,
+  "new_runtime_sources": null,
+  "new_coordinator_admission": null,
+  "primary_runner_sha256": null,
+  "physical_allowlist_entries": {},
+  "observer_allowlist_entries": {},
+  "capacity_bridge_allowlist_entries": {},
+  "preserve_exact": {
+    "program_ELF_sha256": {
+      "plain": "770bbfdb7ee5e92ce78fdf53bd029ebfe9c68586870c80946f7dc1b2a09e31b1",
+      "regex": "e1693d512042779b5496f755d67377681d35926ffbb46e69ca5ff7cc0998969e"
+    },
+    "kernel29_NBF_sha256": "1a06cae9ce4c93eeb634d109ce1e58d6b7d6cade85ec966e7bcd848828ef9d33",
+    "workloads": [
+      "scan",
+      "lookup",
+      "parse",
+      "chase",
+      "regex"
+    ],
+    "footprints_KiB": [
+      32,
+      128
+    ],
+    "control_masks": [
+      0,
+      9,
+      6,
+      15
+    ],
+    "source": "none",
+    "sync": "futex",
+    "profile": "plain",
+    "per_actor_private_workload": true,
+    "performance": {
+      "loops": 256,
+      "repeats": 4,
+      "warmup": 16,
+      "commands_per_boot": 6,
+      "cells_per_command": 8,
+      "ABBA": true,
+      "rotations": [
+        0,
+        2,
+        4
+      ]
+    },
+    "pilot": {
+      "workloads": [
+        "lookup",
+        "regex"
+      ],
+      "footprint_KiB": 32,
+      "loops": 8,
+      "repeats": 2,
+      "warmup": 4,
+      "commands": 6
+    },
+    "acquisition": "unchanged32 globalslots: two pilots +30performance boots,32distinct actual PS UUIDs; alternate image-first by performance-slot parity, preserve per-image order/rotation",
+    "primary": "joint15 complete WHOLE enabled_large/enabled_small; GM4 paired repeats -> GM3 bootpairs -> equal10 workload-size configurations",
+    "diagnostics": "withinimage on/off, off_large/off_small, ratio-of-ratios, I9/D6; steady secondary; all3 bootpoints/ranges/rawcosts/resources/order",
+    "statistics": "no CI/P/bootstrap, no subset or outcome-based image/capacity/metric selection",
+    "stop_policy": "any actual failed/pending/unknown attempt stops whole study; busy without acquisition only DEFERRED; no blind crash rerun"
+  },
+  "prerequisite_order": [
+    "ROOT-reviewed matched source/build/clock and fit/package identities",
+    "per-image complete native/scoped/STD/all-capacity and joint correctness evidence",
+    "per-image physical ownership/MMIO/capability/fixedfunctional/capacity+GP0 qualification",
+    "same-image COST pilot passes with exact newly admitted primary runtime",
+    "fixed32-slot source-bound dispatch/reconcile complete acquisition",
+    "complete promotion audit for both exact images, then unchanged estimator"
+  ],
+  "reservation": {
+    "path": "/home/coyang/fpga-artifacts/pynq-session.lock",
+    "open_existing_inode_only": true,
+    "exclusive_nonblocking_flock": true,
+    "hold": "before any upload/install/reset/stage through guest and actual verified recovery; maintained board-program guard also mandatory",
+    "common_lock_unlink_or_recreation": false,
+    "live_pre_guard_helper_refusal": true,
+    "owned_guard_recovery": "durable owner/file/dir/parent witness before own power, actual new boot+idle and same proven owned stale guard only",
+    "unconfirmed_recovery": "journaled held reservation, fixed explicit recovery-only requests; journal/request OSError cannot release; no guest retry",
+    "release": "only actually verified runner/helper/overlay/operating recovery; never relabel failed guest as PASS",
+    "recovery_triplet": [
+      "power_cycle_pynq.sh",
+      "wait_pynq_ready.sh",
+      "load_pynq_overlay.sh"
+    ],
+    "final_runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "final_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "SIGKILL_or_powerloss_crashproof": false
+  },
+  "limits": [
+    "WHOLE retains all guest activation/reset/controller drain/allocation/fork/warmup/work/check/free/teardown; repeated-crossover carryover and ordinary fence maintenance remain.",
+    "Controller/backend drain is not entire lower memory-system drain.",
+    "Matched greater-capacity complete-cost contrast; no isolated advisory-prefetch benefit, per-application GP0 occupancy, simulation-to-FPGA projection or physically absent-hardware comparison."
+  ]
+}

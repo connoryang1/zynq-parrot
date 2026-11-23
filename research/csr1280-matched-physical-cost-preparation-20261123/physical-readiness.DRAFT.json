@@ -1,0 +1,173 @@
+{
+  "schema": "csr256-1280-matched-physical-readiness-template-v1",
+  "state": "DRAFT UNLAUNCHABLE",
+  "launchable": false,
+  "common": {
+    "BP": "1e7aa2fdc94a56373a26f95b145aff361d4d0aaa",
+    "sets": 256,
+    "epoch_bits": 8,
+    "line_bytes": 64,
+    "ordinary_I_KiB": 32,
+    "ordinary_D_KiB": 32,
+    "L2_KiB": 16,
+    "resident": 2,
+    "logical": 4,
+    "CPU_MHz": 20,
+    "AXI_MHz": 20,
+    "timer_MHz": 8,
+    "observe": 1,
+    "trace": 0,
+    "response_delay": 0
+  },
+  "images": {
+    "small": {
+      "TOP": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+      "i_lines": 256,
+      "d_lines": 256,
+      "total_retained_payload_bytes": 32768,
+      "BIT": null,
+      "HWH": null,
+      "package": null,
+      "MAP": null,
+      "routed_fit_and_timing": null,
+      "actual_source_and_private_generated_inputs": null,
+      "actual_seven_defines_all_three_child_contexts": null,
+      "actual_clock_constraints_and_coverage": null,
+      "fullcore_scoped_STD_allslot_proofs": null,
+      "joint_full_capacity_proof": null,
+      "physical_CMA_MMIO_ownership": null,
+      "actual_present_and_fixed_functional": null,
+      "physical_capacity_GP0": null,
+      "same_image_COST_pilot": null,
+      "ROOT_deployment_authority": null
+    },
+    "large": {
+      "TOP": "88ab04dfcc508176cc977096ca0c132299a8a460",
+      "i_lines": 1280,
+      "d_lines": 1280,
+      "total_retained_payload_bytes": 163840,
+      "BIT": null,
+      "HWH": null,
+      "package": null,
+      "MAP": null,
+      "routed_fit_and_timing": null,
+      "actual_source_and_private_generated_inputs": null,
+      "actual_seven_defines_all_three_child_contexts": null,
+      "actual_clock_constraints_and_coverage": null,
+      "fullcore_scoped_STD_allslot_proofs": null,
+      "joint_full_capacity_proof": null,
+      "physical_CMA_MMIO_ownership": null,
+      "actual_present_and_fixed_functional": null,
+      "physical_capacity_GP0": null,
+      "same_image_COST_pilot": null,
+      "ROOT_deployment_authority": null
+    }
+  },
+  "hardware_approvals": {},
+  "host_approvals": {},
+  "source_bridge": {
+    "raw_TOP_diff": "source-control.diff",
+    "required": "BP/gitlinks and consumed HDL byte equality; two exact retained defaults plus separately reviewed OPT-only build carrier. Do not assert raw TOPs differ only in defaults.",
+    "actual_build_controls_both_images": null,
+    "matched_OPT_policy": "actual identical opt/synth/place/route child commands required; no inherited ExploreArea approval",
+    "capacity_selected_before_application_outcomes": true
+  },
+  "capacity_roles": [
+    "d-enabled",
+    "d-off",
+    "i-enabled",
+    "i-off",
+    "joint"
+  ],
+  "expected_GP0_by_capacity": {
+    "256": {
+      "d-enabled": [
+        0,
+        256,
+        0,
+        256,
+        0,
+        2048
+      ],
+      "d-off": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "i-enabled": [
+        256,
+        0,
+        256,
+        0,
+        2048,
+        0
+      ],
+      "i-off": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint": [
+        256,
+        256,
+        256,
+        256,
+        2048,
+        2048
+      ]
+    },
+    "1280": {
+      "d-enabled": [
+        0,
+        1280,
+        0,
+        1280,
+        0,
+        10240
+      ],
+      "d-off": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "i-enabled": [
+        1280,
+        0,
+        1280,
+        0,
+        10240,
+        0
+      ],
+      "i-off": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "joint": [
+        1280,
+        1280,
+        1280,
+        1280,
+        10240,
+        10240
+      ]
+    }
+  },
+  "capacity_rules": [
+    "Exact software and complete protected payload checks; full512 bits/eight real L1 writes/I16 retirement per target proven in separately bound simulation, physical aggregate counts do not reproduce per-address FST proof.",
+    "Actual fresh AXI-reset epoch for each physical capacity role; counters16-bit saturating, all six exact expected words, two snapshots1000us apart equal and nonsaturated.",
+    "Synthetic advisory-backed capacity != source-none natural application behavior; no application occupancy/hit inference."
+  ]
+}

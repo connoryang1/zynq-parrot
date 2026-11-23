@@ -1,0 +1,44 @@
+{
+  "schema": "csr-matched-COST-host-ownership-template-v1",
+  "state": "DRAFT UNLAUNCHABLE; runtime choice and physical allocator qualification pending",
+  "accepted_rollback_runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+  "compiled_observer_candidate_sha256": "9c2648f1a9d2ceab2645895fdad74a5bc2c2ce62ad8f1161c6b3b72e74da42fa",
+  "compiled_observer_bytes": 35984,
+  "board_helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+  "primary_runner_sha256": null,
+  "primary_runtime_source_successor": null,
+  "primary_runtime_physical_qualification": null,
+  "memory": {
+    "guest_base": "0x80000000",
+    "allocation_bytes": 48234496,
+    "exclusive_guest_limit": "0x82e00000",
+    "Linux_DMA32_last_byte": "0x82dfffff",
+    "Linux_total_KiB": 47104,
+    "bootargs": "mem=46M rdinit=/bin/sh",
+    "FDT_destination": "0x82200000"
+  },
+  "required_physical_ownership_receipt": {
+    "runner_and_libcma_header_library_identities": null,
+    "actual_allocation_request_and_returned_virtual_physical_range": null,
+    "authoritative_CMA_owned_extent_and_exclusive_lifetime": null,
+    "nonzero_allocation_and_no_physical_addition_overflow": null,
+    "actual_DRAM_base_readback_and_relocated_HP0_range": null,
+    "all_NBF_tail_widths_and_FDT_buffer_within_extent": null,
+    "actual_Linux_memory_bound_and_ordinary_memory_attributes": null,
+    "safe_postterminal_lifetime_and_cleanup": null
+  },
+  "source_facts": [
+    "Collected native allocator calls _xlnk_reset(), cma_alloc(length,0), cma_get_phy_addr(), cma_free(); shared reset affects CMA globally. Qualification needs exclusive compatible allocator ownership, not just a printed request.",
+    "top_zynq hp0_axi_{aw,ar}addr=(axi_{aw,ar}addr XOR 0x80000000)+dram_base_li; no allocation-bound mask.",
+    "Frozen boot_bound checks exact allocation-request prints plus Linux46MiB, DMA32/FDT/bootargs; these are necessary, not independent CMA extent proof.",
+    "Collected deployed Makefile64MiB differs accepted binary request46MiB; source-to-oldbinary equivalence was never proved.",
+    "9c uses same direct-CMA path and is compiled-only; it is not itself an ownership fix or a physical approval."
+  ],
+  "runtime_decision": {
+    "if_2dd_exact_ownership_is_independently_qualified": "Primary can retain exact2dd with separately bound new-image prerequisites; 9c is not logically mandatory merely because it prints counters.",
+    "if_primary_selects_9c": "Require new versioned protocol/safe guard/staging/collector source bindings, actual install/identity/rollback/ownership qualification and same runtime on both images. Never substitute it into frozen old2dd contracts.",
+    "saturation_blocker": "Exact9c emits NATIVE_RETAINED_OBSERVER_FAIL on any saturated field, even with equal snapshots. Long COST cells may validly saturate. Do not relax capacity gates or discard saturated app boots post hoc. Resolve primary runtime/error contract prospectively before admission; no per-app GP0 claim."
+  },
+  "GP0_for_primary_inference": false,
+  "approvals": {}
+}
