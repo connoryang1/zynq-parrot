@@ -1,0 +1,88 @@
+--- reference64-init-plus-control256-init
++++ explicit-profile-and-single-init
+@@ -1,23 +1,41 @@
+-    def __init__(self,program,role):
+-        self.program=program;self.lane=role[0];self.active=role.endswith('enabled');self.mode=(1 if self.lane=='i' else 2) if self.active else 0
+-        self.lines=64;self.sets=64;self.targets={};self.marked={};self.inflight=None;self.lookup=None
+-        self.actual_pub={};self.actual_hit={};self.retained={};self.normal={};self.burst=None
+-        self.retired={};self.d_load_retirements=0;self.last_values=None;self.target_mem_before_pub=[]
+-        self.reset=original.Validator({'i':[0]*8,'d':[0]*8},{})
+-        for slot in range(self.lines):
+-            index=(slot&~63)+((slot*0xaaaaaaaaaaaaaaab)&63)
+-            addr=program['code_base']+192*index if self.lane=='i' else program['data_base']+64*slot
+-            self.targets[addr]=dict(slot=slot,index=index,words=generate.code_words(index) if self.lane=='i' else generate.data_words(slot))
+-        names=('populate_begin','verify_begin','verified')
+-        self.markers={name:program['symbols']['retained_capacity_'+self.lane+'_'+name]['address'] for name in names}
+-        self.d_begin=program['symbols']['retained_capacity_d_populate_begin']['address'];self.d_end=program['symbols']['retained_capacity_d_verified']['address']
++def geometry(lines,sets=256):
++    require(type(lines) is int and lines in (256,1536) and type(sets) is int and sets==256,'explicit control256 or candidate1536, same256sets')
++    return Geometry(lines,sets)
+ 
+-# followed by established control256 constructor:
+-    def __init__(self,program,role):
+-        require(program['max_lines']==1792 and program['max_sets']==256,'same062a runtime-geometry ELF bounds')
+-        super().__init__(program,role)
+-        self.lines,self.sets=256,256;self.targets={}
+-        for slot in range(256):
+-            index=(slot*0xaaaaaaaaaaaaaaab)&255
+-            address=program['code_base']+192*index if self.lane=='i' else program['data_base']+64*slot
+-            self.targets[address]=dict(slot=slot,index=index,words=original.generate.code_words(index) if self.lane=='i' else original.generate.data_words(slot))
++def target_index(slot,sets):
++    # At256 this reduces exactly to the established first-way constructor.
++    # At1536 retain the way bits, covering six complete ways, no address search.
++    return (slot&~(sets-1))+((slot*0xaaaaaaaaaaaaaaab)&(sets-1))
++
++def targets(program,lane,profile,generator):
++    require(profile==geometry(profile.lines,profile.sets),'validated explicit geometry')
++    require(lane in ('i','d') and program['max_lines']==1792 and program['max_sets']==256,'unchanged bounded payload generator/program')
++    require(profile.lines<=program['max_lines'] and program['code_stride']==192,'actual target layout bound')
++    result={}
++    for slot in range(profile.lines):
++        index=target_index(slot,profile.sets)
++        address=program['code_base']+192*index if lane=='i' else program['data_base']+64*slot
++        require(address not in result,'unique target address')
++        result[address]=dict(slot=slot,index=index,words=generator.code_words(index) if lane=='i' else generator.data_words(slot))
++    return result
++
++def _lane_fields(obj,program,role,profile,context,mode):
++    require(role in ROLES,'declared role')
++    kind='joint' if mode==3 else 'single'
++    bound=context.anchors['programs'][kind]['manifest'];_verify(bound)
++    require(program==json.loads(Path(bound['path']).read_text()),'unchanged exact program manifest; geometry is separate')
++    obj.program=program;obj.lane=role[0];obj.active=role.endswith('enabled');obj.mode=mode
++    obj.profile=profile;obj.lines=profile.lines;obj.sets=profile.sets
++    obj.targets=targets(program,obj.lane,profile,context.generator)
++    obj.marked={};obj.inflight=None;obj.lookup=None
++    obj.actual_pub={};obj.actual_hit={};obj.retained={};obj.normal={};obj.burst=None
++    obj.retired={};obj.d_load_retirements=0;obj.last_values=None;obj.target_mem_before_pub=[]
++    obj.reset=context.strict.Validator({'i':[0]*8,'d':[0]*8},{})
++    obj.markers={name:program['symbols']['retained_capacity_'+obj.lane+'_'+name]['address'] for name in ('populate_begin','verify_begin','verified')}
++    obj.d_begin=program['symbols']['retained_capacity_d_populate_begin']['address']
++    obj.d_end=program['symbols']['retained_capacity_d_verified']['address']
++
++    def __init__(self,program,role,profile,context):
++        mode=(1 if role[0]=='i' else 2) if role.endswith('enabled') else 0
++        _lane_fields(self,program,role,profile,context,mode)
++        self.role=role
+
+--- reference-joint256-init
++++ explicit-profile-joint-init
+@@ -1,11 +1,8 @@
+-    def __init__(self,program):
+-        require(program['joint_schema']=='retained-joint-capacity-program-v1','new compile manifest required')
+-        require(program['i_lines']==program['d_lines']==program['sets']==256,'one exact qualified256+256 case')
+-        require(program['max_lines']==1792 and program['max_sets']==256,'unchanged generator upper bounds')
+-        self.program=program
+-        self.lanes={lane:LaneValidator(program,lane+'-enabled',program[lane+'_lines'],program['sets']) for lane in ('i','d')}
+-        self.markers={key:program['symbols']['retained_capacity_'+key]['address'] for key in
+-                      ('i_populated','joint_populated','joint_verified')}
+-        self.marked={}
+-        self.call=program['symbols']['retained_capacity_joint_call']['address']
++    def __init__(self,program,profile,context):
++        require(program['joint_schema']=='retained-joint-capacity-program-v1','exact joint program manifest; do not rewrite its old256 metadata')
++        require(program['max_lines']==1792 and program['max_sets']==profile.sets==256,'unchanged joint software upper bounds')
++        self.program=program;self.profile=profile
++        self.lanes={lane:LaneValidator(program,lane,profile,context) for lane in ('i','d')}
++        self.markers={key:program['symbols']['retained_capacity_'+key]['address'] for key in ('i_populated','joint_populated','joint_verified')}
++        self.marked={};self.call=program['symbols']['retained_capacity_joint_call']['address']
+         self.controlled_retirements=0
