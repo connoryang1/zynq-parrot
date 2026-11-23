@@ -1,0 +1,5 @@
+This preserves the four unchanged architectural regressions on the qualified 160 KiB retained-buffer model. It also records recovery identities for all nine source repositories before complete native-base capture.
+
+CSR rebinding, nonresident user-mode data handoff, interrupt-driven resident reseeding and protected RPC all pass, in 42.574, 63.777, 68.997 and 87.723 seconds. All tests use qualified model bc6f17f4 and the exact accepted program/CRT/header recipe; the owned supervisor exits successfully with no remaining process group. ROOT rechecks each program, NBF, trace and log hash. These results establish synthetic architectural correctness, not full-capacity occupancy or application performance.
+
+Eight repositories borrow objects from durable HOME common stores, now protected by explicit recovery references; the ninth has private objects included in the pending source archive. The Git receipt explicitly distinguishes those external stores from bytes inside the native archive. All source and original models/waveforms remain.

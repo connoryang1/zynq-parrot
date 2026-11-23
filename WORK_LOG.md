@@ -891,3 +891,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **160KiB observation clone qualifies:** actual415-path/five-domain preparation126.270s, untouchedrelink exact95699e2a, Syms-registration-only clonebc6f17f4 and onecold08 native56.097s. Qualification221.539s passes allfive complete literalstreams, maintained strict512/eightwinningwrites/Iretire, independentcounter and17geometry audits; bothownedgroupsclose. `research/csr1280-scoped-qualification-20261123` preserves proofs. Four unchanged architectural tests now run under newnative model; allcapacity/routed/FPGA/application claims remain pending.
+
+
+**160KiB four standard regressions pass:** same qualifiedbc6f17f4 runs unchangedCSRrebind/nonresidentSv39data/residentIRQreseed/protectedRPC in42.574/63.777/68.997/87.723s; session6d57ba3f and owned6805f9f2 pass, all groupsclose. ROOT independently rehashes all4program/NBF/FST/log records; `research/csr1280-standard-regressions-20261123` includes exactproofs and9-repository recovery647e443d (8externaldurableobjectstores explicitlyGC-rooted;1private). SevenrawFST exist, no allcapacity/routed/physical/application claim. Completebasearchive/futurefreeze precedesfreshCADfunding.
