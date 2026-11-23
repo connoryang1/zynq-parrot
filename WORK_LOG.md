@@ -897,3 +897,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **160KiB native base durably preserved:** raw/source corpus266027790B/1406members,2models/7rawFST/generatedCPP/source/privateGit/programs/proofs archive25255944B with independent fullreadback, all originals retained. ROOT743fac76 verifies completeinputmembership and rehashes included+excluded originals; only explicitunused nativefutureRUN/HOME0, all actualbytes/OTHER paid. `research/csr1280-native-base-closure-20261123` binds originalmetadata/cache/derivedcanonical accounting and recovery; larger-capacity dynamic/FPGA/application work is not accepted. Fresh1280 CAD fundingbab8d827 starts nineprivate sourceclones/readiness beforeanyvendorlaunch.
+
+
+**160KiB clean routed candidate launches:** fullnative743fac76 finalized, newROOTbab8d827 prices128MiBSOURCE/1.5GiBWORK/shared192MiB plus allfixedOTHER/floors; private9repo sourceeff4c1b8/readiness/actualMake-n pass5256SOURCE/4524WORK/398native consumed files withoneghost exclusion. Exactadmissionbc473480/preflightPASS launches job20261123T021029Z-88ab04dfc, worker1634420/start101563972, ROOTmonitor22559; firstpoll haszeroidentity/foreignvendor/bound violations. `research/csr1280-clean-fit-20261123` bindslaunch/proofs; actualfit/timing, all1280dynamic, FPGA andapplications pending, boardunchanged.
