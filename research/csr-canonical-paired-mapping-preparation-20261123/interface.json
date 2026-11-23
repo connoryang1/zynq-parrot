@@ -1,0 +1,435 @@
+{
+  "state": "86names/directions proven connected by closed behavioral gate; mapped widths pending actual query",
+  "ports": [
+    {
+      "name": "clk_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "reset_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "retained_control_status_i",
+      "direction": "IN",
+      "source_type": "[63:0]"
+    },
+    {
+      "name": "retained_control_cmd_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "retained_control_o",
+      "direction": "OUT",
+      "source_type": "logic [3:0]"
+    },
+    {
+      "name": "cfg_bus_i",
+      "direction": "IN",
+      "source_type": "[cfg_bus_width_lp-1:0]"
+    },
+    {
+      "name": "csr_r_v_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "csr_r_addr_i",
+      "direction": "IN",
+      "source_type": "[rv64_csr_addr_width_gp-1:0]"
+    },
+    {
+      "name": "csr_r_data_o",
+      "direction": "OUT",
+      "source_type": "logic [dword_width_gp-1:0]"
+    },
+    {
+      "name": "csr_r_illegal_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "retire_pkt_i",
+      "direction": "IN",
+      "source_type": "[retire_pkt_width_lp-1:0]"
+    },
+    {
+      "name": "retire_ctxtsw_v_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "fflags_acc_i",
+      "direction": "IN",
+      "source_type": "rv64_fflags_s"
+    },
+    {
+      "name": "frf_w_v_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "debug_irq_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "timer_irq_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "software_irq_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "m_external_irq_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "s_external_irq_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "irq_pending_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "irq_waiting_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "commit_pkt_o",
+      "direction": "OUT",
+      "source_type": "logic [commit_pkt_width_lp-1:0]"
+    },
+    {
+      "name": "decode_info_o",
+      "direction": "OUT",
+      "source_type": "logic [decode_info_width_lp-1:0]"
+    },
+    {
+      "name": "trans_info_o",
+      "direction": "OUT",
+      "source_type": "logic [trans_info_width_lp-1:0]"
+    },
+    {
+      "name": "reservation_trans_info_o",
+      "direction": "OUT",
+      "source_type": "logic [trans_info_width_lp-1:0]"
+    },
+    {
+      "name": "frm_dyn_o",
+      "direction": "OUT",
+      "source_type": "rv64_frm_e"
+    },
+    {
+      "name": "current_physical_thread_id_i",
+      "direction": "IN",
+      "source_type": "[thread_id_width_p-1:0]"
+    },
+    {
+      "name": "current_virtual_context_id_i",
+      "direction": "IN",
+      "source_type": "[context_id_width_p-1:0]"
+    },
+    {
+      "name": "csr_thread_id_i",
+      "direction": "IN",
+      "source_type": "[thread_id_width_p-1:0]"
+    },
+    {
+      "name": "retire_thread_id_i",
+      "direction": "IN",
+      "source_type": "[thread_id_width_p-1:0]"
+    },
+    {
+      "name": "ctx_npc_write_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "ctx_npc_write_rebind_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "ctx_npc_write_rpc_entry_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "ctx_npc_write_virtual_context_id_o",
+      "direction": "OUT",
+      "source_type": "logic [context_id_width_p-1:0]"
+    },
+    {
+      "name": "ctx_npc_write_npc_o",
+      "direction": "OUT",
+      "source_type": "logic [vaddr_width_p-1:0]"
+    },
+    {
+      "name": "ctx_rpush_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "ctx_rpush_fp_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "ctx_rpush_virtual_context_id_o",
+      "direction": "OUT",
+      "source_type": "logic [context_id_width_p-1:0]"
+    },
+    {
+      "name": "ctx_rpush_reg_o",
+      "direction": "OUT",
+      "source_type": "logic [reg_addr_width_gp-1:0]"
+    },
+    {
+      "name": "ctx_rpush_data_o",
+      "direction": "OUT",
+      "source_type": "logic [dpath_width_gp-1:0]"
+    },
+    {
+      "name": "ctx_l1_ready_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "ctx_l1_resp_v_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "ctx_l1_resp_data_i",
+      "direction": "IN",
+      "source_type": "[dword_width_gp-1:0]"
+    },
+    {
+      "name": "ctx_l1_cmd_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "ctx_l1_cmd_w_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "ctx_l1_cmd_paddr_o",
+      "direction": "OUT",
+      "source_type": "logic [paddr_width_p-1:0]"
+    },
+    {
+      "name": "ctx_l1_cmd_data_o",
+      "direction": "OUT",
+      "source_type": "logic [dword_width_gp-1:0]"
+    },
+    {
+      "name": "icache_replay_ready_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "icache_replay_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "icache_replay_paddr_o",
+      "direction": "OUT",
+      "source_type": "logic [paddr_width_p-1:0]"
+    },
+    {
+      "name": "icache_retention_status_i",
+      "direction": "IN",
+      "source_type": "[63:0]"
+    },
+    {
+      "name": "icache_retention_cmd_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "icache_retention_mode_o",
+      "direction": "OUT",
+      "source_type": "logic [1:0]"
+    },
+    {
+      "name": "icache_prefix_status_i",
+      "direction": "IN",
+      "source_type": "[dword_width_gp-1:0]"
+    },
+    {
+      "name": "icache_prefix_entry_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "icache_prefix_entry_index_o",
+      "direction": "OUT",
+      "source_type": "logic [7:0]"
+    },
+    {
+      "name": "icache_prefix_entry_paddr_o",
+      "direction": "OUT",
+      "source_type": "logic [paddr_width_p-1:0]"
+    },
+    {
+      "name": "icache_prefix_count_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "icache_prefix_count_o",
+      "direction": "OUT",
+      "source_type": "logic [8:0]"
+    },
+    {
+      "name": "icache_prefix_trigger_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "icache_prefix_trigger_range_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "icache_prefix_trigger_start_o",
+      "direction": "OUT",
+      "source_type": "logic [7:0]"
+    },
+    {
+      "name": "icache_prefix_trigger_count_o",
+      "direction": "OUT",
+      "source_type": "logic [8:0]"
+    },
+    {
+      "name": "icache_prefix_clear_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "physical_preview_idle_i",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "physical_preview_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "physical_preview_paddr_o",
+      "direction": "OUT",
+      "source_type": "logic [paddr_width_p-1:0]"
+    },
+    {
+      "name": "dcache_replay_status_i",
+      "direction": "IN",
+      "source_type": "[dword_width_gp-1:0]"
+    },
+    {
+      "name": "dcache_replay_entry_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "dcache_replay_config_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "dcache_replay_trigger_v_o",
+      "direction": "OUT",
+      "source_type": "logic"
+    },
+    {
+      "name": "dcache_replay_payload_o",
+      "direction": "OUT",
+      "source_type": "logic [dword_width_gp-1:0]"
+    },
+    {
+      "name": "context_cache_commit_v_li",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "context_cache_launch_v_li",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "pending_ctxtsw_sent_r",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "pending_rpc_call_v_r",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "rpc_entry_valid_r",
+      "direction": "IN",
+      "source_type": "implicit logic"
+    },
+    {
+      "name": "context_cache_victim_physical_thread_id_r",
+      "direction": "IN",
+      "source_type": "[thread_id_width_p-1:0]"
+    },
+    {
+      "name": "pending_ctxtsw_prev_physical_thread_id_r",
+      "direction": "IN",
+      "source_type": "[thread_id_width_p-1:0]"
+    },
+    {
+      "name": "pending_ctxtsw_physical_thread_id_r",
+      "direction": "IN",
+      "source_type": "[thread_id_width_p-1:0]"
+    },
+    {
+      "name": "context_cache_victim_virtual_context_id_r",
+      "direction": "IN",
+      "source_type": "[context_id_width_p-1:0]"
+    },
+    {
+      "name": "context_cache_target_virtual_context_id_r",
+      "direction": "IN",
+      "source_type": "[context_id_width_p-1:0]"
+    },
+    {
+      "name": "virtual_context_resident_v_r",
+      "direction": "IN",
+      "source_type": "[num_contexts_p-1:0]"
+    },
+    {
+      "name": "virtual_context_slot_r",
+      "direction": "IN",
+      "source_type": "[num_contexts_p-1:0][thread_id_width_p-1:0]"
+    },
+    {
+      "name": "virtual_context_npc_r",
+      "direction": "IN",
+      "source_type": "[num_contexts_p-1:0][vaddr_width_p-1:0]"
+    },
+    {
+      "name": "rpc_entry_r",
+      "direction": "IN",
+      "source_type": "[vaddr_width_p-1:0]"
+    }
+  ]
+}
