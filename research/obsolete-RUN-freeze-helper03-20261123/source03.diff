@@ -1,0 +1,119 @@
+--- frozen02/freeze_run.py
++++ prospective03/freeze_run.py
+@@ -7,12 +7,14 @@
+ import owner_scan
+ import transport_role
+ HERE=Path(__file__).resolve().parent
+-OUT=Path('/home/coyang/fpga-artifacts/context-resume/obsolete-native-RUN-freeze-20261123-02')
++OUT=Path('/home/coyang/fpga-artifacts/context-resume/obsolete-native-RUN-freeze-20261123-03')
+ GROUPS={
+  'matched':dict(roots=['/run/user/1001/zp-retained256-fullcore-20261122-02','/run/user/1001/zp-retained256-fullcore-20261122-01'],charge=329830081),
+  'scratch':dict(roots=['/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02','/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-01'],charge=397346275),
+  'borrow1792':dict(roots=['/run/user/1001/zp-retained-borrow-trace0-fullcore-20261122-01','/run/user/1001/zp-retained-borrow-trace0-fullcore-20261122-02','/run/user/1001/zp-retained-borrow-trace0-fullcore-20261122-03'],charge=396196110)}
+ ROOTS=[Path(p)for g in GROUPS.values()for p in g['roots']]
++EXPECTED_ABSENT=[Path('/run/user/1001/zp-retained-borrow-trace0-fullcore-20261122-01'),Path('/run/user/1001/zp-retained-borrow-trace0-fullcore-20261122-02')]
++PRIOR_FAILURE=dict(path='/home/coyang/fpga-artifacts/context-resume/obsolete-native-RUN-freeze-20261123-02/prepare-session.json',bytes=437,sha256='5c2c6a72001d639a0e6e0e06ea71993a6adf80184420d577c528360d0a740fb2')
+ ALLOW=[dict(pid=12456,startticks=67838353,ppid=12455,comm='(sd-pam)',euid=1001),dict(pid=164612,startticks=78172576,ppid=12455,comm='gnome-keyring-d',euid=1001)]
+ META=8*1024**2;DELTA=64*1024**2;SOURCE=128*1024;DEADLINE=600
+ A=None;START=None;LAST=0
+@@ -56,9 +58,33 @@
+  guard(True)
+ def rowstat(p):
+  s=p.lstat();return dict(path=str(p),mode=s.st_mode,device=s.st_dev,inode=s.st_ino,uid=s.st_uid,gid=s.st_gid,nlink=s.st_nlink,bytes=s.st_size,allocated_bytes=s.st_blocks*512,mtime_ns=s.st_mtime_ns,ctime_ns=s.st_ctime_ns)
++def root_presence():
++ require(A['ROOT_expected_absent_roots']==list(map(str,EXPECTED_ABSENT)),'only exact ROOT-declared borrow01/02 may be absent')
++ parent=Path('/run/user/1001');expected=A['ROOT_absent_real_parent_identity']
++ require(set(expected)=={'path','device','inode'}and expected['path']==str(parent),'exact ROOT parent identity fields')
++ def parent_check():
++  q=parent.lstat();require(stat.S_ISDIR(q.st_mode)and dict(path=str(parent),device=q.st_dev,inode=q.st_ino)==expected,'real parent device/inode differs')
++ parent_check();result=[]
++ for root in ROOTS:
++  if root in EXPECTED_ABSENT:
++   parent_check()
++   try:root.lstat()
++   except FileNotFoundError:pass
++   else:raise ValueError('ROOT expected-absent path exists or is a symlink: '+str(root))
++   parent_check()
++   try:root.lstat()
++   except FileNotFoundError:pass
++   else:raise ValueError('ROOT expected-absent path appeared: '+str(root))
++   result.append(dict(path=str(root),presence='ROOT-expected-absent; repeated lstat ENOENT',real_parent_identity=expected))
++  else:
++   q=root.lstat();require(stat.S_ISDIR(q.st_mode),'exact existing real old ROOT pool')
++   result.append(dict(path=str(root),presence='present-real-directory',device=q.st_dev,inode=q.st_ino,mode=q.st_mode))
++ parent_check();return result
++
+ def inventory():
+- rows=[]
++ presence=root_presence();rows=[]
+  for root in ROOTS:
++  if root in EXPECTED_ABSENT:continue
+   require(root.is_dir()and not root.is_symlink(),'exact existing old ROOT pool')
+   todo=[root]
+   while todo:
+@@ -69,8 +95,10 @@
+     require(stat.S_ISREG(r['mode']),'unexpected special old pool member')
+     b=bind(p);require(rowstat(p)==r,'file changed during full SHA read');r.update(kind='file',sha256=b['sha256'])
+    rows.append(r);require(len(rows)<=100000,'bounded inventory records');guard()
++ require(root_presence()==presence,'root presence changed during inventory')
+  return sorted(rows,key=lambda x:x['path'])
+ def scan():
++ presence=root_presence()
+  proof=read(A['ROOT_transport_role_proof']);worker=next(r for r in A['source_inputs']if r['path']==str(HERE/'freeze_run.py'))
+  before=transport_role.check(proof,worker['sha256'],str(OUT));extra=transport_role.allow_identity()
+  result=owner_scan.owner_scan(ROOTS,ALLOW+[extra])
+@@ -80,6 +108,7 @@
+  require(len(found)==1,'exact transport exception actually accounted')
+  result['ROOT_exact_nonproducer_services_skipped']=[r for r in skipped if r['identity']!=extra]
+  result['ROOT_authenticated_transport_nonproducer']=dict(proof=A['ROOT_transport_role_proof'],before=before,after=after,scope='Exact ROOT-declared established PTY to tmux attachment; not FD/maps inspection',uninspected_views=['transport cwd','transport exe','transport fd','transport maps','root parent nonmetadata views'],all_other_user_processes_scanned_normally=True)
++ require(root_presence()==presence,'root presence changed during owner scan');result['root_presence']=presence
+  return result
+ def add(index,r,origin):
+  require(type(r['bytes'])is int and r['bytes']>=0 and len(r['sha256'])==64,'durable content schema')
+@@ -171,7 +200,7 @@
+ def main():
+  global A,START
+  ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--admission',type=Path,required=True);ap.add_argument('--admission-sha256',required=True);ap.add_argument('--prepare',action='store_true');ap.add_argument('--execute',action='store_true');ap.add_argument('--review-sha256');ap.add_argument('--approval',type=Path);ap.add_argument('--approval-sha256');x=ap.parse_args();require(x.prepare!=x.execute,'one explicit ROOT phase');START=time.monotonic();raw=x.admission.read_bytes();require(hashlib.sha256(raw).hexdigest()==x.admission_sha256,'external ROOT authority SHA');A=json.loads(raw)
+- require(A['schema']=='obsolete-native-RUN-freeze-authority-v2'and A['ROOT_approved']is True and A['ROOT_old_pools_obsolete_no_new_producers']is True,'DRAFT cannot run')
++ require(A['schema']=='obsolete-native-RUN-freeze-authority-v3'and A['ROOT_approved']is True and A['ROOT_old_pools_obsolete_no_new_producers']is True,'DRAFT cannot run')
+  require(os.geteuid()==1001 and A['ROOT_no_other_UID_old_producers']is True and A['ROOT_inaccessible_nonproducer_allowlist']==ALLOW,'same qualified UID/exact service exceptions')
+  require(A['roots']==list(map(str,ROOTS))and A['caps']==dict(source=SOURCE,metadata=META,proof_delta=DELTA,seconds=DEADLINE),'exact seven-root/fixed cap scope')
+  require(A['old_BASE_RUN_bytes']==1156926898 and A['pending_Iarea_bytes_still_charged']==33554432 and A['current_canonical_component_unchanged']is True,'no pending reservation transfer')
+@@ -188,19 +217,20 @@
+  signal.setitimer(signal.ITIMER_REAL,DEADLINE)
+  guard(True)
+  expected={str(HERE/n)for n in ['freeze_run.py','owner_scan.py','catalog.json','transport_role.py']};require(expected<=set(r['path']for r in A['source_inputs']),'all executable/catalog sources bound')
+- for r in A['source_inputs']+A['resources']['basis_records']+[A['ROOT_transport_role_proof']]:verify(r)
++ require(A['prior_failed_prepare']==PRIOR_FAILURE,'exact failed02 provenance')
++ for r in A['source_inputs']+A['resources']['basis_records']+[A['ROOT_transport_role_proof'],PRIOR_FAILURE]:verify(r)
+  require(A['catalog']==next(r for r in A['source_inputs']if r['path']==str(HERE/'catalog.json')),'fixed source catalog, no arbitrary redirect')
+  if x.prepare:require(not OUT.exists()and not OUT.is_symlink(),'fresh review prefix');OUT.mkdir()
+  else:require(OUT.is_dir()and not OUT.is_symlink()and not(OUT/'completion.json').exists(),'fresh explicit continuation only')
+- state=dict(schema='obsolete-native-RUN-freeze-completion-v2',state='RUNNING coverage/stop review',admission=dict(path=str(x.admission),bytes=len(raw),sha256=x.admission_sha256),no_pool_deletion_or_mode_change=True,no_cleanup=True)
++ state=dict(schema='obsolete-native-RUN-freeze-completion-v3',state='RUNNING coverage/stop review',admission=dict(path=str(x.admission),bytes=len(raw),sha256=x.admission_sha256),no_pool_deletion_or_mode_change=True,no_cleanup=True)
+  try:
+-  before=scan();index,proof=durable();rows=inventory();require(inventory()==rows,'full double SHA/mode/link/membership inventory mismatch');after=scan();classification=classify(rows,index)
++  presence=root_presence();state.update(root_presence=presence,prior_failed_prepare=PRIOR_FAILURE);before=scan();index,proof=durable();rows=inventory();require(inventory()==rows,'full double SHA/mode/link/membership inventory mismatch');after=scan();classification=classify(rows,index)
+   for r in proof['manifests']+proof['containers']+[proof['cache_origin']]:verify(r)
+   if x.prepare:
+    write(OUT/'inventory-before.json',rows);write(OUT/'inventory-after.json',rows)
+-   review=dict(schema='obsolete-native-RUN-freeze-review-v2',state='PREPARED ROOT coverage/classification review required; no RUN future withdrawn',output_identity=dict(device=OUT.stat().st_dev,inode=OUT.stat().st_ino),admission=state['admission'],inventory=bind(OUT/'inventory-before.json'),second_inventory=bind(OUT/'inventory-after.json'),classifications=classification,derived_candidates=[v for v in classification if v['class']=='derived-candidate-ROOT-review-required'],uncovered=[v for v in classification if v['class']=='uncovered'],durable=proof,owner_before=before,owner_after=after,no_future_release=True)
+-   write(OUT/'review.json',review);state.update(state='PASS preparation only; ROOT classification review pending, no future withdrawal',review=bind(OUT/'review.json'));print(json.dumps(state['review']));return
+-  review_record=bind(OUT/'review.json');require(review_record['sha256']==x.review_sha256,'external reviewed preparation SHA');review=json.loads((OUT/'review.json').read_text());require(review['admission']==state['admission']and read(review['inventory'])==rows and read(review['second_inventory'])==rows and review['classifications']==classification,'reviewed exact current oldpool state')
++   review=dict(schema='obsolete-native-RUN-freeze-review-v3',root_presence=presence,state='PREPARED ROOT coverage/classification review required; no RUN future withdrawn',output_identity=dict(device=OUT.stat().st_dev,inode=OUT.stat().st_ino),admission=state['admission'],inventory=bind(OUT/'inventory-before.json'),second_inventory=bind(OUT/'inventory-after.json'),classifications=classification,derived_candidates=[v for v in classification if v['class']=='derived-candidate-ROOT-review-required'],uncovered=[v for v in classification if v['class']=='uncovered'],durable=proof,owner_before=before,owner_after=after,no_future_release=True)
++   require(root_presence()==presence,'preparation phase-end root presence changed');write(OUT/'review.json',review);state.update(state='PASS preparation only; ROOT classification review pending, no future withdrawal',review=bind(OUT/'review.json'));print(json.dumps(state['review']));return
++  review_record=bind(OUT/'review.json');require(review_record['sha256']==x.review_sha256,'external reviewed preparation SHA');review=json.loads((OUT/'review.json').read_text());require(review['root_presence']==presence and review['admission']==state['admission']and read(review['inventory'])==rows and read(review['second_inventory'])==rows and review['classifications']==classification,'reviewed exact current oldpool state')
+   require(review['output_identity']==dict(device=OUT.stat().st_dev,inode=OUT.stat().st_ino),'same prepared output directory identity')
+   approval_record=bind(x.approval);require(approval_record['sha256']==x.approval_sha256,'external ROOT approval SHA');approval=json.loads(x.approval.read_text());require(approval['ROOT_verified']is True and approval['review']==review_record and approval['authorize_stop_only_after_all_checks']is True,'actual ROOT classification/stop decision')
+   require(approval['prepare_session']['path']==str(OUT/'prepare-session.json'),'fixed prepared lifecycle receipt')
+@@ -210,8 +240,8 @@
+   require(approval['uncovered_capture']==required and approval['ROOT_rebuild_origins_reviewed']is True and approval['cache_origin']==proof['cache_origin'],'all nonapproved data captured, explicit rebuild origins')
+   wanted={v['path']for v in required};delta=capture([r for r in rows if r['path']in wanted]);write(OUT/'proof-delta.json',delta)
+   require(inventory()==rows,'all pool files/dirs unchanged after capture');last=scan()
+-  for r in A['source_inputs']+A['resources']['basis_records']+[A['ROOT_transport_role_proof']]+proof['manifests']+proof['containers']+[proof['cache_origin']]:verify(r)
+-  require(x.admission.read_bytes()==raw,'authority unchanged');verify(approval_record);verify(approval['prepare_session']);guard(True)
++  for r in A['source_inputs']+A['resources']['basis_records']+[A['ROOT_transport_role_proof'],PRIOR_FAILURE]+proof['manifests']+proof['containers']+[proof['cache_origin']]:verify(r)
++  require(root_presence()==presence,'phase-end root presence changed');require(x.admission.read_bytes()==raw,'authority unchanged');verify(approval_record);verify(approval['prepare_session']);guard(True)
+   state.update(state='PASS ROOT-approved unused RUN writes stopped; all actual files kept and coverage classified',ROOT_verified=True,review=review_record,approval=approval_record,durable=proof,proof_delta=bind(OUT/'proof-delta.json'),owner_before=before,owner_after=last,protected_members=len(rows),families={k:dict(roots=v['roots'],original_cap_bytes=768*1024**2,closed_fixed_future_charge_bytes=v['charge'],new_future_RUN_bytes=0)for k,v in GROUPS.items()},unused_fixed_RUN_future_withdrawn_bytes=1123372466,old_BASE_RUN_bytes=1156926898,new_BASE_RUN_bytes=33554432,pending_Iarea_bytes_still_charged=33554432,current768_and_canonical_unchanged=True,all_current_actual_bytes_still_charged=True,physical_bytes_reclaimed=0,original_caps_unchanged=True,new_writes_need_fresh_admission=True,scope='Operational future-write stop only; no new functional/fit/performance or full allmember archival claim; derived objects stay RAM with ROOT-reviewed rebuild origin',seconds=time.monotonic()-START)
+  except BaseException as e:state.update(state='FAIL preserved; no RUN withdrawal accepted',error=repr(e));raise
+  finally:

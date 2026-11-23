@@ -1,0 +1,18 @@
+Prospective03 fixes the ROOT-observed missing-root assumption only. Actual02prepare57975 exited1 before doubleinventory, with ValueError('exact existing old ROOT pool'); prepare-session.json is pinned in source-derivation and authority. No RUN withdrawal occurred. Original01/02 sources, approvals, attempts and outputs remain immutable. No helper import, process/root scan, archive decode, runtime, compiler, reader, vendor or board execution ran during03 preparation.
+
+All seven declared roots and original family caps/fixed charges remain unchanged. ROOT observed matched01/02, scratch01/02 and borrow03 as real directories; only exact borrow01/02 were lstatENOENT, not links. Fresh authority must explicitly admit exactly those two expected-absent paths plus the actual real /run/user/1001 parent device/inode. No history-derived absence or placeholder is accepted. ROOT should cheaply check roots/parent identities before launching.
+
+root_presence() performs two negative lstat checks around real-parent identity checks for each absent root, and real-directory lstat for every present root. It runs before/after each inventory and owner scan, at phase start and phase-end. Unexpected existence (including symlink), absent nonadmitted root, changed parent device/inode, identity or any permission error refuses. Absence markers are recorded separately in root_presence in review/completion/owner records, never classified as data files. Present files retain full doubleSHA/mode/link/membership and durable coverage/capture gates. Checks are sampled, not an atomic or continuous absence guarantee; ROOT's no-new-old-pool-producers authority remains required.
+
+Catalog, approval template, qualified owner_scan.py and transport_role.py are byte-identical02. Exact two service exceptions and exact authenticated PTY-chain checks are unchanged. Transport FD/maps/cwd/exe and privileged-parent nonmetadata views remain explicitly uninspected, not proved absent. The transport ROOT roleproof must be reissued for the exact new worker and output. All other user processes remain normally scanned. No deletion/chmod occurs and all actual bytes remain charged/kept. PendingIarea32MiB and current768/canonical remain unchanged.
+
+Unchanged bounds: source128KiB, metadata8MiB, uncovered delta64MiB,600s per phase,512MiB address-space; fresh ROOT resource authority and qualified owned outer process required. No RUN output allocation. No recomputation of larger refunds: matched329830081 + scratch397346275 + borrow1792396196110 =1123372466 bytes stopped only after actual success; oldBASE1156926898 ->33554432. 109.5-BRAM planning estimate remains conditional and unrelated.
+
+New output /home/coyang/fpga-artifacts/context-resume/obsolete-native-RUN-freeze-20261123-03. Authority/review/completion schema suffixes are v3; literal completion state remains 'PASS ROOT-approved unused RUN writes stopped; all actual files kept and coverage classified'. All core stop fields from02 are unchanged, plus separate root_presence and pinned prior_failed_prepare. CAD must require actual completion SHA and separately bound ROOT owned worker/outer returncode0, owned_group_remainingfalse and failureNone; no template or failed02 approval transfers.
+
+ROOT-only commands after fresh source/resource/role/root-presence authority (NOT run here):
+
+    python3 -B HERE/freeze_run.py --admission ROOT_ADMISSION --admission-sha256 SHA --prepare
+    python3 -B HERE/freeze_run.py --admission SAME_ROOT_ADMISSION --admission-sha256 SHA --execute --review-sha256 ACTUAL_REVIEW_SHA --approval ROOT_APPROVAL --approval-sha256 SHA
+
+All templates remain false/NULL and unlaunchable. Source-only AST/hash/template/equality checks are the only preparation checks.
