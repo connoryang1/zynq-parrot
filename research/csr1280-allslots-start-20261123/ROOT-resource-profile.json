@@ -1,0 +1,73 @@
+{
+  "schema": "csr1280-standalone-allslots-resources-v1",
+  "state": "ROOT FUNDED fresh02 separate128MiB native allslots; identical0.5s/1sgap limits and fullactiveCAD/BASEreserves; stopped01 future0 only",
+  "ROOT_approved": true,
+  "limits": {
+    "pool_cap_bytes": 134217728,
+    "cohort_inside_pool_bytes": 134217728,
+    "delta_HOME_cap_bytes": 0,
+    "helper_cap_bytes": 131072,
+    "RUN_floor_bytes": 1073741824,
+    "HOME_floor_bytes": 1879048192,
+    "SHM_floor_bytes": 536870912
+  },
+  "pool": "/run/user/1001/zp-csr1280-allslots-native-20261123-02",
+  "cohort": "/run/user/1001/zp-csr1280-allslots-native-20261123-02",
+  "base_durable": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked1280-fullcore-20261122",
+  "source_plan": {
+    "path": "/home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation02-20261123/source-plan.json",
+    "bytes": 9202,
+    "sha256": "f8a7a6340c4a2ac59c7ce1bb5a2cf690b66ce483c76958b2a5b6210f12792527"
+  },
+  "base_future_growth_reserved_bytes": 0,
+  "new_writes_to_closed_base_require_new_admission": true,
+  "base_closure_reviewed_complete": true,
+  "base_closure": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked1280-fullcore-20261122/base-full-clone-std-closed01/manifest.json",
+    "bytes": 4668,
+    "sha256": "bdbb63471a8b5ee735d72ad9dd0b0769f31275b6f9f26018ea3e401ac4e460ff"
+  },
+  "base_closed_logical_bytes": 25262839,
+  "all_other_charged_reserves_included": true,
+  "OTHER": {
+    "RUN_bytes": 1156926898,
+    "HOME_bytes": 174672220,
+    "SHM_bytes": 335544320
+  },
+  "historic_RUN_BASE_minimum": 1156926898,
+  "basis_records": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt1280-fpga-preparation-20261123/preparation01/admission.FINAL.json",
+      "bytes": 2218630,
+      "sha256": "bc473480db6890a8602d28cc25d258b46be93415825871a9edbed63f64cb96b4"
+    },
+    {
+      "path": "/home/coyang/.codex/research-reviews/blackparrot/linux-old1536-cache-pack05-20261123/ROOT-layered-disposition.json",
+      "bytes": 1268,
+      "sha256": "e209857478a97ef7fc449f1dcd30c49bb4109efca067ac35cd6fcc0e25d39c6d"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr-unmasked1280-fullcore-20261122/base-full-clone-std-closed01/ROOT-native-future-freeze.json",
+      "bytes": 2001,
+      "sha256": "743fac7665a8748ebcb07a34b971650ac80a35491607b3f86873f9c1d93a9798"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr1280-allslots-failed-accounting01-20261123/ROOT-failed-cohort-closure.json",
+      "bytes": 1051,
+      "sha256": "44ebab41fc4a920db7d6797f5581f488ac3354173ea90b52a03ab3beeb7fab0f"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/csr1280-resource-scan-diagnostic02-20261123/result.json",
+      "bytes": 3247,
+      "sha256": "0d5f07e270afbf5b6be8dac85a5c9f6ac34ba4105d0c175210bc76c4b3861ffc"
+    }
+  ],
+  "active_CAD_admission": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt1280-fpga-preparation-20261123/preparation01/admission.FINAL.json",
+    "bytes": 2218630,
+    "sha256": "bc473480db6890a8602d28cc25d258b46be93415825871a9edbed63f64cb96b4"
+  },
+  "CAD_remaining_in_OTHER": false,
+  "accounting": "OTHER excludes dynamic CAD remaining and includes FULL historicalBASE plus all additional current reserves. Same actual device uses max floor + SUM(CADremaining,OTHER,newSELFremaining).",
+  "note": "Old01 actualbytes preserved/paid; no target started. Only filesystemwalk optimized, no capacity/clock/correctness/deadline relaxation."
+}
