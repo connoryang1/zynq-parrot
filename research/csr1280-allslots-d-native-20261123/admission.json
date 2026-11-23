@@ -1,0 +1,69 @@
+{
+  "schema": "csr-unmasked1280-capacity-stream-native-v1",
+  "role": "d-enabled",
+  "preparation": {
+    "path": "/run/user/1001/zp-csr1280-allslots-native-20261123-03/preparation.json",
+    "bytes": 10376,
+    "sha256": "c4f0eb88c2a2c9c8136110bdd021a8cc8352bd45d80047515005f634d4ed2073"
+  },
+  "runtime_sources": {
+    "path": "/run/user/1001/zp-csr1280-allslots-native-20261123-03/runtime-sources.json",
+    "bytes": 5112,
+    "sha256": "0077c41faa3d196e7db49f1a827691f41965b0a458f0d794e110f9fa168e84e6"
+  },
+  "program": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-capacity1792-fixtures-20261121/preparation01/build01/manifest.json",
+    "bytes": 196913,
+    "sha256": "88546c8afc17c482e42cb731459f44c2a40f2f6aeee2c172321534c872dabd72"
+  },
+  "model": {
+    "path": "/run/user/1001/zp-csr-unmasked1280-fullcore-20261122-01/scoped-csr01/build/obj/Vbsg_nonsynth_zynq_testbench",
+    "bytes": 15954328,
+    "sha256": "bc6f17f4be2140071df2a23b9efcbdc75b30ce41d48b39c76b80019942e1e445"
+  },
+  "compiled_sources": {
+    "path": "/run/user/1001/zp-csr1280-allslots-native-20261123-03/compiled-sources.json",
+    "bytes": 151413,
+    "sha256": "9d4288b29431053b35e6b968fd6dc91cd5b44a96860caf051e39aea7d949ca07"
+  },
+  "elf": {
+    "path": "/run/user/1001/zp-csr1280-allslots-native-20261123-03/d-enabled/prog.riscv",
+    "bytes": 998432,
+    "sha256": "062a3dd884d64bc1fdf7f0048f312cc5efc84280eb89006c21ef6b60f1f43ed6"
+  },
+  "nbf": {
+    "path": "/run/user/1001/zp-csr1280-allslots-native-20261123-03/d-enabled/prog.nbf",
+    "bytes": 2641208,
+    "sha256": "4a8512dfa3074997c7e6ecf63a733a5cc597595c455308397a7f3a88090d6921"
+  },
+  "coverage": {
+    "file_bytes": 570984,
+    "file_zero_bytes": 300118,
+    "missing_bytes": 0,
+    "wrong_bytes": 0,
+    "load_bound": {
+      "write_records": 71373,
+      "maximum_write_end_exclusive": "0x8008cbf0",
+      "allocation_bytes": 48234496
+    },
+    "declared_input": {
+      "address": "0x8008cb50",
+      "bytes": 8,
+      "value": "0xc640000000000002"
+    }
+  },
+  "command": [
+    "/run/user/1001/zp-csr-unmasked1280-fullcore-20261122-01/scoped-csr01/build/obj/Vbsg_nonsynth_zynq_testbench",
+    "+c_args=prog.nbf 1800000",
+    "+bsg_trace=/run/user/1001/zp-csr1280-allslots-native-20261123-03/d-enabled/trace.fst"
+  ],
+  "native_runtime_ms": 1800000,
+  "outer_timeout_s": 1980,
+  "fst_cap_bytes": 25165824,
+  "negative_control": false,
+  "reader": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/retained-use-observation-20261121/fst-reader/fst_events",
+    "bytes": 151200,
+    "sha256": "a9227fe2368ab376b7700a08e044b81c18261432dadeb89e8baeafab021f7541"
+  }
+}
