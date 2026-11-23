@@ -1,0 +1,143 @@
+{
+  "schema": "old2dd-CMA-qualification-plan-v1",
+  "state": "SOURCE ONLY DRAFT UNLAUNCHABLE; no physical evidence collected",
+  "fixed": {
+    "runner_sha256": "2dd9c411614af25025b0b3770fba133c35f3652ad0fa6bf51786a3754a217c30",
+    "helper_sha256": "de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90",
+    "kernel_nbf_sha256": "1a06cae9ce4c93eeb634d109ce1e58d6b7d6cade85ec966e7bcd848828ef9d33",
+    "allocation_bytes": 48234496,
+    "page_count_at_4096": 11776,
+    "guest_base": 2147483648,
+    "guest_end_exclusive": 2195718144,
+    "Linux_total_KiB": 47104,
+    "DMA32_last_byte": 2195718143,
+    "FDT_destination": 2183135232,
+    "common_lock": "/home/coyang/fpga-artifacts/pynq-session.lock"
+  },
+  "approvals": {},
+  "images": {
+    "small": null,
+    "large": null
+  },
+  "resources": null,
+  "phases": [
+    {
+      "id": "A-readonly-interface-collection",
+      "purpose": "Resolve authoritative existing allocator/driver extent/lifetime witness before designing any runtime probe",
+      "execute_by": "ROOT only through maintained serialized board access under existing common inode flock",
+      "no_allocation_or_overlay": true,
+      "required_fixed_files": [
+        "/usr/include/libxlnk_cma.h",
+        "/usr/lib/libcma.so",
+        "/proc/version",
+        "/proc/cmdline"
+      ],
+      "required_metadata": [
+        "actual resolved library path/bytes/hash/build identity and ELF imports for exact old2dd",
+        "device /dev/xlnk major/minor and bound driver name/version/build-id or built-in kernel identity",
+        "exact matching libcma implementation and deployed kernel xlnk/DMA allocator implementation and ioctl structs; source location must be selected by ROOT, not guessed",
+        "available documented per-allocation identity/physical-start/page-count/lifetime read-only witness, its field semantics and access policy",
+        "actual current allocator owners needed to qualify adapter global-reset exclusivity"
+      ],
+      "source_paths_pending": null
+    },
+    {
+      "id": "B-select-existing-authoritative-witness",
+      "purpose": "Offline review of collected files; no new guest/controller",
+      "acceptance": "Return-success semantics plus per-allocation actual start/count/owner identity must establish >=11776 contiguous4096Bpages (or exact equivalent bytes), not requestedlen alone",
+      "preferred": "Existing driver per-buffer record or decoded actual allocation ioctl+successfulmmap tied to documented matched driver implementation and exact PID/start/handle",
+      "supplemental": [
+        "targeted /proc/PID/maps+smaps and fd links tied to printed virtualptr/physicalptr",
+        "privileged read-only pagemap PFNs only if this actual kernel exposes valid PFNs for this mapping; no zero/unavailable=>success",
+        "kernel allocator allocation/release tracepoint only if installed event format and matched source identify same owner/handle/range"
+      ],
+      "insufficient": [
+        "aggregateCmaFree/cma_pages_available delta",
+        "only virtual VMA length",
+        "only physical start",
+        "requested allocation print",
+        "PYNQ Python array size or successful unrelated9c allocation"
+      ]
+    },
+    {
+      "id": "C-one-qualification-boot-per-exact-image",
+      "purpose": "No performance outcome; exact old2dd/de54/kernel29/capabilityprobe and normal return",
+      "execute_by": "Unchanged maintained run_pynq_interactive.sh and safe-session engine own reservation; additive fixed evidence collector only after A/B source review",
+      "new_guest_or_runner": false,
+      "trace_injection": false,
+      "observer_pending": "Actual interface from A/B; if no non-invasive authoritative witness exists, remain unlaunchable and report gap instead of LD_PRELOAD/9c substitution",
+      "steps": [
+        "bind bit/HWH/package/clock/remap/kernel/program/host library+driver identities and source audit before mutation",
+        "ensure compatible exclusive allocator ownership before adapter _xlnk_reset; record exact returned allocation owner/handle/PID+start/base/count and mapping cache attributes before first guest unfreeze",
+        "correlate requested46MiB, returnedvirtual/physicalptr, authoritative full ownedextent, actual DRAM-base register and exactHP0remap; reject zero/overflow/short/noncontiguous ownership",
+        "retain ownership from config/load/unfreeze through complete Linux probe/shell/poweroff/CORE/HOST/BSG terminal; everyNBFwrite tail and fullFDT bounded using exact existing offline1a06 proof plus actualboot47104KiB/end82dfffff",
+        "establish actual hardware terminal/quiescence or defined reset-and-drain semantics BEFORE allocator release; correlate actual driver release with samehandle/PID/range and no earlier reset/free/reuse",
+        "unchanged safe-session recovery including actual runner/helper identity and overlay/power operating checks before unlocking; failures hold reservation for explicit bounded recovery only"
+      ]
+    },
+    {
+      "id": "D-register-both-image-proofs",
+      "schema": "csr-pair-old2dd-physical-ownership-v1",
+      "state": "PASS root-reviewed actual old2dd CMA extent MMIO lifetime",
+      "required": "Only actual source-bound per-image complete evidence may populate existing ownership gate; both image maps remain empty now"
+    }
+  ],
+  "source_bindings": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/native-source/manifest.json",
+      "bytes": 1700,
+      "sha256": "319d73e2322ce10feff700802d8c9b79c514558ea0f2191a2808ec7343b74a1a"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/native-source/0-bsg_zynq_pl.h",
+      "bytes": 3819,
+      "sha256": "63dd7b33674a5ad306b025d7fcc9f3b5db396a7289c12f23e6dda659df6052d5"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/native-source/1-ps.cpp",
+      "bytes": 18958,
+      "sha256": "c14f348de6064d02e1af19bdbb00df433f0f31ca490c681cc4b19ac2bb2bde89"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/native-source/common/bsg_zynq_pl_hardware.h",
+      "bytes": 7285,
+      "sha256": "c80ef06f12fe4bc75831c96e659cff0f6f24d276b6e990102c390481bad547cb"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/04-xlnk.py",
+      "bytes": 14404,
+      "sha256": "43607b40eeaf35b6c00fd7cf81ae24ce33afb3775edd8688bd617bb17f81bdfa"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/retained29_protocol.py",
+      "bytes": 17679,
+      "sha256": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/retained29_safe_session.py",
+      "bytes": 18893,
+      "sha256": "a322a3f2cea13c3ef7448e3cb2d7774331addc3fcb4d10b42ac303bd29541503"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh",
+      "bytes": 1757,
+      "sha256": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr256-1280-cost-context-successor-20261123/csr_pair_context.py",
+      "bytes": 7481,
+      "sha256": "c891598aa3c9cf5509db5434a4d6001530d5312fe73acd93745f493529e31bfb"
+    },
+    {
+      "path": "/home/coyang/zynq-parrot-linux-host-observer/research/csr1280-matched-physical-cost-preparation-20261123/host-ownership.DRAFT.json",
+      "bytes": 3087,
+      "sha256": "659647aa4cf2ace2e301822d8970ffc4cd1f0302c0a24622aa383785f54c2747"
+    }
+  ],
+  "limits": [
+    "No claim source snapshot equals accepted2dd binary; collected deployed Makefile says64MiB while exact2dd runtime gate requires46MiB",
+    "No proof that print-only stop/done halts memory; retainedps frees before DRAM_INITED0; actual binary/driver/hardware lifecycle must be independently bound",
+    "Existing local runner has no diagnostic-prefix argument; do not silently add strace/LD_PRELOAD or editde54/old2dd. A fixed evidence side collector requires separately bound source review; no broad new board framework",
+    "No actual workload/per-appGP0 or9cprimary substitution; futureCOST collection keeps exact32slot architecture/control/WHOLE rules"
+  ]
+}

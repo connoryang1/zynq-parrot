@@ -1,0 +1,581 @@
+{
+  "schema": "old2dd-CMA-source-snippets-v1",
+  "rows": [
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/native-source/0-bsg_zynq_pl.h",
+        "bytes": 3819,
+        "sha256": "63dd7b33674a5ad306b025d7fcc9f3b5db396a7289c12f23e6dda659df6052d5"
+      },
+      "first": 75,
+      "last": 100,
+      "lines": [
+        {
+          "line": 75,
+          "text": "    void *allocate_dram(unsigned long len_in_bytes,"
+        },
+        {
+          "line": 76,
+          "text": "                        unsigned long *physical_ptr) override {"
+        },
+        {
+          "line": 77,
+          "text": ""
+        },
+        {
+          "line": 78,
+          "text": "        // resets all CMA buffers across system (eek!)"
+        },
+        {
+          "line": 79,
+          "text": "        _xlnk_reset();"
+        },
+        {
+          "line": 80,
+          "text": ""
+        },
+        {
+          "line": 81,
+          "text": "        // for now, we do uncacheable to keep things simple, memory accesses go"
+        },
+        {
+          "line": 82,
+          "text": "        // straight to DRAM and"
+        },
+        {
+          "line": 83,
+          "text": "        // thus would be coherent with the PL"
+        },
+        {
+          "line": 84,
+          "text": ""
+        },
+        {
+          "line": 85,
+          "text": "        void *virtual_ptr ="
+        },
+        {
+          "line": 86,
+          "text": "            cma_alloc(len_in_bytes, 0); // 1 = cacheable, 0 = uncacheable"
+        },
+        {
+          "line": 87,
+          "text": "        assert(virtual_ptr != NULL);"
+        },
+        {
+          "line": 88,
+          "text": "        *physical_ptr = cma_get_phy_addr(virtual_ptr);"
+        },
+        {
+          "line": 89,
+          "text": "        printf(\"bsg_zynq_pl: allocate_dram() called with size %ld bytes --> \""
+        },
+        {
+          "line": 90,
+          "text": "               \"virtual \""
+        },
+        {
+          "line": 91,
+          "text": "               \"ptr=%p, physical ptr=0x%8.8lx\\n\","
+        },
+        {
+          "line": 92,
+          "text": "               len_in_bytes, virtual_ptr, *physical_ptr);"
+        },
+        {
+          "line": 93,
+          "text": "        return virtual_ptr;"
+        },
+        {
+          "line": 94,
+          "text": "    }"
+        },
+        {
+          "line": 95,
+          "text": ""
+        },
+        {
+          "line": 96,
+          "text": "    void free_dram(void *virtual_ptr) override {"
+        },
+        {
+          "line": 97,
+          "text": "        printf(\"bsg_zynq_pl: free_dram() called on virtual ptr=%p\\n\","
+        },
+        {
+          "line": 98,
+          "text": "               virtual_ptr);"
+        },
+        {
+          "line": 99,
+          "text": "        cma_free(virtual_ptr);"
+        },
+        {
+          "line": 100,
+          "text": "    }"
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/native-source/0-bsg_zynq_pl.h",
+        "bytes": 3819,
+        "sha256": "63dd7b33674a5ad306b025d7fcc9f3b5db396a7289c12f23e6dda659df6052d5"
+      },
+      "first": 63,
+      "last": 72,
+      "lines": [
+        {
+          "line": 63,
+          "text": "    void tick(void) override { /* Does nothing on PS */"
+        },
+        {
+          "line": 64,
+          "text": "    }"
+        },
+        {
+          "line": 65,
+          "text": ""
+        },
+        {
+          "line": 66,
+          "text": "    void start(void) override { printf(\"bsg_zynq_pl: start() called\\n\"); }"
+        },
+        {
+          "line": 67,
+          "text": ""
+        },
+        {
+          "line": 68,
+          "text": "    void stop(void) override { printf(\"bsg_zynq_pl: stop() called\\n\"); }"
+        },
+        {
+          "line": 69,
+          "text": ""
+        },
+        {
+          "line": 70,
+          "text": "    void done(void) override {"
+        },
+        {
+          "line": 71,
+          "text": "        printf(\"bsg_zynq_pl: done() called, exiting\\n\");"
+        },
+        {
+          "line": 72,
+          "text": "    }"
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/native-source/1-ps.cpp",
+        "bytes": 18958,
+        "sha256": "c14f348de6064d02e1af19bdbb00df433f0f31ca490c681cc4b19ac2bb2bde89"
+      },
+      "first": 157,
+      "last": 177,
+      "lines": [
+        {
+          "line": 157,
+          "text": "    data = zpl->shell_read(GP0_RD_CSR_DRAM_INITED);"
+        },
+        {
+          "line": 158,
+          "text": "    if (data != 0)"
+        },
+        {
+          "line": 159,
+          "text": "        bsg_pr_warn("
+        },
+        {
+          "line": 160,
+          "text": "            \"ps.cpp: ignoring stale cross-process DRAM base pointer %x\\n\","
+        },
+        {
+          "line": 161,
+          "text": "            zpl->shell_read(GP0_RD_CSR_DRAM_BASE));"
+        },
+        {
+          "line": 162,
+          "text": "    zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x0, mask2);"
+        },
+        {
+          "line": 163,
+          "text": ""
+        },
+        {
+          "line": 164,
+          "text": "    bsg_pr_info(\"ps.cpp: allocating owned DRAM buffer with size %ld\\n\","
+        },
+        {
+          "line": 165,
+          "text": "                (long)DRAM_ALLOCATE_SIZE);"
+        },
+        {
+          "line": 166,
+          "text": "    buf = (volatile int *)zpl->allocate_dram(DRAM_ALLOCATE_SIZE, &phys_ptr);"
+        },
+        {
+          "line": 167,
+          "text": "    bsg_pr_info(\"ps.cpp: received %p (phys = %lx)\\n\", buf, phys_ptr);"
+        },
+        {
+          "line": 168,
+          "text": "    // The nonsynthesized AXI memory is indexed from zero.  The explicit"
+        },
+        {
+          "line": 169,
+          "text": "    // simulation-only preload path therefore uses a zero DRAM base while"
+        },
+        {
+          "line": 170,
+          "text": "    // preserving normal allocation and cleanup behavior for the host shim."
+        },
+        {
+          "line": 171,
+          "text": "    if (preload_dram)"
+        },
+        {
+          "line": 172,
+          "text": "        phys_ptr = 0;"
+        },
+        {
+          "line": 173,
+          "text": "    zpl->shell_write(GP0_WR_CSR_DRAM_BASE, phys_ptr, mask1);"
+        },
+        {
+          "line": 174,
+          "text": "    assert((zpl->shell_read(GP0_RD_CSR_DRAM_BASE) == (int32_t)(phys_ptr)));"
+        },
+        {
+          "line": 175,
+          "text": "    bsg_pr_info(\"ps.cpp: wrote and verified base register\\n\");"
+        },
+        {
+          "line": 176,
+          "text": "    zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x1, mask2);"
+        },
+        {
+          "line": 177,
+          "text": "    assert(zpl->shell_read(GP0_RD_CSR_DRAM_INITED) == 1);"
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/native-source/1-ps.cpp",
+        "bytes": 18958,
+        "sha256": "c14f348de6064d02e1af19bdbb00df433f0f31ca490c681cc4b19ac2bb2bde89"
+      },
+      "first": 320,
+      "last": 337,
+      "lines": [
+        {
+          "line": 320,
+          "text": "                break;"
+        },
+        {
+          "line": 321,
+          "text": "            }"
+        },
+        {
+          "line": 322,
+          "text": "        }"
+        },
+        {
+          "line": 323,
+          "text": "    } while (!host->is_finished());"
+        },
+        {
+          "line": 324,
+          "text": ""
+        },
+        {
+          "line": 325,
+          "text": "    // Set bsg client1 to 1 (assert WD reset)"
+        },
+        {
+          "line": 326,
+          "text": "    btb->set_client(&wd_reset_client, 0x1);"
+        },
+        {
+          "line": 327,
+          "text": "    bsg_pr_info(\"ps.cpp: stopping watchdog\\n\");"
+        },
+        {
+          "line": 328,
+          "text": "    // We need some additional toggles for data to propagate through"
+        },
+        {
+          "line": 329,
+          "text": "    btb->idle(50);"
+        },
+        {
+          "line": 330,
+          "text": "    zpl->stop();"
+        },
+        {
+          "line": 331,
+          "text": ""
+        },
+        {
+          "line": 332,
+          "text": "    unsigned long long minstret_stop = get_counter_64(zpl, GP0_RD_MINSTRET);"
+        },
+        {
+          "line": 333,
+          "text": "    unsigned long long mtime_stop ="
+        },
+        {
+          "line": 334,
+          "text": "        get_counter_64(zpl, GP1_CSR_BASE_ADDR + 0x30bff8);"
+        },
+        {
+          "line": 335,
+          "text": "    // test delay for reading counter"
+        },
+        {
+          "line": 336,
+          "text": "    unsigned long long counter_data = get_counter_64(zpl, GP0_RD_MINSTRET);"
+        },
+        {
+          "line": 337,
+          "text": "    clock_gettime(CLOCK_MONOTONIC, &end);"
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/native-source/1-ps.cpp",
+        "bytes": 18958,
+        "sha256": "c14f348de6064d02e1af19bdbb00df433f0f31ca490c681cc4b19ac2bb2bde89"
+      },
+      "first": 384,
+      "last": 395,
+      "lines": [
+        {
+          "line": 384,
+          "text": "    bsg_pr_info("
+        },
+        {
+          "line": 385,
+          "text": "        \"ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): \""
+        },
+        {
+          "line": 386,
+          "text": "        \"%-8.8d%-8.8d%-8.8d%-8.8d\\n\","
+        },
+        {
+          "line": 387,
+          "text": "        zpl->shell_read(GP0_RD_MEM_PROF_3), zpl->shell_read(GP0_RD_MEM_PROF_2),"
+        },
+        {
+          "line": 388,
+          "text": "        zpl->shell_read(GP0_RD_MEM_PROF_1), zpl->shell_read(GP0_RD_MEM_PROF_0));"
+        },
+        {
+          "line": 389,
+          "text": "    bsg_pr_info(\"ps.cpp: freeing DRAM buffer\\n\");"
+        },
+        {
+          "line": 390,
+          "text": "    zpl->free_dram((void *)buf);"
+        },
+        {
+          "line": 391,
+          "text": "    zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x0, mask2);"
+        },
+        {
+          "line": 392,
+          "text": ""
+        },
+        {
+          "line": 393,
+          "text": "    int done_rc = finish(zpl);"
+        },
+        {
+          "line": 394,
+          "text": "    return runtime_limit_reached ? 124 : done_rc;"
+        },
+        {
+          "line": 395,
+          "text": "}"
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/retained-observer-host-api-20261121/04-xlnk.py",
+        "bytes": 14404,
+        "sha256": "43607b40eeaf35b6c00fd7cf81ae24ce33afb3775edd8688bd617bb17f81bdfa"
+      },
+      "first": 79,
+      "last": 89,
+      "lines": [
+        {
+          "line": 79,
+          "text": "    ffi.cdef(\"\"\""
+        },
+        {
+          "line": 80,
+          "text": "    static uint32_t xlnkBufCnt = 0;"
+        },
+        {
+          "line": 81,
+          "text": "    unsigned long cma_mmap(uint32_t phyAddr, uint32_t len);"
+        },
+        {
+          "line": 82,
+          "text": "    unsigned long cma_munmap(void *buf, uint32_t len);"
+        },
+        {
+          "line": 83,
+          "text": "    void *cma_alloc(uint32_t len, uint32_t cacheable);"
+        },
+        {
+          "line": 84,
+          "text": "    unsigned long cma_get_phy_addr(void *buf);"
+        },
+        {
+          "line": 85,
+          "text": "    void cma_free(void *buf);"
+        },
+        {
+          "line": 86,
+          "text": "    uint32_t cma_pages_available();"
+        },
+        {
+          "line": 87,
+          "text": "    void cma_flush_cache(void* buf, unsigned int phys_addr, int size);"
+        },
+        {
+          "line": 88,
+          "text": "    void cma_invalidate_cache(void* buf, unsigned int phys_addr, int size);"
+        },
+        {
+          "line": 89,
+          "text": "    void _xlnk_reset();"
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/linux-tests/retained29_protocol.py",
+        "bytes": 17679,
+        "sha256": "1c5b5b3850aec3edcdea5f1cb0da3336f8ad951ea2ef7df7c664c2b256ed2787"
+      },
+      "first": 153,
+      "last": 169,
+      "lines": [
+        {
+          "line": 153,
+          "text": ""
+        },
+        {
+          "line": 154,
+          "text": "def boot_bound(text, admission):"
+        },
+        {
+          "line": 155,
+          "text": "    identity_lines(text,admission)"
+        },
+        {
+          "line": 156,
+          "text": "    require(re.search(r'allocating owned DRAM buffer with size 48234496\\b',text),'actual owned46M allocation missing')"
+        },
+        {
+          "line": 157,
+          "text": "    require(re.search(r'allocate_dram\\(\\) called with size 48234496 bytes',text),'actual allocation call size missing')"
+        },
+        {
+          "line": 158,
+          "text": "    require('Memory limited to 46MB' in text,'Linux46MB cap missing')"
+        },
+        {
+          "line": 159,
+          "text": "    require(re.search(r'Memory: \\d+K/47104K available',text),'Linux total not47104K')"
+        },
+        {
+          "line": 160,
+          "text": "    require(re.search(r'DMA32\\s+\\[mem 0x0*80000000-0x0*82dfffff\\]',text),'DMA32 bound')"
+        },
+        {
+          "line": 161,
+          "text": "    require(re.search(r'Domain0 Next Arg1\\s*:\\s*0x0*82200000\\b',text),'runtime FDT destination')"
+        },
+        {
+          "line": 162,
+          "text": "    lines = clean_lines(text)"
+        },
+        {
+          "line": 163,
+          "text": "    command = [s.split('Kernel command line:',1)[1].strip() for s in lines if 'Kernel command line:' in s]"
+        },
+        {
+          "line": 164,
+          "text": "    require(len(command)==1 and command[0].split().count('mem=46M')==1"
+        },
+        {
+          "line": 165,
+          "text": "            and command[0].split().count('rdinit=/bin/sh')==1,'bootargs bound')"
+        },
+        {
+          "line": 166,
+          "text": "    require(not KERNEL_FAILURE_MARKER.search(text) and TIMER_GUARD_MARKER not in text,'boot failure marker')"
+        },
+        {
+          "line": 167,
+          "text": ""
+        },
+        {
+          "line": 168,
+          "text": ""
+        },
+        {
+          "line": 169,
+          "text": "def fields(line, prefix, names):"
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "/home/coyang/zynq-parrot-linux-host-observer/codex-skills/bp-fpga-synthesis/scripts/run_pynq_interactive.sh",
+        "bytes": 1757,
+        "sha256": "3038d850c036cc5a50821b6e665a38b12a7740bf68ac9929c650106a54c5c2e5"
+      },
+      "first": 34,
+      "last": 46,
+      "lines": [
+        {
+          "line": 34,
+          "text": "}"
+        },
+        {
+          "line": 35,
+          "text": ""
+        },
+        {
+          "line": 36,
+          "text": "remote_command=\"$remote_dir/run-blackparrot-interactive '$image' '$expected_nbf_sha' '$expected_runner_sha' '$runtime_limit_ms'\""
+        },
+        {
+          "line": 37,
+          "text": "if [[ -n \"$expected_bit_sha\" ]]; then"
+        },
+        {
+          "line": 38,
+          "text": "  remote_command+=\" '$expected_bit_sha'\""
+        },
+        {
+          "line": 39,
+          "text": "fi"
+        },
+        {
+          "line": 40,
+          "text": "exec ssh -tt -o BatchMode=yes \"$ssh_host\" \"$remote_command\""
+        }
+      ]
+    }
+  ]
+}
