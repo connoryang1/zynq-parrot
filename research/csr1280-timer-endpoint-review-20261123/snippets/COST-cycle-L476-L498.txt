@@ -1,0 +1,23 @@
+	for (unsigned repeat = 0; repeat < repeats; ++repeat) for (unsigned order = 0; order < 2; ++order) {
+		unsigned enabled = (repeat & 1) ^ order, selected = enabled ? mask : 0;
+		uint64_t whole_begin = cycle(), prefix_before, prefix_after, replay_before, replay_after, active, reset;
+		struct cell_resources before = resource_snapshot();
+		if (source_off() || replay_idle(&replay_before) || prefix_idle(&prefix_before)) fail("cell source disable/idle");
+		check_prefix_start(prefix_before);
+		check_replay_start(replay_before);
+		if (poll_control(0, &raw)) fail("cell mode0 entry");
+		if ((enabled && submit(selected)) || poll_control(selected, &raw)) fail("cell control/readback before allocation");
+		struct result result = run_cell(loops, warmup, kib, kind, pipe_mode, legs);
+		if (read_control(&active)) fail("cell ending status");
+		if ((active & 15) != selected) { errno = EIO; fail("cell control changed"); }
+		if (source_off() || (enabled && submit(0)) || replay_idle(&replay_after) || prefix_idle(&prefix_after) || poll_control(0, &reset)) fail("cell normal reset/idle");
+		if ((prefix_before & PREFIX_COUNTERS) != (prefix_after & PREFIX_COUNTERS)
+		    || (replay_before & REPLAY_COUNTERS) != (replay_after & REPLAY_COUNTERS)) {
+			errno = EIO; fail("unexpected advisory prefix activity");
+		}
+		struct cell_resource_delta usage = resource_delta(resource_snapshot(), before);
+		uint64_t whole = cycle() - whole_begin;
+		printf(LABEL("RESULT") " repeat=%u order=%u enabled=%u cycles=%" PRIu64 " loops=%u\n", repeat, order, enabled, result.steady, loops);
+		if (legs) printf(LABEL("LEGS") " repeat=%u order=%u enabled=%u child_resume=%" PRIu64 " parent_resume=%" PRIu64 " loops=%u\n", repeat, order, enabled, result.child_resume, result.parent_resume, loops);
+		printf(LABEL("WHOLE") " repeat=%u order=%u enabled=%u cycles=%" PRIu64 " loops=%u\n", repeat, order, enabled, whole, loops);
+		printf(LABEL("CONTROL") " repeat=%u order=%u enabled=%u requested=%u active_raw=0x%016" PRIx64 " reset_raw=0x%016" PRIx64 " busy_scope=uce_client_backend retained_control_writes=%u\n", repeat, order, enabled, selected, active, reset, enabled ? 2U : 0U);

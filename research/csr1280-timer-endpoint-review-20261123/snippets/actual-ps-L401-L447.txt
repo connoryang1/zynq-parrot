@@ -1,0 +1,47 @@
+    } while (!host->is_finished());
+
+    // Set bsg client1 to 1 (assert WD reset)
+    btb->set_client(&wd_reset_client, 0x1);
+    bsg_pr_info("ps.cpp: stopping watchdog\n");
+    // We need some additional toggles for data to propagate through
+    btb->idle(50);
+    zpl->stop();
+
+    unsigned long long minstret_stop = get_counter_64(zpl, GP0_RD_MINSTRET);
+    unsigned long long mtime_stop =
+        get_counter_64(zpl, GP1_CSR_BASE_ADDR + 0x30bff8);
+    // test delay for reading counter
+    unsigned long long counter_data = get_counter_64(zpl, GP0_RD_MINSTRET);
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    setlocale(LC_NUMERIC, "");
+    bsg_pr_info("ps.cpp: end polling i/o\n");
+    bsg_pr_info("ps.cpp: minstret (instructions retired): %'16llu (%16llx)\n",
+                minstret_start, minstret_start);
+    bsg_pr_info("ps.cpp: minstret (instructions retired): %'16llu (%16llx)\n",
+                minstret_stop, minstret_stop);
+    unsigned long long minstret_delta = minstret_stop - minstret_start;
+    bsg_pr_info("ps.cpp: minstret delta:                  %'16llu (%16llx)\n",
+                minstret_delta, minstret_delta);
+    bsg_pr_info("ps.cpp: MTIME start:                     %'16llu (%16llx)\n",
+                mtime_start, mtime_start);
+    bsg_pr_info("ps.cpp: MTIME stop:                      %'16llu (%16llx)\n",
+                mtime_stop, mtime_stop);
+    unsigned long long mtime_delta = mtime_stop - mtime_start;
+    bsg_pr_info("ps.cpp: MTIME delta (RTCLK ticks):       %'16llu (%16llx)\n",
+                mtime_delta, mtime_delta);
+    double target_cycles = 0.0;
+    if (aclk_hz > 0.0 && rtclk_hz > 0.0) {
+        target_cycles = ((double)mtime_delta) * aclk_hz / rtclk_hz;
+        bsg_pr_info("ps.cpp: target time (seconds):          %'16.6f\n",
+                    ((double)mtime_delta) / rtclk_hz);
+        bsg_pr_info("ps.cpp: normalized BP cycles:           %'16.3f\n",
+                    target_cycles);
+        bsg_pr_info("ps.cpp: IPC        :                     %'16f\n",
+                    target_cycles > 0.0
+                        ? ((double)minstret_delta) / target_cycles
+                        : 0.0);
+    } else {
+        bsg_pr_info("ps.cpp: IPC        :                     unavailable\n");
+    }
+    bsg_pr_info("ps.cpp: minstret (instructions retired): %'16llu (%16llx)\n",
+                counter_data, counter_data);

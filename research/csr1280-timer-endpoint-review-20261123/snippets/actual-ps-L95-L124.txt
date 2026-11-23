@@ -1,0 +1,30 @@
+    }
+
+    double aclk_hz = ((double)ACLK_MHZ) * 1000000.0;
+    double rtclk_hz = ((double)RTCLK_MHZ) * 1000000.0;
+    const char *aclk_env = getenv("BSG_ACLK_HZ");
+    const char *rtclk_env = getenv("BSG_RTCLK_HZ");
+    if (aclk_env && *aclk_env) {
+        char *end = nullptr;
+        errno = 0;
+        double value = strtod(aclk_env, &end);
+        if (errno || end == aclk_env || *end != '\0' || value <= 0.0) {
+            bsg_pr_err("ps.cpp: invalid BSG_ACLK_HZ value: %s\n", aclk_env);
+            return -1;
+        }
+        aclk_hz = value;
+    }
+    if (rtclk_env && *rtclk_env) {
+        char *end = nullptr;
+        errno = 0;
+        double value = strtod(rtclk_env, &end);
+        if (errno || end == rtclk_env || *end != '\0' || value <= 0.0) {
+            bsg_pr_err("ps.cpp: invalid BSG_RTCLK_HZ value: %s\n", rtclk_env);
+            return -1;
+        }
+        rtclk_hz = value;
+    }
+    if (aclk_hz > 0.0 && rtclk_hz > 0.0)
+        bsg_pr_info("ps.cpp: counter clocks ACLK=%.0f Hz RTCLK=%.0f Hz\n",
+                    aclk_hz, rtclk_hz);
+    else

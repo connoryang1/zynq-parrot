@@ -1,0 +1,10 @@
+    if result.stdout.count(needle) != 1:
+        raise SystemExit("SDK DTS bootargs template changed; refusing an ambiguous image")
+
+    output = result.stdout.replace(needle, replacement)
+    if output.count(ORIGINAL_TIMEBASE) != 1:
+        raise SystemExit("SDK DTS timebase template changed; refusing an ambiguous image")
+    output = output.replace(
+        ORIGINAL_TIMEBASE,
+        f"timebase-frequency = <{timebase_frequency}>;")
+    sys.stdout.write(output)

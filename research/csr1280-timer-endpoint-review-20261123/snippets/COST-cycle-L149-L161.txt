@@ -1,0 +1,13 @@
+
+static uint64_t cycle(void)
+{
+#ifdef BP_RETAINED29_HOST_VERIFY
+	struct timespec now;
+	if (clock_gettime(CLOCK_MONOTONIC, &now)) fail("host verification clock");
+	return (uint64_t)now.tv_sec * 1000000000 + now.tv_nsec;
+#else
+	uint64_t value;
+	__asm__ volatile("csrr %0, 0xcc0" : "=r"(value) : : "memory");
+	return value;
+#endif
+}

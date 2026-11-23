@@ -1,0 +1,18 @@
+    zpl->shell_write(base_addr + 0x200608, 1, mask1); // cce mode
+
+    bsg_pr_info("ps.cpp: beginning nbf load\n");
+    nbf_load(zpl, argv[1]);
+    zpl->shell_write(base_addr + 0x200008, 0, mask1); // unfreeze
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    unsigned long long minstret_start = get_counter_64(zpl, GP0_RD_MINSTRET);
+    unsigned long long mtime_start =
+        get_counter_64(zpl, GP1_CSR_BASE_ADDR + 0x30bff8);
+    bsg_pr_info("ps.cpp: finished nbf load\n");
+
+    // Set bsg client1 to 0 (deassert WD reset)
+    btb->set_client(&wd_reset_client, 0x1);
+    bsg_pr_info("ps.cpp: starting watchdog\n");
+    // We need some additional toggles for data to propagate through
+    btb->idle(50);
+    zpl->start();

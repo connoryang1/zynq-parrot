@@ -1,0 +1,9 @@
+    ,.o(strobe_n_buf)
+    );
+
+   always_ff @(posedge clk_i)
+     strobe_r_o <= strobe_n_buf;
+
+`ifndef BSG_HIDE_FROM_SYNTHESIS
+   if (debug_lp)
+     begin : debug

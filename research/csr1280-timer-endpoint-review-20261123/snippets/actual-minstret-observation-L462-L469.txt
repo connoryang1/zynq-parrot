@@ -1,0 +1,8 @@
+   // instantiate counters, and then pull control signals out of the DUT in order to figure out when
+   // to increment the counters.
+   //
+   if (cce_type_p != e_cce_uce)
+     assign minstret_lo = blackparrot.processor.m.multicore.cc.y[0].x[0].tile_node.tile.core.core_lite.core_minimal.be.calculator.pipe_sys.csr.gen_csr[0].csr_inst.minstret_lo;
+   else
+     assign minstret_lo = blackparrot.processor.u.unicore.unicore_lite.core_minimal.be.calculator.pipe_sys.csr.gen_csr[0].csr_inst.minstret_lo;
+

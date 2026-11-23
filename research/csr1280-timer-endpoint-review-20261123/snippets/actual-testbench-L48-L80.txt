@@ -1,0 +1,33 @@
+
+  localparam aclk_period_lp = 50000;
+  logic aclk;
+  bsg_nonsynth_clock_gen
+   #(.cycle_time_p(aclk_period_lp))
+   aclk_gen
+    (.o(aclk));
+
+  logic core_clk;
+`ifdef ASYNC_ACLK_CORE_CLK
+  localparam aclk_period_lp = 40000;
+  bsg_nonsynth_clock_gen
+   #(.cycle_time_p(core_clk_period_lp))
+   core_clk_gen
+    (.o(core_clk));
+`elsif
+  assign core_clk = aclk;
+`endif
+
+  logic areset;
+  bsg_nonsynth_reset_gen
+   #(.reset_cycles_lo_p(0), .reset_cycles_hi_p(10))
+   reset_gen
+    (.clk_i(aclk), .async_reset_o(areset));
+  wire aresetn = ~areset;
+
+`ifdef RT_CLK_ENABLE
+  localparam rt_clk_period_lp = 2500000;
+  logic rt_clk;
+  bsg_nonsynth_clock_gen
+   #(.cycle_time_p(rt_clk_period_lp))
+   rt_clk_gen
+    (.o(rt_clk));

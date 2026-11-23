@@ -1,0 +1,11 @@
+#define DRAM_ALLOCATE_SIZE (DRAM_ALLOCATE_SIZE_MB * 1024 * 1024)
+
+// Hardware builds provide these through Makefile.design. Keep zero-valued
+// fallbacks so the shared host source still compiles in environments that do
+// not describe the two clock domains.
+#ifndef ACLK_MHZ
+#define ACLK_MHZ 0
+#endif
+#ifndef RTCLK_MHZ
+#define RTCLK_MHZ 0
+#endif

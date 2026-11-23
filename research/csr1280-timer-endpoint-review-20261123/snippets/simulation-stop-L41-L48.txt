@@ -1,0 +1,8 @@
+
+class bsg_zynq_pl_simulation : public bsg_zynq_pl_base {
+  public:
+    virtual void start(void) { create_peripherals(); }
+    virtual void stop(void) { destroy_peripherals(); }
+    virtual void tick(void) = 0;
+    // Advance one simulated cycle while also resuming outstanding host-side
+    // AXI coroutines.  Raw tick() is still used internally by next() to avoid

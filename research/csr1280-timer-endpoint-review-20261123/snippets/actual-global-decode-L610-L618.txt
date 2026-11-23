@@ -1,0 +1,9 @@
+        12'h9c2:  // S-mode physical-data footprint configuration (write-only)
+          csr_data_lo = '0;
+        12'h9c3:  // S-mode tagged physical-data replay trigger/status
+          csr_data_lo = dcache_replay_status_i;
+        {`CSR_ADDR_GLOBAL_CYCLE}:  // Read-only, core-wide physical cycle counter
+          csr_data_lo = global_cycle_i;
+        default:
+          begin
+            csr_data_lo = '0;

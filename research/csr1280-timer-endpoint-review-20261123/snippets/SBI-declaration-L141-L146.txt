@@ -1,0 +1,6 @@
+static struct sbi_timer_device bp_timer = {
+    .name = "bp-timer",
+    .timer_freq = (unsigned long) PLATFORM_ACLINT_MTIMER_FREQ,
+    .timer_value = bp_timer_value,
+    .timer_event_start = bp_timer_event_start,
+    .timer_event_stop = bp_timer_event_stop
