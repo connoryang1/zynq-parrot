@@ -1,0 +1,248 @@
+{
+  "schema": "old2dd-CMA-cleanup-APF-source-review-v1",
+  "state": "SOURCE/RETAINED MACHINECODE ONLY; no ownership or hardware acceptance",
+  "inputs": [
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver04-20261123/interface.json",
+      "bytes": 133953,
+      "sha256": "3b021d984b87cbe9aebc689d1a71ea046e5c72c7ab6f7030294fc50b99bd85f7"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver04-20261123/extracted/0.log",
+      "bytes": 26536,
+      "sha256": "12fb8e45caf0434caf8bad54f75147a6f358bf8f2303fda4974ca3d3bfbb6da9"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver04-20261123/extracted/1.log",
+      "bytes": 27063,
+      "sha256": "cfe07162c877f6f9294aefa4091b0bdbf58c04e103662b26ab96d469ad05a1cb"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver04-20261123/extracted/2.log",
+      "bytes": 22739,
+      "sha256": "b9c9324212b87c8069b558c00e044e8dbc3e7bb58d29f426218c286b8a12dc2a"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver04-20261123/extracted/3.log",
+      "bytes": 491,
+      "sha256": "4799a565531a66d6caf34765e5ad2194df0adb7e10897595f0f6c7ce6f4135d1"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver04-20261123/extracted/4.log",
+      "bytes": 334,
+      "sha256": "4b503a8a2b14b9bd546a0d0e6e7dc09e66b5013470e618d84b03d5aadd812412"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf-source-manifest.json",
+      "bytes": 4877,
+      "sha256": "3907e11fc7bf5c0ddb038d63ff01da5fc70b2c562202df34961799f112b6a52d"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/xlnk.c",
+      "bytes": 35985,
+      "sha256": "1297415955e17c2d325f244aed90a543ee38fb635689f73dd6fb917dc8086ffb"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/xlnk.h",
+      "bytes": 4654,
+      "sha256": "e3a5e270270ca8419048b1bb7d72c3985730b758d108eb077424115bf38786fe"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/xlnk-ioctl.h",
+      "bytes": 1603,
+      "sha256": "a1749035bcaff52a1d37194fafeedb74ad5d42f33782818bd87bfbfa38c71e49"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/xlnk-sysdef.h",
+      "bytes": 697,
+      "sha256": "d991c24be132ba288342cb766d420693092294ab705418593f0a8a2dc61290d8"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/Makefile",
+      "bytes": 264,
+      "sha256": "8295f6114be3e424133e10a8765145e49dad28a66de99c468ce893d2b7a17760"
+    },
+    {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/Kconfig",
+      "bytes": 423,
+      "sha256": "e308bab6ae02ca52e03c04171564377150ca56634b2433923c83d9d668acdf6d"
+    }
+  ],
+  "readonly_commands": [
+    {
+      "argv": [
+        "objdump",
+        "-d",
+        "-C",
+        "--start-address=0x2e00",
+        "--stop-address=0x3400",
+        "/home/xilinx/zynq-parrot/cosim/black-parrot-example/zynq/control-program"
+      ],
+      "returncode": 0,
+      "truncated": false
+    },
+    {
+      "argv": [
+        "objdump",
+        "-d",
+        "-C",
+        "--start-address=0x3400",
+        "--stop-address=0x3a00",
+        "/home/xilinx/zynq-parrot/cosim/black-parrot-example/zynq/control-program"
+      ],
+      "returncode": 0,
+      "truncated": false
+    },
+    {
+      "argv": [
+        "objdump",
+        "-d",
+        "-C",
+        "--start-address=0x3a00",
+        "--stop-address=0x3f00",
+        "/home/xilinx/zynq-parrot/cosim/black-parrot-example/zynq/control-program"
+      ],
+      "returncode": 0,
+      "truncated": false
+    },
+    {
+      "argv": [
+        "objdump",
+        "-d",
+        "--start-address=0x3470",
+        "--stop-address=0x3488",
+        "/usr/lib/libcma.so"
+      ],
+      "returncode": 0,
+      "truncated": false
+    },
+    {
+      "argv": [
+        "sudo",
+        "-n",
+        "-l"
+      ],
+      "returncode": 0,
+      "truncated": false
+    }
+  ],
+  "build_surface": [
+    {
+      "primary": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/Makefile",
+        "bytes": 264,
+        "sha256": "8295f6114be3e424133e10a8765145e49dad28a66de99c468ce893d2b7a17760"
+      },
+      "board_header": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver04-20261123/extracted/0-Makefile",
+        "bytes": 264,
+        "sha256": "8295f6114be3e424133e10a8765145e49dad28a66de99c468ce893d2b7a17760"
+      },
+      "byte_equal": true,
+      "scope": "Build surface only; not deployed xlnk implementation equivalence"
+    },
+    {
+      "primary": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-primary-source-20261123/apf/Kconfig",
+        "bytes": 423,
+        "sha256": "e308bab6ae02ca52e03c04171564377150ca56634b2433923c83d9d668acdf6d"
+      },
+      "board_header": {
+        "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver04-20261123/extracted/1-Kconfig",
+        "bytes": 423,
+        "sha256": "e308bab6ae02ca52e03c04171564377150ca56634b2433923c83d9d668acdf6d"
+      },
+      "byte_equal": true,
+      "scope": "Build surface only; not deployed xlnk implementation equivalence"
+    }
+  ],
+  "libcma": {
+    "retained": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-interfaces-20261123/extracted/2-libcma.so",
+      "bytes": 57048,
+      "sha256": "126301f9575d119f3b12e41bc2ce26df79a0fdae210169da3bf4b6548dd1fdd3"
+    },
+    "git_blob_sha1": "9ce6ae2901f1f2faa7331cf58c3edc6e806e8643",
+    "official_PYNQ_v2_6_binary_match": "ROOT-reported primary reference plus independently computed exact Git blob identity; no source equivalence inferred"
+  },
+  "exact_2dd": {
+    "fast_allocation": {
+      "range": "0x3426-0x3454",
+      "requested_bytes": 48234496,
+      "cacheable": 0,
+      "steps": [
+        "_xlnk_reset",
+        "cma_alloc(48234496,0)",
+        "NULL assertion",
+        "cma_get_phy_addr",
+        "store/print returned pointers"
+      ]
+    },
+    "cleanup": {
+      "cma_free_call": "0x3d04",
+      "DRAM_INITED_zero_store": "0x3d1e, GP0base+8",
+      "order": "cma_free before DRAM_INITED=0",
+      "previous_actions": [
+        "host-finished or runtime-limit loop exit",
+        "watchdog tag client sequence and50idlewrites",
+        "printf-only stop, counters and optional state dump",
+        "profiling/usage prints"
+      ],
+      "no_explicit_core_freeze_or_HP0_drain_ack_in_this_host_cleanup_path": true,
+      "qualification_limit": "Does not prove outstanding/new DMA actually exists after release, nor exclude guest/firmware terminal quiescence; those remain separate proofs"
+    },
+    "libcma_trampolines": {
+      "sds_alloc_non_cacheable": "0x347c mov r1,0; tailcall xlnkAllocBufInternal",
+      "sds_alloc_cacheable": "0x3478 tailcall xlnkAllocBuf",
+      "sds_free": "0x3484 tailcall xlnkFreeBuf"
+    }
+  },
+  "source_model_top": {
+    "TOP": "a44c03bb7bc520a3b5727c2bb619a055a7ed5acd",
+    "path": "cosim/black-parrot-example/v/top_zynq.sv",
+    "bytes": 42425,
+    "sha256": "cd071d14cb555fc6a9f2257b578442136af0ccc6019b52a2d4b3424723e80214",
+    "DRAM_INITED_references": [
+      {
+        "line": 390,
+        "text": "   logic dram_init_li;"
+      },
+      {
+        "line": 401,
+        "text": "   assign dram_init_li = csr_data_lo[2];"
+      }
+    ],
+    "meaning": "Flag declared/assigned only; no flag-based HP0 ownership or quiescence gate in this source",
+    "physical_source_binding_still_required": true
+  },
+  "APF_primary_only": {
+    "repository_tree": "043f8a226a752a1dd11f7ff64cee6dbe7334d394",
+    "deployed_binary_equivalence": false,
+    "source_ranges": {
+      "allocation": "xlnk.c349-380,693-719",
+      "free": "xlnk.c722-781",
+      "ioctl_dispatch": "xlnk.c1456-1506",
+      "mmap": "xlnk.c1514-1551",
+      "vma_release_reset": "xlnk.c1553-1575",
+      "read_and_file_release": "xlnk.c459-517"
+    },
+    "semantics": [
+      "Allocation calls dma_alloc_attrs with requestedlen/GFP_DMA andattrs0 forcacheable0; successfulhandle storeskernelallocationpoint/len/phy/cache",
+      "Allocationioctl returnspositiveID andDMAphysicalanchor withsuccess; packedlen/id/phy/cachelayout andioctlnumbers agree with actual userspace machinecode",
+      "mmap derivesID fromoffset, setsnoncachedprotection forcache0, remaps theDMAanchor andrecordsuserVA/PID; no explicit VMA-length<=recordedlen check is present in this function",
+      "free clearskernelentry and dma_free_attrs usingrecordedlen/allocationpoint/phy/cache; freeioctl takesID, not an allocation-owner capability",
+      "release(file) is no-op; VMAclose only decrementsmappingcount, not allocationrefcount/free",
+      "reset101 callsfreeallbuffers and releasesAPF DMAchannels; no customBlackParrot HP0completion orhalt semantic is provided",
+      "Static kernelarrays holdallocatedpoint/len/phy/cache/userVA/PID but no per-buffer readonlyproc/sysfs/ioctl query is implemented; read(/dev/xlnk) accesses genericdevicebuffer"
+    ],
+    "witness_consequence": "Under proven deployeddriver/DMA-backend semantics and no foreign reset/free, successfulallocation response+sameID/physical/kernelentry canestablish ownedrange; VMA alone remains insufficient."
+  },
+  "remaining": [
+    "Exact deployed APF/DMA implementation binding beyond matching Kconfig/Makefile and kernelversion/config",
+    "Actual PID/start/libraryloadbias, localhooks, allocationID/len/phy/kernelallocation mapping and exclusive lifetime, includingabsenceofforeignreset/free",
+    "DMAaddress-to-physical/contiguous extent and cache semantics for actualARM DMA backend; no rawbit orpoolsize substitute",
+    "Proven guest/firmware/hardwareterminalquiescence and outstandingHP0completion beforefree, or a separately reviewed prospective lifecycle change; no unmodified2ddapproval until this is closed",
+    "Read-only kerneltable witness access/addresses/layout must be source/deploymentbound; unavailable or zero addresses are not proof. FTRACE/CMA_DEBUGFS disabled means no assumed trace/debugfs witness"
+  ],
+  "approvals": {}
+}
