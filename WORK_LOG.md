@@ -894,3 +894,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **160KiB four standard regressions pass:** same qualifiedbc6f17f4 runs unchangedCSRrebind/nonresidentSv39data/residentIRQreseed/protectedRPC in42.574/63.777/68.997/87.723s; session6d57ba3f and owned6805f9f2 pass, all groupsclose. ROOT independently rehashes all4program/NBF/FST/log records; `research/csr1280-standard-regressions-20261123` includes exactproofs and9-repository recovery647e443d (8externaldurableobjectstores explicitlyGC-rooted;1private). SevenrawFST exist, no allcapacity/routed/physical/application claim. Completebasearchive/futurefreeze precedesfreshCADfunding.
+
+
+**160KiB native base durably preserved:** raw/source corpus266027790B/1406members,2models/7rawFST/generatedCPP/source/privateGit/programs/proofs archive25255944B with independent fullreadback, all originals retained. ROOT743fac76 verifies completeinputmembership and rehashes included+excluded originals; only explicitunused nativefutureRUN/HOME0, all actualbytes/OTHER paid. `research/csr1280-native-base-closure-20261123` binds originalmetadata/cache/derivedcanonical accounting and recovery; larger-capacity dynamic/FPGA/application work is not accepted. Fresh1280 CAD fundingbab8d827 starts nineprivate sourceclones/readiness beforeanyvendorlaunch.
