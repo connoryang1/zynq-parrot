@@ -855,3 +855,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **Synthesis time localizes to optimization stages:** read-only extraction of the completed matchedCSR256 log records cumulative cross-boundary/area finish58:35, timing-optimization finish79:42 and synth_design84:16 (`research/csr-build-stage-timing-20261122`). This explains the scale of the active1536 optimization wait without declaring a hang, minimum runtime or transferable speed forecast; current worker/startticks/vendor CPU advancement are independently verified live, with no source/resource/ownership violations. No new vendor/board run was launched.
+
+
+**Six-way capacity semantics prepared without execution:** ROOT reviews explicit256/1536 constructors, all target/count metadata and globals; six pinned reference spans and all copied semantic bodies match, and4 Python3.8 AST parses pass. Checkpoint `research/csr1536-capacity-semantic-adapter-20261122` preserves reference joint64/256 labels verbatim while separately labeling actual expected1536 counts, exact qualified91653 full167 parser function and current5bdb/ac3/a8/1e7 source anchors. No new constructors/imports/parser/native/reader execution or run authority; fullstream/counter/owned/dynamicjoint gates remain required.
