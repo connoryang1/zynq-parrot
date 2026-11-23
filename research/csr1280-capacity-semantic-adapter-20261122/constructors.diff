@@ -1,0 +1,15 @@
+--- 1536/None.geometry
++++ 1280/None.geometry
+@@ -1,3 +1,3 @@
+ def geometry(lines,sets=256):
+-    require(type(lines) is int and lines in (256,1536) and type(sets) is int and sets==256,'explicit control256 or candidate1536, same256sets')
++    require(type(lines) is int and lines in (256,1280) and type(sets) is int and sets==256,'explicit control256 or candidate1280, same256sets')
+     return Geometry(lines,sets)
+--- 1536/None.target_index
++++ 1280/None.target_index
+@@ -1,4 +1,4 @@
+ def target_index(slot,sets):
+     # At256 this reduces exactly to the established first-way constructor.
+-    # At1536 retain the way bits, covering six complete ways, no address search.
++    # At1280 retain the way bits, covering five complete ways, no address search.
+     return (slot&~(sets-1))+((slot*0xaaaaaaaaaaaaaaab)&(sets-1))
