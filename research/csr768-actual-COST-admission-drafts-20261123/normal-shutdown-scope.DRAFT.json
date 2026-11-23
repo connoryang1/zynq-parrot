@@ -1,0 +1,21 @@
+{
+  "ROOT_verified": false,
+  "state": "DRAFT explicit assumption for ROOT review",
+  "method": "normal-Linux-SBI-shutdown-plus-verified-safe-recovery",
+  "stop_printf_is_halt": false,
+  "abnormal_timeout_is_accepted_result": false,
+  "evidence": {
+    "machinecode": {
+      "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-driver04-20261123/interface.json",
+      "bytes": 133953,
+      "sha256": "3b021d984b87cbe9aebc689d1a71ea046e5c72c7ab6f7030294fc50b99bd85f7"
+    },
+    "safe_engine": {
+      "path": "/home/coyang/zynq-parrot-linux-capacity/linux-tests/retained29_safe_session.py",
+      "bytes": 18893,
+      "sha256": "a322a3f2cea13c3ef7448e3cb2d7774331addc3fcb4d10b42ac303bd29541503"
+    }
+  },
+  "scope": "Accepted normal complete Linux poweroff, CORE/HOST/BSG/helper0 and verified maintained recovery under the entire-session common lock; no formal HP0 drain assertion",
+  "timeout": "Fail cohort; existing owned-helper witness/quiesce and verified recovery, hold reservation if unconfirmed; no guest retry"
+}

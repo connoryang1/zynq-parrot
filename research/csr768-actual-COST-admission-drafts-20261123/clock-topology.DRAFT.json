@@ -1,0 +1,92 @@
+{
+  "scope": "actual-FPGA-clock-topology",
+  "state": "DRAFT actual20/8MHz XCI pins; TAG STA qualification and ROOT approval pending",
+  "ROOT_verified": false,
+  "bit_sha256": "d30262cbd6aa0baec34f77730dc17cc3662a4fa3ba7499776c61e96ffd892ccb",
+  "core_hz": 20000000,
+  "axi_hz": 20000000,
+  "timer_hz": 8000000,
+  "l1i_bytes": 32768,
+  "l1d_bytes": 32768,
+  "l1_sets": 64,
+  "l1_ways": 8,
+  "line_bytes": 64,
+  "l2_bytes": 16384,
+  "clock_wizard_evidence": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/run-20261123T060312Z-1b24c915e/final-poll-100.json.gz",
+    "bytes": 226328,
+    "sha256": "3ba81ae2cf58aa14adbf6b5c562c0b3138222ff52818b511343ae95739d0b52c"
+  },
+  "actual_XCI_records": [
+    {
+      "binding": {
+        "path": "/run/user/1001/zp-linux-csr-opt768-trace0-cad-20261123-01/zynq-parrot-fpga-20261123T060312Z-1b24c915e/cosim/black-parrot-example/vivado/black_parrot_bd_proj.gen/sources_1/bd/black_parrot_bd_1/ip/black_parrot_bd_1_vps_0_0/src/vps_bd_1_clk_wiz_0_0/vps_bd_1_clk_wiz_0_0.xci",
+        "bytes": 69793,
+        "sha256": "f2c46d3ef3542e0b5f542c10540616fa7d9406a8c8493a53fb694a154c1facea"
+      },
+      "result": {
+        "actual": {
+          "CLKOUT1_REQUESTED_OUT_FREQ": [
+            "2E+1"
+          ],
+          "CLKOUT2_REQUESTED_OUT_FREQ": [
+            "8"
+          ]
+        },
+        "valid": true
+      },
+      "final_BD": true
+    },
+    {
+      "binding": {
+        "path": "/run/user/1001/zp-linux-csr-opt768-trace0-cad-20261123-01/zynq-parrot-fpga-20261123T060312Z-1b24c915e/cosim/black-parrot-example/vivado/vps_ip_proj.srcs/sources_1/bd/vps_bd_1/ip/vps_bd_1_clk_wiz_0_0/vps_bd_1_clk_wiz_0_0.xci",
+        "bytes": 70534,
+        "sha256": "d00a6a3d4dc3256483f18891cb03833934331357a616e4fefcf8b7ddc9f7625b"
+      },
+      "result": {
+        "actual": {
+          "CLKOUT1_REQUESTED_OUT_FREQ": [
+            "2E+1"
+          ],
+          "CLKOUT2_REQUESTED_OUT_FREQ": [
+            "8"
+          ]
+        },
+        "valid": true
+      },
+      "final_BD": false
+    },
+    {
+      "binding": {
+        "path": "/run/user/1001/zp-linux-csr-opt768-trace0-cad-20261123-01/zynq-parrot-fpga-20261123T060312Z-1b24c915e/cosim/black-parrot-example/vivado/ip_repo/vps/src/vps_bd_1_clk_wiz_0_0/vps_bd_1_clk_wiz_0_0.xci",
+        "bytes": 70489,
+        "sha256": "a5eaaee4774ac5780dcd7363fbf34b361c444c849689dcf6b606b209a16a6d4a"
+      },
+      "result": {
+        "actual": {
+          "CLKOUT1_REQUESTED_OUT_FREQ": [
+            "2E+1"
+          ],
+          "CLKOUT2_REQUESTED_OUT_FREQ": [
+            "8"
+          ]
+        },
+        "valid": true
+      },
+      "final_BD": false
+    }
+  ],
+  "final_DCP": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/usable96-image01/black_parrot_bd_1_wrapper_postroute_physopt.dcp",
+    "bytes": 37353589,
+    "sha256": "60910bee4cc7f6ec0641228183eb8988aa797d73da76892db3b57bc79acc66f1"
+  },
+  "TAG_STA": null,
+  "clock_coverage_approval": null,
+  "selected_image": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/csr-opt768-fpga-preparation-20261123/preparation01/usable96-image01/ROOT-selected-image.json",
+    "bytes": 3702,
+    "sha256": "68a11107fef916df970e2a90c86c2be1199c9905893c3b128ac564ded889fbd0"
+  },
+  "limits": "XCI frequency identity is existing evidence; no TAG clock/static-timing approval or physical timer calibration is inferred"
+}
