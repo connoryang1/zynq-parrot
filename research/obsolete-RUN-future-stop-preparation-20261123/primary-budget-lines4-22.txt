@@ -1,0 +1,19 @@
+import materialize as source
+BASE=Path('/run/user/1001/zp-retained-borrow256-trace0-fullcore-20261122-01')
+PRIOR_BASE=[]
+BORROW1792=[Path('/run/user/1001/zp-retained-borrow-trace0-fullcore-20261122-'+x)for x in ('01','02','03')]
+BORROW1792_CAP=768*1024**2
+OWN_CAP=768*1024**2
+MATCHED=[Path('/run/user/1001/zp-retained256-fullcore-20261122-02'),Path('/run/user/1001/zp-retained256-fullcore-20261122-01')]
+SCRATCH=[Path('/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-02'),Path('/run/user/1001/zp-retained-scratch-trace0-fullcore-20261122-01')]
+MATCHED_CAP=768*1024**2;SCRATCH_CAP=768*1024**2
+R7=Path('/run/user/1001/zp-linux-canonical-r7-20261121');R7_CAP=2560*1024**2
+FLOOR=1024**3
+DURABLE=Path('/home/coyang/fpga-artifacts/context-resume/retained-borrow256-trace0-fullcore-20261122')
+DURABLE_CAP=64*1024**2
+
+def required_free(own,matched,scratch,r7,borrow1792,free):
+    source.require(0<=own<=OWN_CAP and 0<=matched<=MATCHED_CAP and 0<=scratch<=SCRATCH_CAP and 0<=r7<=R7_CAP and 0<=borrow1792<=BORROW1792_CAP,'all five bounded work allocations')
+    need=FLOOR+OWN_CAP-own+MATCHED_CAP-matched+SCRATCH_CAP-scratch+BORROW1792_CAP-borrow1792
+    source.require(free>=need,'1GiB floor plus ALL five remaining work allocations')
+    return need
