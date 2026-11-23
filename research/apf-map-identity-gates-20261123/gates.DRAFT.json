@@ -1,0 +1,109 @@
+{
+  "state": "SOURCE_ONLY_UNADMITTED; no memory reader implemented",
+  "metadata05": {
+    "path": "/home/coyang/fpga-artifacts/context-resume/old2dd-CMA-readonly-metadata05-20261123/interface.json",
+    "bytes": 8386,
+    "sha256": "344e747df5fae6d2d945c02828e6c14991de6dbc7f4bd2c64d76c416e71d793a"
+  },
+  "actual_kernel": {
+    "release": "5.4.0-xilinx-v2020.1",
+    "build": "#1 SMP PREEMPT Mon Oct 19 19:19:47 UTC 2020",
+    "architecture": "armv7l",
+    "build_id": "a93fa9554e74fb8033fe3ac1fe845c7046b1af83",
+    "config_sha256": "3f1d37703f0d93bf688b976dc4a94e8443761c00b5f724e489d8ead51e66cea3",
+    "notes_sha256": "b8a9bf39e78834cb53c9d76f1ac32aa59425226a25c6a5e65a07fd8408acf293",
+    "runtime_text_symbols": [
+      "c06bebd4 t xlnk_release",
+      "c06bebf4 t xlnk_vma_close",
+      "c06bece8 t xlnk_mmap",
+      "c06beed0 t xlnk_freebuf",
+      "c06bef90 t xlnk_probe",
+      "c06bf6a0 t xlnk_ioctl"
+    ],
+    "live_controller_selected": false
+  },
+  "retained_config_facts": {
+    "PAGE_OFFSET": "0xc0000000",
+    "VMSPLIT_3G": true,
+    "ARM_PATCH_PHYS_VIRT": true,
+    "ARM_LPAE": false,
+    "HIGHMEM": true,
+    "KALLSYMS_ALL": false,
+    "STRICT_DEVMEM": false
+  },
+  "candidate_System_map_paths": [
+    "/boot/System.map-5.4.0-xilinx-v2020.1",
+    "/boot/System.map",
+    "/usr/src/kernel/System.map",
+    "/lib/modules/5.4.0-xilinx-v2020.1/build/System.map",
+    "/lib/modules/5.4.0-xilinx-v2020.1/source/System.map"
+  ],
+  "candidate_ELF_paths": [
+    "/boot/vmlinux-5.4.0-xilinx-v2020.1",
+    "/usr/src/kernel/vmlinux",
+    "/usr/lib/debug/boot/vmlinux-5.4.0-xilinx-v2020.1",
+    "/usr/lib/debug/lib/modules/5.4.0-xilinx-v2020.1/vmlinux"
+  ],
+  "exact_symbol_selection": [
+    "_text",
+    "_stext",
+    "_etext",
+    "_sdata",
+    "_edata",
+    "__bss_start",
+    "__bss_stop",
+    "_end",
+    "__pv_offset",
+    "__pv_phys_pfn_offset",
+    "xlnk_release",
+    "xlnk_vma_close",
+    "xlnk_mmap",
+    "xlnk_freebuf",
+    "xlnk_probe",
+    "xlnk_ioctl",
+    "xlnk_bufpool",
+    "xlnk_bufpool_alloc_point",
+    "xlnk_bufpool_size",
+    "xlnk_buflen",
+    "xlnk_phyaddr",
+    "xlnk_userbuf",
+    "xlnk_buf_process",
+    "xlnk_bufcacheable"
+  ],
+  "required_gates": [
+    "exact running boot/notes/config preserved before-after",
+    "candidate ELF BuildID and machine/class/endian match",
+    "System.map cryptographically bound to same ELF/build provenance; address matches alone insufficient",
+    "all six runtime APF text addresses match; no guessed slide",
+    "actual object st_size/section/alignment and compiled slot bound establish table ABI",
+    "matched ARM source+DT+iomem+live text/data anchors establish direct-map translation",
+    "no memory read until explicit ROOT address/ABI/read-semantics approval",
+    "existing controller PID/TID+library map+bias and no-free/reset lifetime contract required for buffer witness"
+  ],
+  "metadata_only_prospective_limits": {
+    "owned_seconds": 30,
+    "outer_seconds": 40,
+    "AS_bytes": 134217728,
+    "selected_output_bytes": 524288,
+    "whole_new_HOME_bytes": 1048576,
+    "maximum_map_candidates": 5,
+    "maximum_ELF_candidates": 4,
+    "map_stream_bytes_per_file": 8388608
+  },
+  "source_for_translation_review": [
+    "arch/arm/kernel/setup.c",
+    "arch/arm/include/asm/memory.h",
+    "arch/arm/kernel/head.S",
+    "arch/arm/mm/init.c",
+    "drivers/char/mem.c",
+    "arch/arm/include/asm/io.h"
+  ],
+  "ROOT_funding": null,
+  "ROOT_common_flock_release": null,
+  "selected_System_map": null,
+  "selected_same_build_ELF": null,
+  "proven_PHYS_OFFSET": null,
+  "approved_code_read_ranges": null,
+  "approved_table_read_ranges": null,
+  "actual_buffer_extent_lifetime_witness": null
+}
