@@ -1,0 +1,43 @@
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation-20261123/bridge.py
++++ bridge.py
+@@ -7 +7 @@
+-COHORT=Path('/run/user/1001/zp-csr1280-allslots-native-20261123-01')
++COHORT=Path('/run/user/1001/zp-csr1280-allslots-native-20261123-02')
+--- /home/coyang/zynq-parrot-retained-metadata/research/csr1280-allslots-native-preparation-20261123/fixed_shared.py
++++ fixed_shared.py
+@@ -2 +2 @@
+-import json,os,shutil
++import json,os,shutil,stat
+@@ -36,3 +36,8 @@
+-    # du-style allocated blocks, including directories/symlinks, no dereference
+-    # of symlink targets, one charge per hardlinked inode inside each root.
+-    root=Path(root);todo=[root];seen=set();total=0
++    # Same per-root du semantics as01: include root and directory/symlink blocks,
++    # do not follow symlinks, deduplicate hardlinked inodes. DirEntry.stat avoids
++    # per-file Path allocation and the separate per-file path/lstat traversal.
++    root=os.fspath(root);seen=set();total=0;todo=[]
++    try:st=os.lstat(root)
++    except FileNotFoundError:return 0
++    seen.add((st.st_dev,st.st_ino));total+=st.st_blocks*512
++    if stat.S_ISDIR(st.st_mode):todo.append(root)
+@@ -40,2 +45,10 @@
+-        path=todo.pop()
+-        try:st=path.lstat()
++        directory=todo.pop()
++        try:
++            with os.scandir(directory) as entries:
++                for entry in entries:
++                    try:st=entry.stat(follow_symlinks=False)
++                    except FileNotFoundError:continue
++                    key=(st.st_dev,st.st_ino)
++                    if key in seen:continue
++                    seen.add(key);total+=st.st_blocks*512
++                    if stat.S_ISDIR(st.st_mode):todo.append(entry.path)
+@@ -43,7 +55,0 @@
+-        key=(st.st_dev,st.st_ino)
+-        if key in seen:continue
+-        seen.add(key);total+=st.st_blocks*512
+-        if __import__('stat').S_ISDIR(st.st_mode):
+-            try:
+-                with os.scandir(path) as entries:todo.extend(Path(e.path)for e in entries)
+-            except FileNotFoundError:continue
