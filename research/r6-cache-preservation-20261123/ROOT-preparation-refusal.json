@@ -1,0 +1,6 @@
+{
+  "state": "REFUSED before manifest, archive or reclamation",
+  "reason": "Old R6 vendor worktree has a valid .git file, unlike prior standalone kernel cache scope; require explicit exact-root tracked-file check rather than no-Git-ancestor rule",
+  "affected": "/home/coyang/fpga-work-linux-retained-native1792-canonical-r6/zynq-parrot-fpga-20261121T220319Z-eb7d39013/.git",
+  "guardrail": "Validate literal gitdir then exact-worktree ls-files before selecting transient .rtd; preserve Git/source/netlists and all original caches until archive/readback"
+}

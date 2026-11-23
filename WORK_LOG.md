@@ -882,3 +882,6 @@ This file records major accepted milestones and new engineering progress. Detail
 
 
 **Fresh160KiB clean correctness gate passes:** one fresh eleven-phase full-core execution bf2a4ff4 uses model95699e2a, TOP88ab04dfc/BP1e7 and actual1280 lines per side with all17 ordinary/retained geometry facts unchanged. Clean8-worker build149.395s; integrity, cold08 strict512-bit/eight real L1 writes/I retirement and independent I/D[1,1,8] counters all pass, every owned group closes, source endcheck passes. ROOT fe5dcc13 independently checks model/log/proof bytes and fresh no compiler/model/vendor workers; `research/csr1280-initial-native-20261123` preserves exact receipts. Sparse simulation only; scoped observation, standard regressions, full occupancy, routed fit and physical applications remain pending.
+
+
+**Inactive synthesis caches preserved and reclaimed:** bounded R6 cache-pack04 archives130 untracked transient .rtd files213594504B to42286452B22c9fa6f, verifies every member byte/mode, stable originals and live compiler/FD inactivity before unlink; allbytesrecoverable. Worker21.491s exits0 with closed groups, net~171MB funds nextwholeCAD HOME envelope; source/netlists/checkpoints/traces/images/logs unchanged. `research/r6-cache-preservation-20261123` keeps recovery identities and pre-mutation preparation refusals.
