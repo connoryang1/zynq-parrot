@@ -161,8 +161,16 @@ package bp_common_pkg;
   // Retention-capacity experiment for early Linux data previews.  Keep the
   // accepted four-context/four-slot endpoint unchanged except for growing
   // each two-way L2 bank from 16 to 64 sets (4 KiB to 16 KiB total).
+  // Retained fg/bg experiment (branch experiment/retained-preserve-capture):
+  // Linux runs on one hart and switches in software, so drop the unused
+  // hardware multi-context state (second CSR file/register bank, context
+  // cache, CSR snapshot store) to fit the retained store and HP0 delay shim.
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch16k_cfg_override_p =
     '{l2_sets: 64
+      ,num_threads: 1
+      ,num_contexts: 1
+      ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
+                                  - $clog2(bp_default_cfg_p.num_threads)
       ,default: "inv"
       };
   `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch16k_cfg_p
