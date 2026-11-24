@@ -83,7 +83,7 @@ DEFINES += BP_CACHE_MISS_TRACE=$(BP_CACHE_MISS_TRACE)
 # Optional actual retained-use GP0 observation. Included in MODEL_RETAINED_TAG;
 # This r2 capacity candidate includes observation in its actual fit cost;
 # explicit0 remains available for matched diagnostic comparison only.
-BP_RETAINED_OBSERVE ?= 1
+BP_RETAINED_OBSERVE ?= 0
 ifneq ($(filter $(BP_RETAINED_OBSERVE),0 1),$(BP_RETAINED_OBSERVE))
 $(error BP_RETAINED_OBSERVE must be 0 or 1)
 endif
