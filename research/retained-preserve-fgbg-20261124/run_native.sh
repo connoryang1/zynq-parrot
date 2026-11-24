@@ -10,7 +10,7 @@ BP=/home/coyang/bp-retained-preserve-20261124
 INSTALL=/home/coyang/zynq-parrot-linux-research/install
 IMPORT=/home/coyang/zynq-parrot-linux-research/import
 HERE=$TOP/research/retained-preserve-fgbg-20261124
-MODEL=/run/user/1001/zp-retained-fgbg-model-d${delay}-s${sets}
+MODEL=${MODEL_ROOT:-/run/user/1001}/zp-retained-fgbg-model-d${delay}-s${sets}
 OUT=$HERE/$label
 mkdir -p "$OUT"
 export LD_LIBRARY_PATH=$INSTALL/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
@@ -26,7 +26,7 @@ if [[ ! -x $MODEL/design/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench ]]; then
   cp $TOP/cosim/black-parrot-example/verilator/Makefile $MODEL/design/verilator/Makefile
   cp /home/coyang/zynq-parrot-linux-research/riscv/bootrom/bootrom.none.riscv $MODEL/program/bootrom/
   ( cd $MODEL/design/verilator && /usr/bin/time -v make -j1 build "${opts[@]}" ZP_RISCV_DIR=$MODEL/program \
-      VERILATOR_BUILD_JOBS=10 EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS \
+      VERILATOR_BUILD_JOBS=${BUILD_JOBS:-10} EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS \
       VERILATOR_SUPPORT_SOURCES=$TOP/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv ) > "$OUT/build.log" 2>&1 \
       || { echo "BUILD FAILED; see $OUT/build.log"; tail -30 "$OUT/build.log"; exit 1; }
 fi
@@ -35,8 +35,12 @@ CC=$INSTALL/bin/riscv64-unknown-elf-gcc
 $CC -O2 -I$TOP/software/include -I$INSTALL/riscv64-unknown-elf/include \
   --specs=$INSTALL/riscv64-unknown-elf/lib/dramfs.specs --specs=$INSTALL/riscv64-unknown-elf/lib/perch.specs \
   "$@" -o $OUT/prog.riscv $TOP/testing/rtl/retained_fgbg_benchmark.c
+# Per-label NBF and cwd so several cases can run in parallel on one model.
+exec 9>$MODEL/.nbf.lock; flock 9
 cp $OUT/prog.riscv $run/prog.riscv
 rm -f $run/prog.mem $run/prog.nbf
 ( cd $run && make prog.nbf "${opts[@]}" ZP_RISCV_DIR=$MODEL/program ) > "$OUT/nbf.log" 2>&1
-( cd $run && timeout 3600 ./obj_dir/Vbsg_nonsynth_zynq_testbench +c_args=$run/prog.nbf ) > "$OUT/run.log" 2>&1 || true
-grep -E "FGBG|BSG-PASS|BSG-FAIL|CORE PASS|CORE FAIL|Error|Assert" "$OUT/run.log" | head -20
+cp $run/prog.nbf $OUT/prog.nbf
+flock -u 9
+( cd $OUT && timeout 7200 $run/obj_dir/Vbsg_nonsynth_zynq_testbench +c_args=$OUT/prog.nbf ) > "$OUT/run.log" 2>&1 || true
+grep -aE "FGBG|BSG-PASS|BSG-FAIL|CORE PASS|CORE FAIL" "$OUT/run.log" | head -20
