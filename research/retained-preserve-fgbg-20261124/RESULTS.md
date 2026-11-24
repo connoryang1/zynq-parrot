@@ -31,6 +31,8 @@ Session `board-s04` (independent boot, same settings):
 
 Per-task gating is essential on both lanes: letting the background capture instructions loses most of the gain. The gain shrinks as the foreground grows because foreground lines and captured kernel lines share the 256-line store; a 768-line-per-side candidate (top `143aa29eb`) is building for a capacity sweep.
 
+Session `board-s05` (third boot): scan D 1.025x [1.013, 1.073], scan I 1.153x [1.126, 1.169], chase joint 1.235x [1.207, 1.342], lookup joint 1.194x [1.176, 1.220]. Background size with a 12 KiB scan foreground and joint retention: 32 KiB 1.268x [1.220, 1.356], 64 KiB 1.231/1.243x, 128 KiB 1.180x [1.146, 1.218] whole. Foreground latency stays about 1.4x; the whole-transaction gain shrinks as the background's share of time grows.
+
 For comparison, the old global always-capture policy on the deployed image measured 0.913x (D) and 0.898x (joint) on scan 32 KiB.
 
 Interpretation (supported by the data, not separately traced): the instruction gain comes mostly from retained kernel code on the futex wake/switch path, which both tasks execute. That's why I-only improves the whole transaction more than the foreground's own request.
