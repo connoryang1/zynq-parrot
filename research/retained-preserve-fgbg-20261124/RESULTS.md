@@ -16,6 +16,21 @@ Session `board-s03` (48 loops, 8 warmup, 4 repeats, fg 12 KiB):
 | chase | joint | 1.210x [1.181, 1.239] | 1.368x | 1.229x |
 | lookup | joint | 1.220x [1.174, 1.255] | 1.386x | 1.065x |
 
+Session `board-s04` (independent boot, same settings):
+
+| foreground | policy | whole | fg latency | fg request |
+|---|---|---|---|---|
+| scan 12 KiB | joint (replication) | 1.243x [1.227, 1.297] | 1.487x | 1.778x |
+| scan 12 KiB | I capture also during bg (`iall`) | 1.047x [1.026, 1.075] | 1.027x | 1.032x |
+| scan 12 KiB | joint, I capture also during bg | 1.101x [1.085, 1.140] | 1.151x | 1.428x |
+| chase 12 KiB | joint, I capture also during bg | 1.069x [1.037, 1.098] | 1.095x | 1.444x |
+| parse 12 KiB | joint | 1.179x [1.175, 1.210] | 1.252x | 1.062x |
+| scan 4 KiB | joint | 1.286x [1.256, 1.339] | 1.718x | 4.036x |
+| scan 8 KiB | joint | 1.238x [1.211, 1.277] | 1.484x | 1.661x |
+| scan 16 KiB | joint | 1.202x [1.163, 1.250] | 1.318x | 1.167x |
+
+Per-task gating is essential on both lanes: letting the background capture instructions loses most of the gain. The gain shrinks as the foreground grows because foreground lines and captured kernel lines share the 256-line store; a 768-line-per-side candidate (top `143aa29eb`) is building for a capacity sweep.
+
 For comparison, the old global always-capture policy on the deployed image measured 0.913x (D) and 0.898x (joint) on scan 32 KiB.
 
 Interpretation (supported by the data, not separately traced): the instruction gain comes mostly from retained kernel code on the futex wake/switch path, which both tasks execute. That's why I-only improves the whole transaction more than the foreground's own request.
