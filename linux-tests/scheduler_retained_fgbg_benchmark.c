@@ -91,7 +91,8 @@ static void send_turn(struct shared *s, unsigned v)
 struct result { uint64_t whole, fg_work, fg_latency, bg_work; };
 
 static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, unsigned bg_kib,
-			      const char *fg_kind, const char *bg_kind, unsigned enable, unsigned capture)
+			      const char *fg_kind, const char *bg_kind, unsigned enable, unsigned capture,
+			      unsigned bg_capture)
 {
 	struct result r = {0};
 	struct shared *s = mmap(NULL, sizeof(*s), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
@@ -99,7 +100,7 @@ static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, 
 	atomic_init(&s->turn, 0);
 	/* Start every cell from an empty, settled store. */
 	submit(0); settle(0);
-	if (enable) { submit(enable); settle(enable); }
+	if (enable) { submit(enable | bg_capture); settle(enable | bg_capture); }
 	int ready[2];
 	if (pipe(ready)) fail("pipe");
 	pid_t child = fork();
@@ -142,7 +143,7 @@ static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, 
 		uint64_t t0 = cycle();
 		sum += resume_workload_run(&w);
 		uint64_t t1 = cycle();
-		submit(enable);                     /* keep lookups, capture off */
+		submit(enable | bg_capture);        /* keep lookups; background capture */
 		if (n >= warmup) { r.fg_work += t1 - t0; r.fg_latency += t1 - woke; }
 		send_turn(s, 1);
 		wait_turn(s, 0);
@@ -170,11 +171,15 @@ int main(int argc, char **argv)
 	unsigned warmup = strtoul(argv[3], 0, 0), fg_kib = strtoul(argv[4], 0, 0);
 	unsigned bg_kib = strtoul(argv[5], 0, 0);
 	const char *fg_kind = argv[6], *bg_kind = argv[7], *policy = argv[8];
-	unsigned enable, capture;
+	/* bg_capture: capture bits left on while the background runs. "-iall"
+	 * keeps instruction capture on for both tasks (shared kernel code). */
+	unsigned enable, capture, bg_capture = 0;
 	if (!strcmp(policy, "i")) { enable = 1; capture = 8; }
 	else if (!strcmp(policy, "d")) { enable = 2; capture = 4; }
 	else if (!strcmp(policy, "joint")) { enable = 3; capture = 12; }
-	else { fputs("policy must be i, d or joint (off is the paired control)\n", stderr); return 2; }
+	else if (!strcmp(policy, "iall")) { enable = 1; capture = 8; bg_capture = 8; }
+	else if (!strcmp(policy, "joint-iall")) { enable = 3; capture = 12; bg_capture = 8; }
+	else { fputs("policy must be i, d, joint, iall or joint-iall (off is the paired control)\n", stderr); return 2; }
 	if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL)) fail("preview off");
 	uint64_t raw = status();
 	if (!(raw >> 63)) { errno = ENODEV; fail("retained capability"); }
@@ -186,7 +191,7 @@ int main(int argc, char **argv)
 		for (unsigned order = 0; order < 2; ++order) {
 			unsigned on = (rep + order) & 1;  /* ABBA-style alternation */
 			struct result r = run_cell(loops, warmup, fg_kib, bg_kib, fg_kind, bg_kind,
-						   on ? enable : 0, on ? capture : 0);
+						   on ? enable : 0, on ? capture : 0, on ? bg_capture : 0);
 			printf("FGBG_RESULT repeat=%u order=%u enabled=%u whole=%" PRIu64 " fg_work=%" PRIu64
 			       " fg_latency=%" PRIu64 " bg_work=%" PRIu64 " loops=%u\n", rep, order, on,
 			       r.whole, r.fg_work, r.fg_latency, r.bg_work, loops);

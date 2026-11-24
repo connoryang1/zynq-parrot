@@ -26,6 +26,7 @@ CTRL_ORIG = '2dd9c411614af250'
 CTRL_NEW = Path('/home/coyang/fpga-artifacts/context-resume/host-stdin-eof-fix-20261123/compile02/remote/candidate/control-program')
 PROMPT = re.compile(r'(?:^|\r?\n)(?:~ )?# ')
 GUEST = '/tmp/fgbg'
+RESTORE_PACKAGE = Path('/home/coyang/fpga-artifacts/context-resume/csr256-fallback-20261123/qualification01/black_parrot_bd_1.zynq.pynqz2.tar.xz.b64')
 LOCAL_NBF_DIR = Path('/run/user/1001/zp-fgbg-nbf')
 LOCAL_ORIG_NBF = Path('/home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/package/linux-retained-control29-accepted-rootfs-mem46-shell.nbf')
 
@@ -95,6 +96,7 @@ def main():
     ap.add_argument('--case', action='append', required=True,
                     help='benchmark argument string, e.g. "64 4 8 12 64 scan scan d"')
     ap.add_argument('--runtime-ms', type=int, default=3_600_000)
+    ap.add_argument('--chunk', type=int, default=400, help='base64 characters per console command')
     a = ap.parse_args()
     out = a.out; out.mkdir(parents=True, exist_ok=False)
     rec = dict(started=time.time(), cases=a.case, host=HOST, steps=[])
@@ -102,9 +104,11 @@ def main():
     elf = a.elf.read_bytes(); elf_sha = hashlib.sha256(elf).hexdigest()
     rec['elf_sha256'] = elf_sha
     idle = ssh('pgrep -x control-program || echo IDLE; ls -d ~/bp-logs/.control-program.lock 2>/dev/null || true', out, 'idle')
-    if 'IDLE' not in idle or '.control-program.lock' in idle:
+    # A lock whose owner died in a power cycle is stale; the runner clears it.
+    if 'IDLE' not in idle:
         raise RuntimeError('board busy')
     ctrl_installed = False
+    child = None
     try:
         power_cycle(out, 'initial')
         stage, _ = sh([str(SCRIPTS / 'stage_pynq_artifacts.sh'), str(a.package), HOST], out, 'stage', 900)
@@ -142,8 +146,8 @@ def main():
             child.expect(PROMPT, timeout=900); rec['steps'].append(('boot', time.time()))
             payload = base64.b64encode(gzip.compress(elf, 9)).decode()
             child.sendline(f': > {GUEST}.b64'); child.expect(PROMPT, timeout=60)
-            for i in range(0, len(payload), 76):
-                child.sendline(f"echo '{payload[i:i+76]}' >> {GUEST}.b64"); child.expect(PROMPT, timeout=120)
+            for i in range(0, len(payload), a.chunk):
+                child.sendline(f"echo '{payload[i:i+a.chunk]}' >> {GUEST}.b64"); child.expect(PROMPT, timeout=180)
             child.sendline(f'base64 -d {GUEST}.b64 | gunzip > {GUEST} && chmod +x {GUEST} && sha256sum {GUEST}')
             child.expect(r'([0-9a-f]{64})  ' + GUEST, timeout=120)
             if child.match.group(1) != elf_sha: raise RuntimeError('guest ELF hash mismatch')
@@ -164,9 +168,16 @@ def main():
     finally:
         save()
         try:
+            if child is not None and child.isalive():
+                child.close(force=True)
             if ctrl_installed:
-                ssh(f'cd {ZDIR} && cp -p control-program.orig-2dd control-program && sha256sum control-program | grep -q ^{CTRL_ORIG}', out, 'ctrl-restore', check=False)
+                # The power cycle kills any stuck control-program, so restoring
+                # afterwards can never hit "text file busy".
+                power_cycle(out, 'pre-restore')
+                ssh(f'cd {ZDIR} && cp -p control-program.orig-2dd control-program && sha256sum control-program | grep -q ^{CTRL_ORIG}', out, 'ctrl-restore')
             ssh(f'cd {ZDIR} && rm -f {SESSION_NBF} /dev/shm/{SESSION_NBF} /dev/shm/control-program.6caf', out, 'nbf-restore', check=False)
+            # Leave the previously deployed 32 KiB package staged as found.
+            sh([str(SCRIPTS / 'stage_pynq_artifacts.sh'), str(RESTORE_PACKAGE), HOST], out, 'restore-stage', 900, check=False)
             power_cycle(out, 'final')
             rec['clock_final'] = clocks(out, 'clock-final', 'read')
             rec['recovered'] = True
