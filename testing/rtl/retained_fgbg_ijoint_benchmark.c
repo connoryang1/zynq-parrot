@@ -92,7 +92,11 @@ int main(void) {
    * L1/L2 lower bound that any retention scheme can approach. */
   static const char *names[5] = {"off", "d", "i", "joint", "warm"};
   static const uint64_t enable[5] = {0, 2, 1, 3, 0}, capture[5] = {0, 4, 8, 12, 0};
+#ifndef MODES_MASK
+#define MODES_MASK 0x1f
+#endif
   for (unsigned mode = 0; mode < 5; ++mode) {
+    if (!((MODES_MASK >> mode) & 1)) continue;
     policy(0); wait_idle();                      /* enable change: empty store */
     policy(enable[mode]); wait_idle();
     uint64_t fgc = 0, bgc = 0;
