@@ -96,6 +96,7 @@ def main():
     ap.add_argument('--case', action='append', required=True,
                     help='benchmark argument string, e.g. "64 4 8 12 64 scan scan d"')
     ap.add_argument('--runtime-ms', type=int, default=3_600_000)
+    ap.add_argument('--nbf', type=Path, help='prebuilt local NBF (uploaded to board RAM) instead of patching the board copy')
     ap.add_argument('--chunk', type=int, default=400, help='base64 characters per console command')
     a = ap.parse_args()
     out = a.out; out.mkdir(parents=True, exist_ok=False)
@@ -119,8 +120,13 @@ def main():
         c = rec['clock_set']['after']
         if c['fclk0_mhz'] != 50.0: raise RuntimeError('FCLK0 not 50 MHz: %r' % c)
         # RAM-backed timer64 NBF; the persistent original is never modified.
-        ssh(f'cd {ZDIR} && rm -f /dev/shm/{SESSION_NBF} && python3 -B -c {shlex.quote(PATCH_RPC)} '
-            f'{BOARD_NBF} /dev/shm/{SESSION_NBF} && ln -sfn /dev/shm/{SESSION_NBF} {SESSION_NBF}', out, 'nbf', 300)
+        if a.nbf:
+            ssh(f'rm -f /dev/shm/{SESSION_NBF}', out, 'nbf-clean')
+            sh(['scp', '-q', str(a.nbf), f'{HOST}:/dev/shm/{SESSION_NBF}'], out, 'nbf-upload', 600)
+            ssh(f'cd {ZDIR} && ln -sfn /dev/shm/{SESSION_NBF} {SESSION_NBF}', out, 'nbf', 60)
+        else:
+            ssh(f'cd {ZDIR} && rm -f /dev/shm/{SESSION_NBF} && python3 -B -c {shlex.quote(PATCH_RPC)} '
+                f'{BOARD_NBF} /dev/shm/{SESSION_NBF} && ln -sfn /dev/shm/{SESSION_NBF} {SESSION_NBF}', out, 'nbf', 300)
         nbf_sha = ssh(f'sha256sum /dev/shm/{SESSION_NBF}', out, 'nbf-sha').split()[0]; rec['nbf_sha256'] = nbf_sha
         # Controller: keep the original as control-program.orig-2dd and install 6caf.
         sh(['scp', '-q', str(CTRL_NEW), f'{HOST}:/dev/shm/control-program.6caf'], out, 'ctrl-upload')
@@ -133,6 +139,12 @@ def main():
         env = dict(os.environ, PYNQ_CONTROL_PROGRAM_SHA256=ctrl_sha, PYNQ_BITSTREAM_SHA256=bit_sha,
                    PYNQ_CONTROL_PROGRAM_TIMEOUT_MS=str(a.runtime_ms))
         local_nbf = LOCAL_NBF_DIR / SESSION_NBF
+        if a.nbf:
+            LOCAL_NBF_DIR.mkdir(parents=True, exist_ok=True)
+            if local_nbf.exists(): local_nbf.unlink()
+            local_nbf.symlink_to(a.nbf.resolve())
+        elif local_nbf.is_symlink():
+            local_nbf.unlink()
         if not local_nbf.exists():
             LOCAL_NBF_DIR.mkdir(parents=True, exist_ok=True)
             subprocess.run([sys.executable, '-B', '-c', PATCH_RPC, str(LOCAL_ORIG_NBF), str(local_nbf)], check=True)

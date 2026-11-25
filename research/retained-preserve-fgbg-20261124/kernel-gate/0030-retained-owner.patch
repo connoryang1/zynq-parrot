@@ -1,0 +1,106 @@
+--- /home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/build/linux-6.6/kernel/sys.c	2026-11-21 02:12:50.023392543 -0500
++++ kernel/sys.c	2026-11-24 23:06:46.365267166 -0500
+@@ -193,6 +193,43 @@
+ }
+ #endif
+ 
++#define PR_BP_RETAINED_OWNER 0x42505065
++#if defined(CONFIG_RISCV) && defined(CONFIG_64BIT) && defined(CONFIG_MMU)
++extern struct task_struct *bp_retained_owner;
++extern unsigned long bp_retained_owner_enable, bp_retained_owner_capture;
++
++/* Register the caller as the retained-capture owner (enable != 0), or
++ * unregister (enable == 0). The caller is running, so apply its state now;
++ * context_switch() maintains it afterwards. */
++static int bp_retained_owner_set(unsigned long enable, unsigned long capture)
++{
++	u64 status;
++	int error;
++
++	preempt_disable();
++	error = bp_retained_probe(&status);
++	if (!error) {
++		if (enable) {
++			WRITE_ONCE(bp_retained_owner_enable, enable);
++			WRITE_ONCE(bp_retained_owner_capture, capture);
++			WRITE_ONCE(bp_retained_owner, current);
++			asm volatile("csrw 0x5c2, %0" : : "r"(enable | capture) : "memory");
++		} else {
++			unsigned long en = READ_ONCE(bp_retained_owner_enable);
++			WRITE_ONCE(bp_retained_owner, NULL);
++			asm volatile("csrw 0x5c2, %0" : : "r"(en) : "memory");
++		}
++	}
++	preempt_enable();
++	return error;
++}
++#else
++static int bp_retained_owner_set(unsigned long enable, unsigned long capture)
++{
++	return -ENODEV;
++}
++#endif
++
+ #ifndef SET_UNALIGN_CTL
+ # define SET_UNALIGN_CTL(a, b)	(-EINVAL)
+ #endif
+@@ -2836,6 +2873,23 @@
+ 	case PR_RISCV_V_GET_CONTROL:
+ 		error = RISCV_V_GET_CONTROL();
+ 		break;
++	case PR_BP_RETAINED_OWNER:
++		/* arg2: lane enables (1..3) or 0 to unregister; arg3: capture bits. */
++		if ((arg2 & ~3UL) || (arg3 & ~12UL) || arg4 || arg5
++		    || ((arg3 & 4) && !(arg2 & 2)) || ((arg3 & 8) && !(arg2 & 1))) {
++			error = -EINVAL;
++			break;
++		}
++		if (!capable(CAP_SYS_ADMIN)) {
++			error = -EPERM;
++			break;
++		}
++		if (num_possible_cpus() != 1) {
++			error = -EOPNOTSUPP;
++			break;
++		}
++		error = bp_retained_owner_set(arg2, arg3);
++		break;
+ 	case PR_BP_RETAINED_CONTROL:
+ 		if ((arg2 & ~15UL) || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
+--- /home/coyang/fpga-artifacts/context-resume/retained-control-kernel29-20261121/build/linux-6.6/kernel/sched/core.c	2026-11-06 14:17:09.559865887 -0500
++++ kernel/sched/core.c	2026-11-24 23:06:46.361267366 -0500
+@@ -5354,6 +5354,11 @@
+ /*
+  * context_switch - switch to the new MM and the new thread's register state.
+  */
++#ifdef CONFIG_RISCV
++struct task_struct *bp_retained_owner;
++unsigned long bp_retained_owner_enable, bp_retained_owner_capture;
++#endif
++
+ static __always_inline struct rq *
+ context_switch(struct rq *rq, struct task_struct *prev,
+ 	       struct task_struct *next, struct rq_flags *rf)
+@@ -5362,6 +5367,21 @@
+ 	/* The incoming task is known and the same-mm translation is still active. */
+ #ifdef CONFIG_RISCV
+ 	riscv_bp_preview_next(prev, next);
++	/*
++	 * Kernel-managed retained-line capture (prctl PR_BP_RETAINED_OWNER).
++	 * Switching to the owner turns demand capture on for the rest of its
++	 * switch-in path and execution; switching away keeps lookups enabled
++	 * but stops capture, so other tasks cannot displace the owner's lines.
++	 * A lane-enable value that is unchanged never clears the store. Only a
++	 * pointer comparison is made; the owner is never dereferenced here.
++	 */
++	if (unlikely(READ_ONCE(bp_retained_owner))) {
++		unsigned long en = READ_ONCE(bp_retained_owner_enable);
++		if (next == READ_ONCE(bp_retained_owner))
++			asm volatile("csrw 0x5c2, %0" : : "r"(en | READ_ONCE(bp_retained_owner_capture)) : "memory");
++		else if (prev == READ_ONCE(bp_retained_owner))
++			asm volatile("csrw 0x5c2, %0" : : "r"(en) : "memory");
++	}
+ #endif
+ 
+ 	/*

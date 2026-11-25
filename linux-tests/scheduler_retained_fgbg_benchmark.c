@@ -40,6 +40,7 @@
 #define PR_BP_PREVIEW_ENABLE 0x4250505a
 #define PR_BP_RETAINED_CONTROL 0x42505063
 #define PR_BP_RETAINED_STATUS 0x42505064
+#define PR_BP_RETAINED_OWNER 0x42505065
 #define BUSY UINT64_C(0x300)
 
 static void fail(const char *m) { perror(m); exit(1); }
@@ -92,7 +93,7 @@ struct result { uint64_t whole, fg_work, fg_latency, bg_work; };
 
 static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, unsigned bg_kib,
 			      const char *fg_kind, const char *bg_kind, unsigned enable, unsigned capture,
-			      unsigned bg_capture)
+			      unsigned bg_capture, int kmode)
 {
 	struct result r = {0};
 	struct shared *s = mmap(NULL, sizeof(*s), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
@@ -101,6 +102,11 @@ static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, 
 	/* Start every cell from an empty, settled store. */
 	submit(0); settle(0);
 	if (enable) { submit(enable | bg_capture); settle(enable | bg_capture); }
+	/* Kernel-managed gating: the foreground registers itself as the owner
+	 * once; context_switch() turns capture on/off. No per-turn calls in
+	 * either cell. Registration happens before fork, in the parent. */
+	if (kmode && enable && prctl(PR_BP_RETAINED_OWNER, (unsigned long)enable, (unsigned long)capture, 0UL, 0UL))
+		fail("retained owner register");
 	int ready[2];
 	if (pipe(ready)) fail("pipe");
 	pid_t child = fork();
@@ -139,11 +145,11 @@ static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, 
 	for (unsigned n = 0; n < warmup + loops; ++n) {
 		if (n == warmup) begin = cycle();
 		uint64_t woke = s->bg_yield;
-		submit(enable | capture);           /* foreground: capture on */
+		if (!kmode) submit(enable | capture);  /* foreground: capture on */
 		uint64_t t0 = cycle();
 		sum += resume_workload_run(&w);
 		uint64_t t1 = cycle();
-		submit(enable | bg_capture);        /* keep lookups; background capture */
+		if (!kmode) submit(enable | bg_capture);  /* keep lookups; background capture */
 		if (n >= warmup) { r.fg_work += t1 - t0; r.fg_latency += t1 - woke; }
 		send_turn(s, 1);
 		wait_turn(s, 0);
@@ -152,6 +158,7 @@ static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, 
 	send_turn(s, 2);
 	while (atomic_load_explicit(&s->turn, memory_order_acquire) != 3) sched_yield();
 	r.bg_work = s->bg_yield;
+	if (kmode && enable && prctl(PR_BP_RETAINED_OWNER, 0UL, 0UL, 0UL, 0UL)) fail("retained owner unregister");
 	int st;
 	if (waitpid(child, &st, 0) != child || !WIFEXITED(st) || WEXITSTATUS(st)) { errno = ECHILD; fail("child"); }
 	if (!resume_workload_check_total(&w, sum)) { errno = EIO; fail("fg checksum"); }
@@ -174,6 +181,12 @@ int main(int argc, char **argv)
 	/* bg_capture: capture bits left on while the background runs. "-iall"
 	 * keeps instruction capture on for both tasks (shared kernel code). */
 	unsigned enable, capture, bg_capture = 0;
+	int kmode = 0;
+	size_t plen = strlen(policy);
+	char base[32];
+	if (plen > 2 && plen < sizeof(base) && !strcmp(policy + plen - 2, "-k")) {
+		memcpy(base, policy, plen - 2); base[plen - 2] = 0; policy = base; kmode = 1;
+	}
 	if (!strcmp(policy, "i")) { enable = 1; capture = 8; }
 	else if (!strcmp(policy, "d")) { enable = 2; capture = 4; }
 	else if (!strcmp(policy, "joint")) { enable = 3; capture = 12; }
@@ -183,15 +196,15 @@ int main(int argc, char **argv)
 	if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL)) fail("preview off");
 	uint64_t raw = status();
 	if (!(raw >> 63)) { errno = ENODEV; fail("retained capability"); }
-	printf("FGBG_CONFIG loops=%u repeats=%u warmup=%u fg_kib=%u bg_kib=%u fg=%s bg=%s policy=%s"
+	printf("FGBG_CONFIG loops=%u repeats=%u warmup=%u fg_kib=%u bg_kib=%u fg=%s bg=%s policy=%s%s"
 	       " i_lines=%u d_lines=%u set_log2=%u\n", loops, repeats, warmup, fg_kib, bg_kib, fg_kind,
-	       bg_kind, policy, (unsigned)((raw >> 16) & 0xffff), (unsigned)((raw >> 32) & 0xffff),
+	       bg_kind, policy, kmode ? "-k" : "", (unsigned)((raw >> 16) & 0xffff), (unsigned)((raw >> 32) & 0xffff),
 	       (unsigned)((raw >> 48) & 0xff));
 	for (unsigned rep = 0; rep < repeats; ++rep) {
 		for (unsigned order = 0; order < 2; ++order) {
 			unsigned on = (rep + order) & 1;  /* ABBA-style alternation */
 			struct result r = run_cell(loops, warmup, fg_kib, bg_kib, fg_kind, bg_kind,
-						   on ? enable : 0, on ? capture : 0, on ? bg_capture : 0);
+						   on ? enable : 0, on ? capture : 0, on ? bg_capture : 0, kmode);
 			printf("FGBG_RESULT repeat=%u order=%u enabled=%u whole=%" PRIu64 " fg_work=%" PRIu64
 			       " fg_latency=%" PRIu64 " bg_work=%" PRIu64 " loops=%u\n", rep, order, on,
 			       r.whole, r.fg_work, r.fg_latency, r.bg_work, loops);
