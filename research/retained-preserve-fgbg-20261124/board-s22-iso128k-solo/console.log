@@ -1,0 +1,448 @@
+CONTROL_PROGRAM_SHA256=6caf34070d62b2d9986795f1868b9d34ee4b8f0447732359cb944e9d0b10a53d
+NBF_SHA256=b883e95c4049085780e510d24e3d80e1b587e02ee6a11b62fbbcb33b5f3f32a8
+LOG=/home/xilinx/bp-logs/fgbg-kernel29-timer64-interactive-20261125T172607Z-2358.log
+BITSTREAM_SHA256=56cbdf4422a2606719779a86d3d9fc474b5abb7cdcef5fe63e9c1a7b9e7aee80
+// bsg_zynq_pl: be sure to run as root
+// bsg_zynq_pl: mmap returned 40000000 (offset 0) errno=0
+// bsg_zynq_pl: mmap returned 80000000 (offset 0) errno=0
+INFO:    ps.cpp: limiting target runtime to 3600000 ms
+INFO:    ps.cpp: reading four base registers
+INFO:    ps.cpp: reset(lo)=0, bitbang=0, dram_init=0, dram_base=0
+INFO:    ps.cpp: attempting to write and read register 0x8
+INFO:    ps.cpp: successfully wrote and read registers in bsg_zynq_shell (verified ARM GP0 connection)
+INFO:    Creating Bitbang Driver: 0xbef9d6b0 40000004 16 1
+INFO:    Creating host: 0xbef9d6b0 40000018 40000014
+INFO:    Setting non-blocking terminal mode
+INFO:    Reset Tag Master
+INFO:    Resetting Tag Client 0
+INFO:    Resetting Tag Client 1
+INFO:    Setting Tag Client 0<-1
+INFO:    Setting Tag Client 1<-1
+INFO:    Setting Tag Client 0<-0
+INFO:    Idling for 50
+INFO:    ps.cpp: allocating owned DRAM buffer with size 48234496
+bsg_zynq_pl: allocate_dram() called with size 48234496 bytes --> virtual ptr=0xb3c6c000, physical ptr=0x16900000
+INFO:    ps.cpp: received 0xb3c6c000 (phys = 16900000)
+INFO:    ps.cpp: wrote and verified base register
+INFO:    ps.cpp: attempting to read mtime reg in BP CFG space, should increase monotonically  (testing ARM GP1 connections)
+DEBUG-PS: ps.cpp: 0-2454838
+DEBUG-PS: ps.cpp: 1-2455169
+DEBUG-PS: ps.cpp: 2-2455441
+DEBUG-PS: ps.cpp: 3-2455690
+DEBUG-PS: ps.cpp: 4-2455944
+DEBUG-PS: ps.cpp: 5-2456184
+DEBUG-PS: ps.cpp: 6-2456438
+DEBUG-PS: ps.cpp: 7-2456681
+DEBUG-PS: ps.cpp: 8-2456922
+DEBUG-PS: ps.cpp: 9-2457166
+INFO:    ps.cpp: attempting to read and write mtime reg in BP CFG space (testing ARM GP1 connections)
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: writing mtimecmp
+INFO:    ps.cpp: reading mtimecmp
+INFO:    ps.cpp: beginning config
+INFO:    ps.cpp: beginning nbf load
+DEBUG-PS: ps.cpp: nbf finish command, line 1916452
+DEBUG-PS: ps.cpp: finished loading 1916452 lines of nbf.
+INFO:    ps.cpp: finished nbf load
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: starting watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: start() called
+
+OpenSBI v1.4
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name             : blackparrot
+Platform Features         : medeleg
+Platform HART Count       : 1
+Platform IPI Device       : bp-ipi
+Platform Timer Device     : bp-timer @ 8000000Hz
+Platform Console Device   : bp-console
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : ---
+Platform Shutdown Device  : bp-reset
+Platform Suspend Device   : ---
+Platform CPPC Device      : ---
+Firmware Base             : 0x80000000
+Firmware Size             : 310 KB
+Firmware RW Offset        : 0x40000
+Firmware RW Size          : 54 KB
+Firmware Heap Offset      : 0x45000
+Firmware Heap Size        : 34 KB (total), 2 KB (reserved), 9 KB (used), 22 KB (free)
+Firmware Scratch Size     : 4096 B (total), 336 B (used), 3760 B (free)
+Runtime SBI Version       : 2.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : 0
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x0000000080040000-0x000000008004ffff M: (R,W) S/U: ()
+Domain0 Region01          : 0x0000000080000000-0x000000008003ffff M: (R,X) S/U: ()
+Domain0 Region02          : 0x0000000000000000-0xffffffffffffffff M: () S/U: (R,W,X)
+Domain0 Next Address      : 0x0000000080200000
+Domain0 Next Arg1         : 0x0000000082200000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+Domain0 SysSuspend        : yes
+
+Boot HART ID              : 0
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.11
+Boot HART Base ISA        : rv64imafdcb
+Boot HART ISA Extensions  : none
+Boot HART PMP Count       : 0
+Boot HART PMP Granularity : 0 bits
+Boot HART PMP Address Bits: 0
+Boot HART MHPM Info       : 0 (0x00000000)
+Boot HART Debug Triggers  : 0 triggers
+Boot HART MIDELEG         : 0x0000000000000222
+Boot HART MEDELEG         : 0x000000000000b109
+[    0.000000] Linux version 6.6.0 (coyang@blackparrot1) (riscv64-linux-gcc.br_real (Buildroot 2021.11-8547-g7e65a1a) 13.2.0, GNU ld (GNU Binutils) 2.41) #28 SMP Fri Nov 20 15:11:06 EST 2026
+[    0.000000] Machine model: blackparrot,riscv64
+[    0.000000] SBI specification v2.0 detected
+[    0.000000] SBI implementation ID=0x1 Version=0x10004
+[    0.000000] SBI TIME extension detected
+[    0.000000] SBI IPI extension detected
+[    0.000000] SBI RFENCE extension detected
+[    0.000000] SBI SRST extension detected
+[    0.000000] Memory limited to 46MB
+[    0.000000] efi: UEFI not found.
+[    0.000000] OF: reserved mem: 0x0000000080000000..0x000000008003ffff (256 KiB) nomap non-reusable mmode_resv1@80000000
+[    0.000000] OF: reserved mem: 0x0000000080040000..0x000000008004ffff (64 KiB) nomap non-reusable mmode_resv0@80040000
+[    0.000000] Zone ranges:
+[    0.000000]   DMA32    [mem 0x0000000080000000-0x0000000082dfffff]
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000080000000-0x000000008004ffff]
+[    0.000000]   node   0: [mem 0x0000000080050000-0x0000000082dfffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000080000000-0x0000000082dfffff]
+[    0.000000] SBI HSM extension detected
+[    0.000000] Falling back to deprecated "riscv,isa"
+[    0.000000] riscv: base ISA extensions acdfim
+[    0.000000] riscv: ELF capabilities acdfim
+[    0.000000] percpu: Embedded 19 pages/cpu s37944 r8192 d31688 u77824
+[    0.000000] pcpu-alloc: s37944 r8192 d31688 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 
+[    0.000000] Kernel command line: console=hvc0 loglevel=8 rdinit=/bin/sh mem=46M  
+[    0.000000] Dentry cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 11615
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]       fixmap : 0xffffffc6fea00000 - 0xffffffc6ff000000   (6144 kB)
+[    0.000000]       pci io : 0xffffffc6ff000000 - 0xffffffc700000000   (  16 MB)
+[    0.000000]      vmemmap : 0xffffffc700000000 - 0xffffffc800000000   (4096 MB)
+[    0.000000]      vmalloc : 0xffffffc800000000 - 0xffffffd800000000   (  64 GB)
+[    0.000000]      modules : 0xffffffff0174e000 - 0xffffffff80000000   (2024 MB)
+[    0.000000]       lowmem : 0xffffffd800000000 - 0xffffffd802e00000   (  46 MB)
+[    0.000000]       kernel : 0xffffffff80000000 - 0xffffffffffffffff   (2047 MB)
+[    0.000000] Memory: 21332K/47104K available (8291K kernel code, 3735K rwdata, 4096K rodata, 5399K init, 388K bss, 25772K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=32 to nr_cpu_ids=1.
+[    0.000000] rcu: 	RCU debug extended QS entry/exit.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] riscv-intc: 64 local interrupts mapped
+[    0.000000] riscv: providing IPIs using SBI IPI extension
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] clocksource: riscv_clocksource: mask: 0xffffffffffffffff max_cycles: 0x1d854df40, max_idle_ns: 440795202120 ns
+[    0.000311] sched_clock: 64 bits at 8MHz, resolution 125ns, wraps every 2199023255500ns
+[    0.024842] Console: colour dummy device 80x25
+[    0.028810] printk: console [hvc0] enabled
+[    0.208882] Calibrating delay loop (skipped), value calculated using timer frequency.. 16.00 BogoMIPS (lpj=32000)
+[    0.220157] pid_max: default: 32768 minimum: 301
+[    0.262929] Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    0.273991] Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    1.087050] RCU Tasks Trace: Setting shift to 0 and lim to 1 rcu_task_cb_adjust=1.
+[    1.145056] riscv: ELF compat mode unsupported
+[    1.149524] ASID allocator disabled (1 bits)
+[    1.214845] rcu: Hierarchical SRCU implementation.
+[    1.221790] rcu: 	Max phase no-delay instances is 1000.
+[    1.350630] EFI services will not be available.
+[    1.416174] smp: Bringing up secondary CPUs ...
+[    1.424854] smp: Brought up 1 node, 1 CPU
+[    1.561234] devtmpfs: initialized
+[    1.865958] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    1.878072] futex hash table entries: 256 (order: 2, 16384 bytes, linear)
+[    2.104397] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    2.216063] DMA: preallocated 128 KiB GFP_KERNEL pool for atomic allocations
+[    2.235000] DMA: preallocated 128 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    2.690075] cpu0: Ratio of byte access time to unaligned word access is 0.00, unaligned accesses are slow
+[    3.383253] SCSI subsystem initialized
+[    3.468106] libata version 3.00 loaded.
+[    3.538941] usbcore: registered new interface driver usbfs
+[    3.556588] usbcore: registered new interface driver hub
+[    3.575885] usbcore: registered new device driver usb
+[    3.870409] vgaarb: loaded
+[    3.918126] clocksource: Switched to clocksource riscv_clocksource
+[    8.410029] NET: Registered PF_INET protocol family
+[    8.467889] IP idents hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[    8.622823] tcp_listen_portaddr_hash hash table entries: 128 (order: 0, 4096 bytes, linear)
+[    8.637773] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    8.647840] TCP established hash table entries: 512 (order: 0, 4096 bytes, linear)
+[    8.659906] TCP bind hash table entries: 512 (order: 3, 32768 bytes, linear)
+[    8.689488] TCP: Hash tables configured (established 512 bind 512)
+[    8.750042] UDP hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    8.775290] UDP-Lite hash table entries: 256 (order: 2, 24576 bytes, linear)
+[    8.848291] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    9.147464] RPC: Registered named UNIX socket transport module.
+[    9.155762] RPC: Registered udp transport module.
+[    9.160143] RPC: Registered tcp transport module.
+[    9.165887] RPC: Registered tcp-with-tls transport module.
+[    9.170717] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    9.177976] PCI: CLS 0 bytes, default 64
+[    9.579022] workingset: timestamp_bits=62 max_order=13 bucket_order=0
+[    9.991730] NFS: Registering the id_resolver key type
+[   10.007331] Key type id_resolver registered
+[   10.014227] Key type id_legacy registered
+[   10.027863] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[   10.039176] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[   10.208080] 9p: Installing v9fs 9p2000 file system support
+[   10.302629] NET: Registered PF_ALG protocol family
+[   10.331548] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[   10.343417] io scheduler mq-deadline registered
+[   10.350179] io scheduler kyber registered
+[   68.916267] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[   70.075516] [drm] radeon kernel modesetting enabled.
+[   75.038076] loop: module loaded
+[   75.698302] e1000e: Intel(R) PRO/1000 Network Driver
+[   75.705398] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[   76.262906] usbcore: registered new interface driver uas
+[   76.287042] usbcore: registered new interface driver usb-storage
+[   76.489775] mousedev: PS/2 mouse device common for all mice
+[   76.635402] sdhci: Secure Digital Host Controller Interface driver
+[   76.643154] sdhci: Copyright(c) Pierre Ossman
+[   76.658819] sdhci-pltfm: SDHCI platform and OF driver helper
+[   76.743234] usbcore: registered new interface driver usbhid
+[   76.750945] usbhid: USB HID core driver
+[   76.827189] NET: Registered PF_INET6 protocol family
+[   77.527065] Segment Routing with IPv6
+[   77.558868] In-situ OAM (IOAM) with IPv6
+[   77.587177] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[   77.789847] NET: Registered PF_PACKET protocol family
+[   77.821761] 9pnet: Installing 9P2000 support
+[   77.855252] Key type dns_resolver registered
+[   77.886367] start plist test
+[   78.345966] end plist test
+[   83.503314] debug_vm_pgtable: [debug_vm_pgtable         ]: Validating architecture page table helpers
+[   85.099395] clk: Disabling unused clocks
+[  116.194071] Freeing unused kernel image (initmem) memory: 5396K
+[  116.210134] Run /bin/sh as init process
+[  116.215601]   with arguments:
+[  116.219287]     /bin/sh
+[  116.222629]   with environment:
+[  116.226470]     HOME=/
+[  116.230020]     TERM=linux
+/bin/sh: can't access tty; job control turned off
+~ # : > /tmp/fgbg.b64
+~ # echo 'H4sIALgaB2sC/+1be1gUR7av7p6eGRAHpEFQUUdAjUQIL9H4YGEERlyXmPjKTbLi0PNgdG
+DGmUE0wYQBmkdUfDQCUbNxzV3XeLO5URQS3SWavasxNzebaFaNyackY9R4TWaSaEAjzK3qB/R0NNlv7/
+fdf+62X1N1fnVO1alTVadqrNPP5S8owDEMiA8OvgOIqovlsRwBb0/nU5LDZoBQ+HcMGA2UkFZI+HIAFp
+Sm4iAoVQt8hCDnEHAHjgWlEwQ+McWG5BxIriAN3PNZJqMxSUretwSAliQQlIKIoVLUxw+SefqDOVhQOo
+/g8RVEsBwuyPkFOb/AL6YRQr8jZHZRCG+LgLcI9hBTrcCnlfCjZ+EXbiPKr5gk6DMJC0ptAp9NJvcolF
+OCv/8Rugce' >> /tmp/fgbg.b64
+~ # echo 'E9q7n13k4y5a+yGbteQhmzHZZi2vWJvstLroNVmZyTZHVqYxxWVPSRN1ixBk9EVLBvUNl+
+gxAr6J8B0u0OECFg3fSPhGwXccfGPhGyfMtwShHqSSCr7D4BsmyI8Vxms8fEMFTCNpbxR8Y340hwCg4D
+sGviESLF6i/72e0cL4oTEfKcEnyPqHCfoiPjxHN2G4ifzvmsRTC7SKf6s+BoZrMfXEQlgAFBHqGtkaGd
+RTJeljhMQ20UJ/Rgt9R/qsfG5HVdobNcMXHt4X0eBvrZqantP/i2dbq7JvB/6YUjTn+/ju8H+PfTa0Yf
+WBHVVO/a4qkHD7X5eeITof/nZD3K6jbNx3I6/c2nbwXzWVX7RWFbeycRHP7Kry3nj/8jsP54zfUlEz/M
+kds8J3R759' >> /tmp/fgbg.b64
+~ # echo 'ZL5/SkTgRl3U7D88PDznVy9WvfngquiR19cMdNf7NNoSo2rK2I1x95t/Vq4PYSAinO+tWz
+D8FqFvfk2w1Q8L+DEZnijgIDwYTxXwD4YH4wsFvFpWj0fAU2X8Twl4jgz/nYAvlNWTgaHx+SYA5gXjnw
+j8PTL+HgHfIqv/bQHfLcNfFOuR4U9zcy0GxOZiQX5otsAfIWu3ScBfl+FTBNwhq3+6aB8Z/1HRzjJcJe
+ArZHi52F8ZTonjK2v3D+J8kOFt4rjI6jkjjouMHxP7K8PDxP7K6lkizhMZ/1wB18r4a8TxkuGHRDvI6n
+lEnLcy/i+4caTAtTnB4zhPGF+tbHyBw0m7bcBR4XYBh8nptDtBcbHLbaBXFdOlq4rNBqsNmJ0mEyirKC
+8zOIDZbKtw' >> /tmp/fgbg.b64
+~ # echo 'lQKz3bkKuNxOm6kcOE0GI8wb7RVuUGxaa3WDMoPNZqdhRdDJ06g2p7u4zGAtBy661GQsXm
+c12TgJ2B4wO5zWcrcZ0LxMmanMZXID2mZ3mUClwep2WBGr022vsKFC2rEOmCudVrcJoXSZA7YCqym3F0
+Npg9tqh42sc6HKQBnS12F1mIJ6ZKkwOI0AKYb2mSzwU3uQfkGhbm5xekr69MFsRiaszWKzlxhsxQ471N
+zkTOTnBy75R8A3GPn5fwpuP8LQP4z30cgXN2xtVSLvPxYT5yEOeiX77yGunAAPCDI8Pz7IrxbGG5ftQ+
+L8UAj7lPiI61++z2oleIL0HJCDDZ4HVdJ6JLhaWo8EHy3BH5DgWqkfluCREnyGBB8rwXMkeJgEnyfBh0
+v9uQQfI8Ef' >> /tmp/fgbg.b64
+~ # echo 'l+AxEnyFBJeeAUoluPS84JDgsRJ8rQSX7vfVEjxCgjdK8HESfIsEpyR4uwQfJcF3S3DpWW
+WfBI+W4K9LcOlm/IYEl54bj0lw6ZnmHQk+XoJ/IMFHSPDzEpyQ7ncSPEo6nyX4MAnul+C4BO+T4Ip7nC
+/aMuBeTPw5l+gmHqKIuf1sDUwXUaD2YA2wwBGOyYZ6ZWtSLISGsztPNycH0xoZ3TxVVi6jmx+Ulcvo5i
+RZuYxuniIrl9HND8jKZXTzZFm5jG6eJCuX0c0TZeUyujlRVi6jmxNk5TK6OV5WLqObJ8jKZXSzVlYuo5
+vHizSFYZ88aqmd3nCx2+fRJ8zeGp+QOSLxd/rX6ujIW7pGE1bgyU9I9SQmpOYmwHTC170+f8CftLGxdK
+cqDKDS7ps+' >> /tmp/fgbg.b64
+~ # echo '/yXf/oZGm2cyR/sh/fX+TY0ORPn847+GZW5PPirNvgvpr3avaF+7v8EzOZ45crm7B9Z39Z
+SJOFJHsAyTsb8unvEk+/xvfUtjZPz1H9iGjwKr9divaFsvuB11ysQyZEoG2QJ8/pf8NE5mI4TJjGcg7a
+PVZCnH8QuO/poeQ2b9Vp/9DaPHb2V/NX3JQh2m9xQgrSjyd6TP/9wFOoZ0DuGvRlJkvrLme6j/ee9oEn
+RWes+pcDpkeAnfbq55/UjqnApjz6rw1ZuPs2xvbzg2Ob5H6Z5U+k1ztn/mtZTL9Za9FSWVnkmFpqwbpx
+u/ro+vp0iyEPbn8+mPL9TBltUzlPRwxdIrgYQZExISMtMSEmY/OiFhhmFCQubqCdc3PnZb94Wn8LUNRx
+tmYcyG7C/p' >> /tmp/fgbg.b64
+~ # echo 'Xap0rLDmBpbn0a9fxioj8OEFx/MxaNeXPutflrSJxm6teUhLqpNMYt+gPd+jo8gSX8SxiC
+sW+jeqheoxsP1T9AjS7PP/4kzS83QuaaajyZT5TyvNrPIYcZrZF3l948vDsDAfcBDQJiuIiRiUee5DYm
+LuGLKAJVcPh+2dZ/R09K3yvZWePKzwaFMXRm8MUWAwz+SbGSi5wJUE3tsX6QNbHk164bvJ4D3adAjrbu
+moy8tFVMKhu3CnXRj+0O4wNTbPo8f0TAFZcIWhSK0S6neU1pGlZKJ3dOYPTXx9+ncZVNsHVjqMNCYc2g
+U26Xn5u2qu/3/+8YgW/4keSy4OxqfB2i8dpceTRT7w+nMla/aaWGVq2L4QH9jtpilygdIcF8lbIZvpvu
+EDOS56NFlU' >> /tmp/fgbg.b64
+~ # echo 'X4nGg65WzWNjwnAP231tbyUaMUw/C/b8lMXzS7ZBZRTHD42mYcL1H7C87ptMYcj8TfMv1h
+/ZOOkZT17WJnOfZ4Hnl9g8elgITjdmRtMb8qLpjYujXVOhtaAWr2cntXDW+uKP2MW2jg0NucxU766p/S
+csGed/wImsYaDeUlK51/x2RaGJIpkZcHz/RBzGtjGJE4bB8Xx9q9675eadt6vqK6/XQ8nWttvXNxAPYw
+m1D3via2d6JhCzsAkDVcvX72FQa/7FdAi5wGy6CC2cupgmyAWoVjIb2vNQ7SyPlsjEEomZWDwxG9N2r8
+fyP7Q8a6ntarj45mZMT7epCmqhL6jN9CRAvzGxpnqLgTjs2cqtwRQ4X14MyT/+FkdxK/C5TlpBpnNrJ4
+ejD8MVy9EM' >> /tmp/fgbg.b64
+~ # echo 'Tx+CK5Yvz+XoDjqSzIYr9tYBuGo36bO/OnBgUv0e5gE0f19mGxRRsSM66q6ChI2Ku+SvtG
+NGHKDIY6HQHm1L/gT1/7f1h80maM8pSS8uOXzdErouyd1948sDaMTRCKeGZTPZfXB8l8DVkYJmNpwvL6
+OZTha8GgLld8P5PfJWEj/33/otN2cz+8HeyqN1cK43KyZdsUxfCtdwQYfpNji+mWoj8ZoYjKWUWUoPu7
+wfK8R+6ZmP5R25m/0ZueD0Z50b3v/i4DW6ZRP47kHwHjFzE6DrwiK/mwLe01X4wMLx+3dwo249hGXvzA
+gtzM0YNis3I+QOv0a0m0KG1sh1YY0810TnkFme/JUMmQjXR7R3W92di/Waldefec2KZlNG2Kc5Tfwa0f
+ar7yHPQPn0' >> /tmp/fgbg.b64
+~ # echo '4XmjdsP+tddOHg7b8od7dzQMEJlQOyYMQH+xQxWFPOFjaDw20CP2J9ZO9ozMtVCq3t7bm+
+kXVPG6irNodabCsUtKr4D+fOdxqBG0n+fH6664Dq67WDjT5u2tfNdcaMru2dN4oWF+Y0lDUf1FqBX5JJ
+TfimYzlK+lt4YomMJRnVcqCgRvBud3NT2OjBKt5h/GW+15k8jR3efz+/pPVHrDyOvD99dX7mTGAO+Wrl
+flKwDN7YEqca5fYpavH3W0u+74ZqQzu12FC3pvRXqPeV4F95fNfdBjaqAdwMLZ3s1h+xEnNTIEZ7creO
+5tiHsJ7KXvljec3Metzkd9ADzDzWj9qSP4Lfwb/CvDwWC7IIm/fuvVkNc4iWU+0FO5Fc73Jm6XeuUIP/
+dR/s2D0G/k' >> /tmp/fgbg.b64
+~ # echo '/fYAlOTmVtqf0NpA+1n2V8OPcNJLYXvue+0kVwLXf+A4smD9q3+Kg5zmA8fsP1nHdOgryw
+TuzHtz+kD1Kq58EWxvJScFczkrfXCCvaKPO84h/+IDWmttp2crpJSAZKA1SB2036ch+VK/s3x993pDJ3
+fqENtCpw9Je+gkgrRDp5HwS3KNUAkcv0+2C+2Sc6D+Bp/ffmEQeQLqu8Lnf+RjEWGW+MCKYi63GNpjOc
+cFc1o+B8e1+tdcbup9+//kfUr8vtP/Jbaih+MFrQAIVkWCmGkwM+0vDbXTMEApPYBajQVY+CODgj8wKT
+UG5+Ajp1zw11FbGgCs5/hNSzUA0/Mx0KWH/FAe7kCAfv4qYCE/Xa8CUDtgqVYBxId4EC/LqABqq4O5lc
+P+bVoOq9KC' >> /tmp/fgbg.b64
+~ # echo 'jr/cwunnyXvKQb8egNYFtSc92+BJENDtaC1c6mNVESCh7ptt0P8DOFaID0P8dv9Lt0et3n
+uz/u6HxtquuovZN+ApMpMECanwnQHf2VwehxgOaRzSOKQVdB2pe//Ga02nTHv64GqZklRXxLzrL+nLak
+rfCNfH6bFfon2X+tSCJcyog28iQUeHKQrcynVXrLoqLL/EglrjdqWXVNlXHHvdIYaaam5vmVIEvdG/vz
+/nM0Yfd0xeizc87M7nDAnPD5vfVV/e30SHktlxOb/zshW3wxPAYahrIgntr/A+03A7ysgus4A/vHSkFZ
+30Eqq/B5krIkoplUrR2Ta7x2s4OcBwux2ZhFrcfBLurCM5DXj6BB1LZm6COox9i9TTzVejQvR0y1Xt9L
+eeDXQVLRqg' >> /tmp/fgbg.b64
+~ # echo 'wgNqtvnZyKzwIxoq/LlDbHP2gazwgyjvZJvHpWUCRHXpwgHzyOlrF3rOXl5+13wT+yUV/t
+KTbHP3OLYGT2SJCOUr8ybOPbr5Ug4VupuwFr1SyC77Eus4ORnraLhKZDVQZ7uwA5s7Gs4R1PleLGNeH2
+CfaMQ6Kh/HO+48je9kYgCj2rkxFDseOutWDDGznlTt3KACY0iSeDn89wNHz8UQXqMrMKv+r6AmjlXNAu
+yn0J4xSvxKG8YeaaONdyNnr1ifVRPNjlHinq2vtbGfDMNn9zxR39GwBos1En9RgW4mvS0B/B6Qyv4Yb1
+vnQJyRUj4IlrdebLvQ9nK1HvPkxxqZiekb0ttIZUflO8RYNdsQo0wAvWDGiiPIzp8tCcQZQ4aRIQfbEq
+qnY3EOYrYC' >> /tmp/fgbg.b64
+~ # echo 'Y1Rx/lFvNUHrfnaUWroAUE89BSJuJKTWEV5N2KfT33g2MD0f2ljdp6bIisgs9UySUq89BL
+37gSx1Oso7KTI6DeWhF1K3P0mRh8dR577AkjdnqFQEu6wLmwNzv8fZZb3Ym5tH7GZUHb0ncapND4raou
+iv7nQUvAnYc1eww9C2KiLMyzZGAxbaGtFQ6mwvzMVd9ar/+NEJxtSVMNuIFazcu1K56vNn9lQlH6Wess
+GVUYdR0bPh6vI1w700KqnBo+9fSoeEgTgvo5qg8o69O8Aq7wZQX7qEvrAM6ssRri8sg/pykOsLy0SnUa
+1ZANGMMqmV0twOoF6xzOFx5NwM1UXALrsK+4F0rZ2hBAb4O6aLo7tw6hzqYUfvObx/ZLNqf1s7HXsl4f
+UYzLvdfHc/' >> /tmp/fgbg.b64
+~ # echo 'gxXQoWHKLmTPeYsG2EZoT/XayE71TDXbCO2pnnGgU52O8k5KHZvG56E11W+MS2+A47mmns
+jQfym03m74LTlaVdTW0RBDNCv3t7aURHlFm0GbizaLeu9unCEO/qq0b8fe9PWMD3wMvef6JQ8f8PUUD6
+C86AXWL/mqe0/fu/73b5y+dvbyhZ7ld0v6zDd9PYF+bv1tjWcoZbUC/SL66+b1S0SpjzuH5Mu6c0coL8
+NyziPY69etjvdPujH/WtFl5c2kutfqkgu3FsbloFPSTugn6cY2nD9VYQV7+DNVzy/8pg99PZduxuV6N0
+7u9z4/vZ/bJR6E55k7exy4+3OjzrrHmg99U+z6/Q1qK6uMAS2BX59qmVv7RgPY+jWqraO+D9SeUCJ/rs
+hq8375+4GZ' >> /tmp/fgbg.b64
+~ # echo 'TE01WbDRTteeCINeY/sVNWwz//hxivDjlGYLQYXvJl4p8hTQZV1gzm5inhLQRg1RWwA3VV
+V3K63sUmfUXwNs2ySAyjrb6lWw7n6vjein1V3KjoZr0L+rIC+99aoqaztt7QJT9vFI9nZ6bRfgOE6ogL
+f1bIAO78JJlXdlV19NNfKMKbW0uwtQBFDc+q+WSqwAy8f2ETMaQBSt297SS7vMGqrNDArgavZ+0Tmwfk
+lNdVc3nD3Q47HNA2pK82xkp2amBnq+Q5Qm+0DLM52adEQ5Kc24NOItFT5ahZCO8HMAm4vls82/eZLSdI
+97cS6LA0VGg31wJkOPVukCd+pFD3dy0MNlrL1G0EQl8BSQ6qx2atk1LEOvwjJU5wbX9UmCX9cdvV04c9
+xT8PBuGlMS' >> /tmp/fgbg.b64
+~ # echo 'iKKbOgFa5QVtETSjYpSm70nCG70I9j3OQhLZ273jF31fU11TjeXXVK9bPcmvyI2/CdazvR
+8FNv2nZ+6o92ozSGz+jaJrj1326OhdBM7g3pdqBkqsb1vjV8a7M5iOnBo3NS0aoBkBeRU17g7Cjce78w
+2oDJXUVHvmkoX084khRAaDwT1aMbqZvmkBlAYoaDURmRG+HOf8W4Hg35RrkH9Tcv5NmYX8m5Lzb8qRab
+XZJIFozzxPAefllJ3jMlSXQEalBWeUGfpz2JBfED3CScEjdLd7//tEP4OfYL2empveHYm9P+UFUEtSTx
+CxmmJLAELWsBicqaJXePERKhyOo+rM4DjGENSdNeBgE6NEGswR/C8/OidxmriDeQoZ1fttHacGAHXuSz
+iW0zG67HuQ' >> /tmp/fgbg.b64
+~ # echo 'oYrhxlPUHklk/8bLXvmBwb9lvVtqblgPQ+vvqrleePjh1fF9k27O9xfdMBg/tHYthif5US
+SuvFvb1XQx+7JHTykUK9m6PCX1LyH4qN3rM8e+x5/Xn2cmMXgPXN9dEz6rsVC9vcAbOTnA9qpSvwnEW5
+A0OoG8ePVzh869x42v+9w6AY4r5O9gVT1K4ayZDM9Pb/JnR/h7Bnq0QAd/v4EeF20o5+IU7PZVFQ4AHA
+anywRputTApeYKt2mtFl0Q8f9f6zS5DdZyk1HrchvcFS4JbXK7bSaQvIrnq3AZLKaZ2okuLazZ4dI6TQ
+6Twe2CNTnLKhxas6V4lbVEW8InHFVu5EmY2s3mKmuVsWoluvjhowNcdpudv0YzrbGaKhFLsD60vdzttI
+vhFsBs0fIX' >> /tmp/fgbg.b64
+~ # echo 'XcJTIqML9Dp98aJHFjwiaDZnYoUWtT0Hamy28H+RbggvGcw5TM5ip2n1nIm2CiFoAemlpU
+tN9CpXRZlY78LcRYsk9+foMQop1yWEo5szkU4WKdg/u81Kr9OWVbjc2hIT6uZUrXWq1jhVy3FCArJq7U
+7tkKD2Aciltbq07lKT1mGwOoesMUUMrZDYyeAwlFhtVve6ITvMfaSooFDPjxTqpjBYKMuPF8rdyx68pU
+q4v7zmMAfz1mIbbIyrwDiUhVOk2Ga3pMP8oF7c5aFUP3tluckJNbBYXW6Tk79XROOJLkI5PoNxnWRerj
+INjq9kFAQ+LXdlCu5Rf0X5YAv8Q5dabUZ+3gTVw9nnsfxFSxYslswUu9NocqKMqdxQYjMZOUuV2m0mND
+OQpSqhumLe' >> /tmp/fgbg.b64
+~ # echo 'ZnCbypFlbJzpBotEc3O2QHZGqcXE3cQC/u4Wzi9DmSnZ4bTTySUW7r5PiC/SCukDQpoqpN
+gYYpZNuJN7/VogUAeXeeK3MEV3ajBtR3dcMH0V3SHB9Bi6u4HpZZjehGkfkuuF5bC6bpj+B0xH9wUCN2
+F643YgoIb1tf4QCCzEg+OTiKcfA1gVho0ZjnMYuoNr/yYQSOWCDDAOm4rahNgDkvgYFMf2EcRmSOKsFq
+N7I1E2TxOR16iY58EXH897J08jyq1F90lQX/FO6XX4bkR9gHJ/RKBOU43lNSk9uJsNnQ8r2KZuj1rxju
+607ozu/GPHdad0Go7FgzcqmpTb1GxoexT+eUtYa8R2TVvkCyMJDfbR386e+xjf1xK2XdMagbCCj3R/05
+3VndN9TEzF' >> /tmp/fgbg.b64
+~ # echo '3jl95vyCRgUvOV+oeCkPiCLtUS+MzOOqWRoqcOiG6YQcf6+Grsfu3goEuI7pNBE6D87Z6X
+GIfwvxp3g8db6opgfH847DOk5xtQzaoxHyj/s+EDgtXD7nwXcXzH8Kx3A/xteha1LkNeJLtylZdUtoER
+L/SBf6TsGpAmiKYTB5B1Y3X5PaiDcpeB4hPucylM+GY7+F1yVnnqhLEVRmfqhUGx26E9wH+WPRvLsSCH
+DxQnmaDxSL0Vg80ahoCWuP2jkad++IJa6BF0aianhjESnY6TPIVhfwkrbIxdvUK1DJCyNbI3bE4o2n88
+7k/S3vrO5j3QXzOTgRPso7r/tkaejxvFN5qNXFfMU7YmHVtqE64TiOwwXRPDhuCy7opIWw4sf5NhdK4R
+Iee7wt8kKB' >> /tmp/fgbg.b64
+~ # echo 'iCPm+Ty+QMorYBceD673H4N1O2KfkpbgSXzBE3x/L+g+Kf3xBEN9zkN8H19YLNUWX8wLPx
+UqrTJv2FIpCf75/PP55/OPP4eEuO2Fo4R9eRR2z6jnXnkUNBYcVyzG8YoxKmpJHCwXpyGUj5GVi7E9PU
+J5HPhxfDMXRyLEM98aCHDn6HZiKC6Di9NQ8bQYY9Ku4GnxoJYv6CvGfIgxNtEyewzGkOQMxUNx/RMyUZ
+K4QyCJ+ZkRigXh50OC4+dShYpDZO3HytqHRxO71M4DAt0o1BcQaFEvv0Bnh2D/J/MlIDyDcV1CvOH/l1
+SMx5c/+rlzZ2of0FXAU7jTbndr01PT01LS0pJnTMucnmyZbsqaZkgzTNGmZaSkp6SC3KXoSI8CCQG2AM
+3yCNK5JivT' >> /tmp/fgbg.b64
+~ # echo 'mu5IKy5Ld6QWG1DOnO5ILzaiPzTCnrbSLiefMcMDucnK5cvKKmxpjlSgxkKHgRRXKYqBNJ
+SAFC7k0AFSyu1uU0qurjDZbbCAFEt5RQr8ZVwKUozryl3ryvjU7eRL1picLhQZKSWKYZnTZDMgRiHnsL
+lBCvz5Av867UaD2wBSTKXFZic86heXGp1DFEiBP3et5VZ3scHpNKxDSg3lzZAQ86gSVDesj9PIUGaloR
+Z22IKLb6DE5QIptL2szFSOmkWmSzG43U5rCfwh5frfz+thwpoT19XQ9yU/jrUH94jVp4S1L8oPfYcR7C
+eBzK+Jz0RZ7Jno794QgE8BCPJ3cv+I9IPHZ7soL/rHdiJYYbm8+Dwo2ACX+c92RfD3KkqhKrXMf2UIvh
+OX+eM+VbD/' >> /tmp/fgbg.b64
+~ # echo 'vZ/9Zgm+TZQX/Vl2yFBcslR/XJbOE3ylSIv+sjFkKB5f1B+/R/+XSb71kPrv84L8ivvYX+
+y/QZDXyfaDGaHB+4cYNymXN0u+HQr2O7KOyr6rEdNVcnnhO4UIITh3LfXT82+1bP43xgv2E4J+zxPB/H
+L7rZPJD31PFPwd0f3ab5DJfyDIfyDI/8fPtL9VsAUhO4+I3xup77N+RXy3EI9LyM4r5+8jr5alrwpx0I
+TsPNPzd8q/IehEyOKur/2MvPj8RRh7UX7w+7Hk4O/GlDJ5cf68L2tfPP9wP6ARH/bT+p+RyUcIceARaX
++f/hcEjJDFl8em3fucJJe/JLSfKsNF+ZSf+M6Ps7PwraB8XxC/G1z2M/4fk8UfD35HI8jf+Rn5/wHiIj
+KAWDkAAA==' >> /tmp/fgbg.b64
+~ # base64 -d /tmp/fgbg.b64 | gunzip > /tmp/fgbg && chmod +x /tmp/fgbg && sha256
+sum /tmp/fgbg
+fa2a7dfdfa476aec6efa63bdd021afa39f7f48e68babd596950e5594e921d48b  /tmp/fgbg
+~ # echo FGBG_CASE_BEGIN 0; /tmp/fgbg 48 2 4 12 64 scan scan solo; echo FGBG_CAS
+E_EXIT 0 rc=$?
+FGBG_CASE_BEGIN 0
+FGBG_SOLO repeat=0 kind=warm fg=scan fg_kib=12 bg_kib=64 per_req=1492
+FGBG_SOLO repeat=0 kind=getpid fg=scan fg_kib=12 bg_kib=64 per_req=2062
+FGBG_SOLO repeat=0 kind=yield fg=scan fg_kib=12 bg_kib=64 per_req=1388
+FGBG_SOLO repeat=0 kind=same-proc-bg fg=scan fg_kib=12 bg_kib=64 per_req=83757
+FGBG_SOLO repeat=1 kind=warm fg=scan fg_kib=12 bg_kib=64 per_req=5294
+FGBG_SOLO repeat=1 kind=getpid fg=scan fg_kib=12 bg_kib=64 per_req=1530
+FGBG_SOLO repeat=1 kind=yield fg=scan fg_kib=12 bg_kib=64 per_req=2009
+FGBG_SOLO repeat=1 kind=same-proc-bg fg=scan fg_kib=12 bg_kib=64 per_req=70726
+FGBG_PASS
+FGBG_CASE_EXIT 0 rc=0
+~ # echo FGBG_CASE_BEGIN 1; /tmp/fgbg 48 2 4 12 256 scan scan solo; echo FGBG_CA
+SE_EXIT 1 rc=$?
+FGBG_CASE_BEGIN 1
+FGBG_SOLO repeat=0 kind=warm fg=scan fg_kib=12 bg_kib=256 per_req=6101
+FGBG_SOLO repeat=0 kind=getpid fg=scan fg_kib=12 bg_kib=256 per_req=4564
+FGBG_SOLO repeat=0 kind=yield fg=scan fg_kib=12 bg_kib=256 per_req=1250
+FGBG_SOLO repeat=0 kind=same-proc-bg fg=scan fg_kib=12 bg_kib=256 per_req=72220
+FGBG_SOLO repeat=1 kind=warm fg=scan fg_kib=12 bg_kib=256 per_req=2689
+FGBG_SOLO repeat=1 kind=getpid fg=scan fg_kib=12 bg_kib=256 per_req=1586
+FGBG_SOLO repeat=1 kind=yield fg=scan fg_kib=12 bg_kib=256 per_req=2236
+FGBG_SOLO repeat=1 kind=same-proc-bg fg=scan fg_kib=12 bg_kib=256 per_req=65707
+FGBG_PASS
+FGBG_CASE_EXIT 1 rc=0
+~ # poweroff -f
+[  244.171124] reboot: Power down
+INFO:    CORE PASS
+INFO:    Setting Tag Client 1<-1
+INFO:    ps.cpp: stopping watchdog
+INFO:    Idling for 50
+bsg_zynq_pl: stop() called
+INFO:    ps.cpp: end polling i/o
+INFO:    ps.cpp: minstret (instructions retired):              234 (              ea)
+INFO:    ps.cpp: minstret (instructions retired):      819,345,994 (        30d63a4a)
+INFO:    ps.cpp: minstret delta:                       819,345,760 (        30d63960)
+INFO:    ps.cpp: MTIME start:                          114,742,655 (         6d6d57f)
+INFO:    ps.cpp: MTIME stop:                         2,079,320,558 (        7befe9ee)
+INFO:    ps.cpp: MTIME delta (=1/8 BP cycles):       1,964,577,903 (        7519146f)
+INFO:    ps.cpp: IPC        :                             0.052132
+INFO:    ps.cpp: minstret (instructions retired):      819,346,087 (        30d63aa7)
+INFO:    ps.cpp: wall clock time                :  245,573,551,513 (      392d530599) ns
+INFO:    ps.cpp: sim/emul speed                 : 3,839,979,458.82 BP cycles per minute
+INFO:    ps.cpp: BP DRAM USAGE MASK (each bit is 8 MB): 00000000000000000000000000000063
+INFO:    ps.cpp: freeing DRAM buffer
+bsg_zynq_pl: free_dram() called on virtual ptr=0xb3c6c000
+bsg_zynq_pl: done() called, exiting
+INFO:    Restoring terminal settings
+INFO:    Returning from ps_main with RC: 0
+INFO:    BSG PASS
+BOARD_RUNNER_SOURCE_SHA256=de54badda52bcf716daaed5155d9be8674b3f0c137e0e411be075c7685c1db90
+Connection to 192.168.4.35 closed.

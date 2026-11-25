@@ -10,6 +10,21 @@ Image top `7997d361c` / BlackParrot `a7b509f40`: 1536+1536 retained lines (96 Ki
 | chase 32 KiB | 1.00x | 1.692x [1.648, 1.762] | 1.039x [1.005, 1.066] | 1.791x [1.737, 1.819] / 1.794x [1.752, 1.891] | 2.84x / 2.78x |
 | lookup 32 KiB | 1.00x | 1.657x [1.620, 1.785] | 1.037x [1.010, 1.077] | 1.728x [1.687, 1.792] / 1.748x [1.715, 1.820] | 2.43x / 2.52x |
 
+## Equal-area baseline (largest L2 that fits, no store)
+
+The baseline spends BRAM on L2 capacity instead of the store: 512 L2 sets (128 KiB), no retained lines, delay 160. It's job `20261125T193733Z-d2ed33b7a`, top `d2ed33b7a`: WNS +0.591 ns, 43,492 LUT, 114.5/140 BRAM, against 133.5 for the retention image. A 256 KiB L2 would not fit. Earlier "128 KiB"/"256 KiB" images (s21/s22) were invalid, because Vivado never received `BP_ZP_L2_SETS` and they used the default 16 KiB L2 (85.5 BRAM). This baseline was checked through the effective-define line and the BRAM delta. Session `board-s26-l2-128k-baseline` runs off A/A cells, which are flat (0.997–1.016x). The comparison below is on absolute cycles per loop against the retention image's joint-k cells (s15/s16/s23–s25 medians):
+
+| workload | 128 KiB L2 whole | retention whole | speedup | 128 KiB L2 fg latency | retention fg latency | speedup |
+|---|---|---|---|---|---|---|
+| scan 12 KiB, bg 64 KiB | 725k | 555k | 1.31x | 276k | 141k | 1.96x |
+| chase 32 KiB, bg 64 KiB | 658k | 518k | 1.27x | 238k | 109k | 2.18x |
+| lookup 32 KiB, bg 64 KiB | 667k | 542k | 1.23x | 241k | 132k | 1.82x |
+| scan 12 KiB, bg 256 KiB | 1,618k | 1,520k | 1.06x | 305k | 182k | 1.68x |
+
+The larger L2 recovers about a quarter of the off-cell time, mostly in the background and the switch path. Retention still wins clearly on foreground latency, 1.7–2.2x, and modestly on throughput. The throughput margin shrinks to 1.06x once the background no longer fits in either structure. The retention image uses 19 more BRAM tiles than this baseline, so the comparison favours the baseline's area.
+
+Retaining the background too (`both`, s23) gives 1.884x whole [1.870, 1.918] against the same chip with retention off, the best throughput point, but foreground latency drops to 2.34x (joint 2.70x in the same boot).
+
 ## Memory-latency sensitivity (HP0 delay 300, about 340-cycle DRAM)
 
 Same RTL and kernel, only `BP_AXI_RESPONSE_DELAY` 160 → 300. Top `03b676f3b`, job `20261125T090903Z-03b676f3b`: WNS +0.036 ns, WHS +0.023 ns, 50,057 LUT, 133.5/140 BRAM, bit `e10971e708d13edc443c71b6c6ff6ff3a8301ebbe142ab862c4dfccc5f01ee41`. Session `board-s18-c1536i-d300-kgate`. The first attempt, `board-s17`, hit the intermittent boot hang at kernel time 6 s; there was no output for 900 s, then recovery ran. The 300 delay is one point in a sweep, not the headline. About 340 cycles matches a 2–3 GHz core behind a loaded DRAM controller. 200 cycles is the conservative point.
