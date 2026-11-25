@@ -170,8 +170,15 @@ package bp_common_pkg;
 `ifndef BP_ZP_L2_SETS
 `define BP_ZP_L2_SETS 64
 `endif
+  // BP_ZP_DCACHE_PF_FULL=1 installs whole prefetched lines into the L1 D-cache
+  // (address-replay experiment) instead of the narrow advisory sector buffer.
+  // It only takes effect without the retained store (BP_RETAINED_BUFFER=0).
+`ifndef BP_ZP_DCACHE_PF_FULL
+`define BP_ZP_DCACHE_PF_FULL 0
+`endif
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch16k_cfg_override_p =
     '{l2_sets: `BP_ZP_L2_SETS
+      ,dcache_prefetch_full_line: `BP_ZP_DCACHE_PF_FULL
       ,num_threads: 1
       ,num_contexts: 1
       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width

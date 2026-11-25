@@ -68,6 +68,8 @@ DEFINES += BP_RETAINED_SETS=$(BP_RETAINED_SETS)
 # L2 sets per bank for the prefetch16k cfg (64 = 16 KiB; 512 = 128 KiB).
 BP_ZP_L2_SETS ?= 512
 DEFINES += BP_ZP_L2_SETS=$(BP_ZP_L2_SETS)
+BP_ZP_DCACHE_PF_FULL ?= 0
+DEFINES += BP_ZP_DCACHE_PF_FULL=$(BP_ZP_DCACHE_PF_FULL)
 
 # Accepted physical-demand-miss history, separate from retained payload and
 # ordinary cache geometry. Keep existing traced images as the default.

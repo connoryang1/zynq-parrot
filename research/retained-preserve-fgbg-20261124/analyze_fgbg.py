@@ -41,7 +41,7 @@ if __name__ == '__main__':
     rows = []
     for c in cases:
         k = c['config']
-        name = f"{k['fg']}{k['fg_kib']}K/{k['bg']}{k['bg_kib']}K {k['policy']}"
+        name = f"{k['fg']}{k['fg_kib']}K/{k['bg']}{k['bg_kib']}K {k['policy']}{['','+pfl','+pfe'][int(k.get('replay','0'))]}"
         if not c['passed']:
             print(f'INCOMPLETE {name} ({len(c["rows"])} rows) {c["log"]}'); continue
         s = summarize(c)

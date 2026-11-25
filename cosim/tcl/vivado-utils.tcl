@@ -147,13 +147,13 @@ proc vivado_experiment_defines {} {
         error "incomplete retained-buffer Verilog configuration"
     }
     set result [list]
-    foreach name [concat $names {BP_RETAINED_OBSERVE BP_AXI_RESPONSE_DELAY BP_CACHE_MISS_TRACE BP_ZP_L2_SETS}] {
+    foreach name [concat $names {BP_RETAINED_OBSERVE BP_AXI_RESPONSE_DELAY BP_CACHE_MISS_TRACE BP_ZP_L2_SETS BP_ZP_DCACHE_PF_FULL}] {
         if {![info exists ::env($name)]} { continue }
         set value $::env($name)
         if {![regexp {^(0|[1-9][0-9]*)$} $value]} {
             error "$name must be a canonical nonnegative integer, got '$value'"
         }
-        if {$name in {BP_RETAINED_BUFFER BP_RETAINED_OBSERVE BP_CACHE_MISS_TRACE} && $value > 1} {
+        if {$name in {BP_RETAINED_BUFFER BP_RETAINED_OBSERVE BP_CACHE_MISS_TRACE BP_ZP_DCACHE_PF_FULL} && $value > 1} {
             error "$name must be 0 or 1"
         }
         if {$name eq "BP_AXI_RESPONSE_DELAY" && $value > 384} {
