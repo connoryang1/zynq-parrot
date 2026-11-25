@@ -65,6 +65,9 @@ DEFINES += BP_RETAINED_BUFFER=$(BP_RETAINED_BUFFER)
 DEFINES += BP_RETAINED_I_LINES=$(BP_RETAINED_I_LINES)
 DEFINES += BP_RETAINED_D_LINES=$(BP_RETAINED_D_LINES)
 DEFINES += BP_RETAINED_SETS=$(BP_RETAINED_SETS)
+# L2 sets per bank for the prefetch16k cfg (64 = 16 KiB; 512 = 128 KiB).
+BP_ZP_L2_SETS ?= 64
+DEFINES += BP_ZP_L2_SETS=$(BP_ZP_L2_SETS)
 
 # Accepted physical-demand-miss history, separate from retained payload and
 # ordinary cache geometry. Keep existing traced images as the default.

@@ -184,15 +184,52 @@ int main(int argc, char **argv)
 	int kmode = 0;
 	size_t plen = strlen(policy);
 	char base[32];
+	if (!strcmp(policy, "solo")) {
+		/* Locality probe, retention off, one process, no futex handoff:
+		 * cycles per foreground request when the previous request ran
+		 * immediately before (warm), after a trivial system call, after a
+		 * sched_yield with nothing else runnable, and after scanning bg_kib
+		 * in the same process (pollution without a context switch). */
+		struct resume_workload w, b;
+		uint64_t sum = 0, bsum = 0;
+		static const char *names[4] = {"warm", "getpid", "yield", "same-proc-bg"};
+		if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL)) fail("preview off");
+		submit(0); settle(0);
+		if (resume_workload_init(&w, fg_kind, fg_kib, 0xc3)) fail("fg alloc");
+		if (resume_workload_init(&b, bg_kind, bg_kib, 0x3c)) fail("bg alloc");
+		for (unsigned rep = 0; rep < repeats; ++rep)
+			for (unsigned k = 0; k < 4; ++k) {
+				uint64_t tot = 0;
+				for (unsigned n = 0; n < warmup + loops; ++n) {
+					if (k == 1) syscall(SYS_getpid);
+					else if (k == 2) sched_yield();
+					else if (k == 3) bsum += resume_workload_run(&b);
+					uint64_t t0 = cycle();
+					sum += resume_workload_run(&w);
+					uint64_t t1 = cycle();
+					if (n >= warmup) tot += t1 - t0;
+				}
+				printf("FGBG_SOLO repeat=%u kind=%s fg=%s fg_kib=%u bg_kib=%u per_req=%" PRIu64 "\n",
+				       rep, names[k], fg_kind, fg_kib, bg_kib, tot / loops);
+				fflush(stdout);
+			}
+		if (!resume_workload_check_total(&w, sum) || !resume_workload_check_total(&b, bsum)) {
+			errno = EIO; fail("solo checksum");
+		}
+		puts("FGBG_PASS");
+		return 0;
+	}
 	if (plen > 2 && plen < sizeof(base) && !strcmp(policy + plen - 2, "-k")) {
 		memcpy(base, policy, plen - 2); base[plen - 2] = 0; policy = base; kmode = 1;
 	}
-	if (!strcmp(policy, "i")) { enable = 1; capture = 8; }
+	/* "off": both cells retention-off (A/A noise floor; equal-area baseline). */
+	if (!strcmp(policy, "off")) { enable = 0; capture = 0; }
+	else if (!strcmp(policy, "i")) { enable = 1; capture = 8; }
 	else if (!strcmp(policy, "d")) { enable = 2; capture = 4; }
 	else if (!strcmp(policy, "joint")) { enable = 3; capture = 12; }
 	else if (!strcmp(policy, "iall")) { enable = 1; capture = 8; bg_capture = 8; }
 	else if (!strcmp(policy, "joint-iall")) { enable = 3; capture = 12; bg_capture = 8; }
-	else { fputs("policy must be i, d, joint, iall or joint-iall (off is the paired control)\n", stderr); return 2; }
+	else { fputs("policy must be off, i, d, joint, iall or joint-iall (off is the paired control)\n", stderr); return 2; }
 	if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL)) fail("preview off");
 	uint64_t raw = status();
 	if (!(raw >> 63)) { errno = ENODEV; fail("retained capability"); }

@@ -165,8 +165,13 @@ package bp_common_pkg;
   // Linux runs on one hart and switches in software, so drop the unused
   // hardware multi-context state (second CSR file/register bank, context
   // cache, CSR snapshot store) to fit the retained store and HP0 delay shim.
+  // BP_ZP_L2_SETS (default 64, i.e. 16 KiB) sizes the L2 for the equal-area
+  // baseline: the retained store's BRAM spent on L2 capacity instead.
+`ifndef BP_ZP_L2_SETS
+`define BP_ZP_L2_SETS 64
+`endif
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch16k_cfg_override_p =
-    '{l2_sets: 64
+    '{l2_sets: `BP_ZP_L2_SETS
       ,num_threads: 1
       ,num_contexts: 1
       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
