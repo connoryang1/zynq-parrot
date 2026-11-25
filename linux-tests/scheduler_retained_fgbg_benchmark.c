@@ -91,9 +91,23 @@ static void send_turn(struct shared *s, unsigned v)
 
 struct result { uint64_t whole, fg_work, fg_latency, bg_work; };
 
+/* Emulated address replay of the foreground's data footprint (oracle address
+ * list = its whole buffer, one Zicbop prefetch.r per 64-byte line through the
+ * detached-fill slots). 1 = late: the foreground replays at request start
+ * (a switch-in trigger). 2 = early: the background replays the foreground's
+ * lines at the end of its turn, before the futex wake (a pre-wake trigger);
+ * the foreground buffer is then created before fork so both processes map the
+ * same read-only physical pages. Applied only in the enabled cell. */
+static unsigned replay_policy;
+static void replay_lines(const unsigned char *p, size_t bytes)
+{
+	for (size_t i = 0; i < bytes; i += 64)
+		__asm__ volatile("ori zero, %0, 1" : : "r"(p + i) : "memory");
+}
+
 static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, unsigned bg_kib,
 			      const char *fg_kind, const char *bg_kind, unsigned enable, unsigned capture,
-			      unsigned bg_capture, int kmode)
+			      unsigned bg_capture, int kmode, unsigned replay)
 {
 	struct result r = {0};
 	struct shared *s = mmap(NULL, sizeof(*s), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
@@ -107,11 +121,14 @@ static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, 
 	 * either cell. Registration happens before fork, in the parent. */
 	if (kmode && enable && prctl(PR_BP_RETAINED_OWNER, (unsigned long)enable, (unsigned long)capture, 0UL, 0UL))
 		fail("retained owner register");
+	struct resume_workload w;
+	if (replay_policy == 2 && resume_workload_init(&w, fg_kind, fg_kib, 0xc3)) fail("fg alloc");
 	int ready[2];
 	if (pipe(ready)) fail("pipe");
 	pid_t child = fork();
 	if (child < 0) fail("fork");
 	if (!child) {
+		const struct resume_workload *fgw = &w;
 		struct resume_workload w;
 		uint64_t sum = 0, bg = 0;
 		char token = 0;
@@ -124,6 +141,7 @@ static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, 
 			sum += resume_workload_run(&w);
 			uint64_t t1 = cycle();
 			if (n >= warmup) bg += t1 - t0;
+			if (replay == 2) replay_lines(fgw->data, fgw->bytes);
 			s->bg_yield = cycle();
 			send_turn(s, 0);
 		}
@@ -134,10 +152,9 @@ static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, 
 		atomic_store_explicit(&s->turn, 3, memory_order_release);
 		_exit(0);
 	}
-	struct resume_workload w;
 	uint64_t sum = 0, begin = 0;
 	char token;
-	if (resume_workload_init(&w, fg_kind, fg_kib, 0xc3)) fail("fg alloc");
+	if (replay_policy != 2 && resume_workload_init(&w, fg_kind, fg_kib, 0xc3)) fail("fg alloc");
 	close(ready[1]);
 	if (read(ready[0], &token, 1) != 1) fail("ready read");
 	close(ready[0]);
@@ -147,6 +164,7 @@ static struct result run_cell(unsigned loops, unsigned warmup, unsigned fg_kib, 
 		uint64_t woke = s->bg_yield;
 		if (!kmode) submit(enable | capture);  /* foreground: capture on */
 		uint64_t t0 = cycle();
+		if (replay == 1) replay_lines(w.data, w.bytes);
 		sum += resume_workload_run(&w);
 		uint64_t t1 = cycle();
 		if (!kmode) submit(enable | bg_capture);  /* keep lookups; background capture */
@@ -219,8 +237,13 @@ int main(int argc, char **argv)
 		puts("FGBG_PASS");
 		return 0;
 	}
+	if (plen > 4 && plen < sizeof(base) && policy[plen - 4] == '+') {
+		replay_policy = !strcmp(policy + plen - 4, "+pfl") ? 1 : !strcmp(policy + plen - 4, "+pfe") ? 2 : 0;
+		if (!replay_policy) { fputs("replay suffix must be +pfl or +pfe\n", stderr); return 2; }
+		memcpy(base, policy, plen - 4); base[plen - 4] = 0; policy = base; plen -= 4;
+	}
 	if (plen > 2 && plen < sizeof(base) && !strcmp(policy + plen - 2, "-k")) {
-		memcpy(base, policy, plen - 2); base[plen - 2] = 0; policy = base; kmode = 1;
+		memmove(base, policy, plen - 2); base[plen - 2] = 0; policy = base; kmode = 1;
 	}
 	/* "off": both cells retention-off (A/A noise floor; equal-area baseline). */
 	if (!strcmp(policy, "off")) { enable = 0; capture = 0; }
@@ -236,14 +259,15 @@ int main(int argc, char **argv)
 	uint64_t raw = status();
 	if (!(raw >> 63)) { errno = ENODEV; fail("retained capability"); }
 	printf("FGBG_CONFIG loops=%u repeats=%u warmup=%u fg_kib=%u bg_kib=%u fg=%s bg=%s policy=%s%s"
-	       " i_lines=%u d_lines=%u set_log2=%u\n", loops, repeats, warmup, fg_kib, bg_kib, fg_kind,
-	       bg_kind, policy, kmode ? "-k" : "", (unsigned)((raw >> 16) & 0xffff), (unsigned)((raw >> 32) & 0xffff),
+	       " replay=%u i_lines=%u d_lines=%u set_log2=%u\n", loops, repeats, warmup, fg_kib, bg_kib, fg_kind,
+	       bg_kind, policy, kmode ? "-k" : "", replay_policy, (unsigned)((raw >> 16) & 0xffff), (unsigned)((raw >> 32) & 0xffff),
 	       (unsigned)((raw >> 48) & 0xff));
 	for (unsigned rep = 0; rep < repeats; ++rep) {
 		for (unsigned order = 0; order < 2; ++order) {
 			unsigned on = (rep + order) & 1;  /* ABBA-style alternation */
 			struct result r = run_cell(loops, warmup, fg_kib, bg_kib, fg_kind, bg_kind,
-						   on ? enable : 0, on ? capture : 0, on ? bg_capture : 0, kmode);
+						   on ? enable : 0, on ? capture : 0, on ? bg_capture : 0, kmode,
+						   on ? replay_policy : 0);
 			printf("FGBG_RESULT repeat=%u order=%u enabled=%u whole=%" PRIu64 " fg_work=%" PRIu64
 			       " fg_latency=%" PRIu64 " bg_work=%" PRIu64 " loops=%u\n", rep, order, on,
 			       r.whole, r.fg_work, r.fg_latency, r.bg_work, loops);
