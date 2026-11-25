@@ -1,5 +1,15 @@
 This file summarizes the measured results of the per-task retained-line experiment: native RTL simulation of the mechanism, and FPGA/Linux application measurements on the routed candidate. It separates mechanism evidence (simulation) from complete-application evidence (board) and records exact identities, so each number can be traced to its raw log.
 
+# Final configuration (best measured)
+
+Image top `7997d361c` / BlackParrot `a7b509f40`: 1536+1536 retained lines (96 KiB I + 96 KiB D) in 256 sets, per-way shadow-tag filter on both lanes, preserve-on-capture-toggle control, single-thread prefetch16k core, HP0 response delay 160 (about 200-cycle DRAM). Job `20261125T071606Z-7997d361c`: WNS +0.909 ns, WHS +0.035 ns, 49,971 LUT, 133.5/140 BRAM. Kernel29 with patch 0030 (kernel-gated capture) and the timer64 fix. Sessions `board-s15-c1536i-kgate` and `board-s16-c1536i-kgate`; whole-transaction speedup, off cells with no extra system calls:
+
+| workload (bg 64 KiB scan) | off | I only | D only | both | fg latency (both) |
+|---|---|---|---|---|---|
+| scan 12 KiB | 1.00x | 1.569x [1.550, 1.709] | 1.040x [1.027, 1.053] | 1.812x [1.757, 1.846] / 1.781x [1.701, 1.855] | 2.61x / 2.59x |
+| chase 32 KiB | 1.00x | 1.692x [1.648, 1.762] | 1.039x [1.005, 1.066] | 1.791x [1.737, 1.819] / 1.794x [1.752, 1.891] | 2.84x / 2.78x |
+| lookup 32 KiB | 1.00x | 1.657x [1.620, 1.785] | 1.037x [1.010, 1.077] | 1.728x [1.687, 1.792] / 1.748x [1.715, 1.820] | 2.43x / 2.52x |
+
 # Headline (1024 lines per side, kernel-gated capture)
 
 Image top `464bfe1f4` / BlackParrot `6b3598d3d` (64 KiB I + 64 KiB D retained, 128 sets, per-way shadow filter), job `20261125T024513Z-464bfe1f4`: WNS +0.388 ns, WHS +0.036 ns, 48,383 LUT, 116.5 BRAM, bit `678eacb92acf495bc04173222e3fca360f8ac1a7144bdd7ef5c076f594e86970`. Kernel29 plus patch 0030, timer64 fix. Sessions `board-s11-c1024-kgate` and `board-s12-c1024-kgate`. Whole-transaction speedup, off cells with no extra system calls:
