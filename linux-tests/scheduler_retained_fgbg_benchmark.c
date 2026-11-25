@@ -229,7 +229,9 @@ int main(int argc, char **argv)
 	else if (!strcmp(policy, "joint")) { enable = 3; capture = 12; }
 	else if (!strcmp(policy, "iall")) { enable = 1; capture = 8; bg_capture = 8; }
 	else if (!strcmp(policy, "joint-iall")) { enable = 3; capture = 12; bg_capture = 8; }
-	else { fputs("policy must be off, i, d, joint, iall or joint-iall (off is the paired control)\n", stderr); return 2; }
+	/* "both": I+D capture stays on for both tasks (retain the background too). */
+	else if (!strcmp(policy, "both")) { enable = 3; capture = 12; bg_capture = 12; }
+	else { fputs("policy must be off, i, d, joint, iall, joint-iall or both (off is the paired control)\n", stderr); return 2; }
 	if (prctl(PR_BP_PREVIEW_ENABLE, 0UL, 0UL, 0UL, 0UL)) fail("preview off");
 	uint64_t raw = status();
 	if (!(raw >> 63)) { errno = ENODEV; fail("retained capability"); }
