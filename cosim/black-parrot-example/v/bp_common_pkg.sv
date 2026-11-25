@@ -177,11 +177,18 @@ package bp_common_pkg;
 `define BP_ZP_DCACHE_PF_FULL 0
 `endif
   // BP_ZP_DCACHE_PF_ELS: detached D-cache hint slots (replay parallelism).
+  // BP_ZP_L2_BANKS: L2 bank count (each bsg_cache bank blocks on one miss,
+  // so banks bound coherent replay parallelism). Capacity is
+  // banks * BP_ZP_L2_SETS * 2 ways * 64 B.
+`ifndef BP_ZP_L2_BANKS
+`define BP_ZP_L2_BANKS 2
+`endif
 `ifndef BP_ZP_DCACHE_PF_ELS
 `define BP_ZP_DCACHE_PF_ELS 4
 `endif
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch16k_cfg_override_p =
     '{l2_sets: `BP_ZP_L2_SETS
+      ,l2_banks: `BP_ZP_L2_BANKS
       ,dcache_prefetch_full_line: `BP_ZP_DCACHE_PF_FULL
       ,dcache_prefetch_els: `BP_ZP_DCACHE_PF_ELS
       ,num_threads: 1
