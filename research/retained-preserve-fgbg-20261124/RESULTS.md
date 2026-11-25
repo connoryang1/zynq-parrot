@@ -1,5 +1,17 @@
 This file summarizes the measured results of the per-task retained-line experiment: native RTL simulation of the mechanism, and FPGA/Linux application measurements on the routed candidate. It separates mechanism evidence (simulation) from complete-application evidence (board) and records exact identities, so each number can be traced to its raw log.
 
+# Headline (1024 lines per side, kernel-gated capture)
+
+Image top `464bfe1f4` / BlackParrot `6b3598d3d` (64 KiB I + 64 KiB D retained, 128 sets, per-way shadow filter), job `20261125T024513Z-464bfe1f4`: WNS +0.388 ns, WHS +0.036 ns, 48,383 LUT, 116.5 BRAM, bit `678eacb92acf495bc04173222e3fca360f8ac1a7144bdd7ef5c076f594e86970`. Kernel29 plus patch 0030, timer64 fix. Sessions `board-s11-c1024-kgate` and `board-s12-c1024-kgate`. Whole-transaction speedup, off cells with no extra system calls:
+
+| workload (bg 64 KiB scan) | off | I only | D only | both |
+|---|---|---|---|---|
+| scan 12 KiB | 1.00x | 1.516x [1.495, 1.592] | 1.051x [1.026, 1.077] | 1.692x [1.591, 1.770] / 1.653x [1.628, 1.663] |
+| chase 32 KiB | 1.00x | 1.644x [1.639, 1.752] | 1.039x [1.003, 1.078] | 1.714x [1.673, 1.771] / 1.704x [1.625, 1.746] |
+| lookup 32 KiB | 1.00x | 1.623x [1.609, 1.663] | 1.033x [1.012, 1.058] | 1.671x [1.605, 1.774] / 1.649x [1.625, 1.792] |
+
+Foreground wake-to-done latency improves 2.2–2.7x with both lanes. Foreground-size sweep (both lanes, scan): 12 KiB 1.692x, 32 KiB 1.536x, 48 KiB 1.531x, 64 KiB 1.463x. Instruction retention carries most of the gain. The retained lines are dominated by the Linux futex/scheduler switch path, which only kernel-switch-time gating captures fully.
+
 # FPGA/Linux application results
 
 Image: top `1eb904204` / BlackParrot `13c71ade6`, single-thread `prefetch16k` (16 KiB L2), 256+256 retained lines in 64 sets, HP0 response delay 160 (about 200-cycle DRAM latency), observer off. Routed job `20261124T201838Z-1eb904204`: WNS +0.763 ns, WHS +0.018 ns, 47,493 LUT, 94.5 BRAM. Bitstream SHA-256 `83f559229d560a62ff868f7c5d6606d008464461578b3a0fe586a687aa753553`. Linux: kernel29 with the timer64 firmware fix (NBF `5e6343cf…`), FCLK0 set to 50 MHz (core 20 MHz), controller `6caf` with the stdin EOF fix.
