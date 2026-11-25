@@ -101,6 +101,13 @@ struct result { uint64_t whole, fg_work, fg_latency, bg_work; };
 static unsigned replay_policy;
 static void replay_lines(const unsigned char *p, size_t bytes)
 {
+	/* BlackParrot drops a hint that misses the DTLB, and a context switch or
+	 * the background's scan leaves none of these pages resident. A hardware
+	 * replay engine would issue physical addresses; emulate that by first
+	 * touching one line per 4 KiB page (a demand miss each) to load the
+	 * translation, then hinting every line. */
+	for (size_t i = 0; i < bytes; i += 4096)
+		(void)*(const volatile unsigned char *)(p + i);
 	for (size_t i = 0; i < bytes; i += 64)
 		__asm__ volatile("ori zero, %0, 1" : : "r"(p + i) : "memory");
 }
