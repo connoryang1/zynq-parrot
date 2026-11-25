@@ -10,13 +10,13 @@ BP=/home/coyang/bp-retained-preserve-20261124
 INSTALL=/home/coyang/zynq-parrot-linux-research/install
 IMPORT=/home/coyang/zynq-parrot-linux-research/import
 HERE=$TOP/research/retained-preserve-fgbg-20261124
-MODEL=${MODEL_ROOT:-/run/user/1001}/zp-retained-fgbg-model-d${delay}-s${sets}-i${I_LINES:-256}-d${D_LINES:-256}-l2s${L2_SETS:-64}${BUFFER:+-b$BUFFER}${PF_FULL:+-pf$PF_FULL}${PF_OUT:+-po$PF_OUT}${PF_ELS:+-pe$PF_ELS}${L2_BANKS:+-l2b$L2_BANKS}
+MODEL=${MODEL_ROOT:-/run/user/1001}/zp-retained-fgbg-model-d${delay}-s${sets}-i${I_LINES:-256}-d${D_LINES:-256}-l2s${L2_SETS:-64}${BUFFER:+-b$BUFFER}${PF_FULL:+-pf$PF_FULL}${PF_OUT:+-po$PF_OUT}${PF_ELS:+-pe$PF_ELS}${L2_BANKS:+-l2b$L2_BANKS}${RINST:+-ri$RINST}${IPF_ELS:+-ie$IPF_ELS}${DRE:+-dr$DRE}
 OUT=$HERE/$label
 mkdir -p "$OUT"
 export LD_LIBRARY_PATH=$INSTALL/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg
 opts=(TOP=$TOP ZP_INSTALL_DIR=$INSTALL ZP_IMPORT_DIR=$IMPORT BP_RTL_DIR=$BP CFG=$CFG
-      BP_RETAINED_BUFFER=${BUFFER:-1} BP_RETAINED_I_LINES=${I_LINES:-256} BP_RETAINED_D_LINES=${D_LINES:-256} BP_RETAINED_SETS=$sets BP_ZP_L2_SETS=${L2_SETS:-64} BP_ZP_DCACHE_PF_FULL=${PF_FULL:-0} BP_ZP_DCACHE_PF_ELS=${PF_ELS:-4} BP_ZP_L2_BANKS=${L2_BANKS:-2}
+      BP_RETAINED_BUFFER=${BUFFER:-1} BP_RETAINED_I_LINES=${I_LINES:-256} BP_RETAINED_D_LINES=${D_LINES:-256} BP_RETAINED_SETS=$sets BP_ZP_L2_SETS=${L2_SETS:-64} BP_ZP_DCACHE_PF_FULL=${PF_FULL:-0} BP_ZP_DCACHE_PF_ELS=${PF_ELS:-4} BP_ZP_L2_BANKS=${L2_BANKS:-2} BP_REPLAY_INSTALL=${RINST:-0} BP_ICACHE_PF_ELS=${IPF_ELS:-4} BP_DREPLAY_ENTRIES=${DRE:-32}
       BP_AXI_RESPONSE_DELAY=$delay BP_CACHE_MISS_TRACE=0 BP_RETAINED_OBSERVE=1)
 if [[ ! -x $MODEL/design/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench ]]; then
   rm -rf "$MODEL"; mkdir -p "$MODEL/design/verilator" "$MODEL/program/bootrom"
@@ -43,4 +43,4 @@ rm -f $run/prog.mem $run/prog.nbf
 cp $run/prog.nbf $OUT/prog.nbf
 flock -u 9
 ( cd $OUT && timeout 7200 $run/obj_dir/Vbsg_nonsynth_zynq_testbench +c_args=$OUT/prog.nbf ) > "$OUT/run.log" 2>&1 || true
-grep -aE "FGBG|REPLAY|BSG-PASS|BSG-FAIL|CORE PASS|CORE FAIL" "$OUT/run.log" | head -20
+grep -aE "FGBG|REPLAY|HYBRID|BSG-PASS|BSG-FAIL|CORE PASS|CORE FAIL" "$OUT/run.log" | head -20

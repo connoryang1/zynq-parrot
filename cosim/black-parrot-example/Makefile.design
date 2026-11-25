@@ -74,6 +74,12 @@ BP_ZP_DCACHE_PF_ELS ?= 4
 DEFINES += BP_ZP_DCACHE_PF_ELS=$(BP_ZP_DCACHE_PF_ELS)
 BP_ZP_L2_BANKS ?= 2
 DEFINES += BP_ZP_L2_BANKS=$(BP_ZP_L2_BANKS)
+# Address-replay hybrid (BlackParrot experiment/replay-hybrid): install
+# replayed I lines into L1, I hint slots, D replay lines per task slot.
+BP_REPLAY_INSTALL ?= 0
+BP_ICACHE_PF_ELS ?= 4
+BP_DREPLAY_ENTRIES ?= 32
+DEFINES += BP_REPLAY_INSTALL=$(BP_REPLAY_INSTALL) BP_ICACHE_PF_ELS=$(BP_ICACHE_PF_ELS) BP_DREPLAY_ENTRIES=$(BP_DREPLAY_ENTRIES)
 
 # Accepted physical-demand-miss history, separate from retained payload and
 # ordinary cache geometry. Keep existing traced images as the default.
