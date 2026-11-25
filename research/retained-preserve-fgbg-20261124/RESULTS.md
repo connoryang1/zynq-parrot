@@ -54,6 +54,24 @@ Image top `143aa29eb` (same RTL, 768+768 lines in 128 sets), job `20261124T23115
 
 Capacity matters even for a 12 KiB foreground (joint 1.23x → 1.63–1.66x): the store must hold the kernel switch path's code and data as well as the foreground's lines, and the instruction side carries most of the gain. A 1024-line-per-side build (top `f8dc8313e`) is next.
 
+## Kernel-gated capture (no per-turn system calls)
+
+Kernel patch `kernel-gate/0030-retained-owner.patch` on kernel29 (built in a copy of the kernel29 tree with the same banner; NBF SHA-256 in `kernel-gate/nbf.sha256`, with the timer64 fix). `prctl(PR_BP_RETAINED_OWNER, enable, capture)` registers the calling task. `context_switch()` writes CSR 0x5c2 with capture on when switching to the owner and capture off when switching away, without changing lane enables. Policies with `-k` register the foreground once per on cell; off cells make no extra system calls, so this is the cleaner baseline.
+
+768-line image, session `board-s09-c768-kgate`:
+
+| foreground (bg 64 KiB scan) | policy | whole | fg latency | fg request |
+|---|---|---|---|---|
+| scan 12 KiB | joint, kernel-gated | 1.579x [1.520, 1.653] | 2.180x | 1.860x |
+| scan 12 KiB | joint, userspace-gated (same boot) | 1.656x [1.614, 1.734] | 2.554x | 2.484x |
+| scan 12 KiB | I only, kernel-gated | 1.527x [1.502, 1.608] | 1.899x | 1.527x |
+| scan 12 KiB | D only, kernel-gated | 1.031x [0.993, 1.051] | 1.068x | 1.082x |
+| scan 32 KiB | joint, kernel-gated | 1.478x [1.437, 1.561] | 1.694x | 1.389x |
+| chase 32 KiB | joint, kernel-gated | 1.624x [1.585, 1.647] | 2.307x | 2.236x |
+| lookup 32 KiB | joint, kernel-gated | 1.559x [1.513, 1.611] | 2.186x | 2.078x |
+
+The retained configurations run at the same absolute speed under either gating (about 620k vs 625k cycles/loop for scan 12 KiB). The userspace ratio is higher only because its off cell also pays two prctl calls per turn. Kernel gating needs no application changes and improves the instruction-only case (1.53x vs 1.45x).
+
 For comparison, the old global always-capture policy on the deployed image measured 0.913x (D) and 0.898x (joint) on scan 32 KiB.
 
 Interpretation (supported by the data, not separately traced): the instruction gain comes mostly from retained kernel code on the futex wake/switch path, which both tasks execute. That's why I-only improves the whole transaction more than the foreground's own request.
