@@ -10,13 +10,13 @@ BP=/home/coyang/bp-retained-preserve-20261124
 INSTALL=/home/coyang/zynq-parrot-linux-research/install
 IMPORT=/home/coyang/zynq-parrot-linux-research/import
 HERE=$TOP/research/retained-preserve-fgbg-20261124
-MODEL=${MODEL_ROOT:-/run/user/1001}/zp-retained-fgbg-model-d${delay}-s${sets}-i${I_LINES:-256}-d${D_LINES:-256}-l2s${L2_SETS:-64}${BUFFER:+-b$BUFFER}${PF_FULL:+-pf$PF_FULL}
+MODEL=${MODEL_ROOT:-/run/user/1001}/zp-retained-fgbg-model-d${delay}-s${sets}-i${I_LINES:-256}-d${D_LINES:-256}-l2s${L2_SETS:-64}${BUFFER:+-b$BUFFER}${PF_FULL:+-pf$PF_FULL}${PF_OUT:+-po$PF_OUT}${PF_ELS:+-pe$PF_ELS}
 OUT=$HERE/$label
 mkdir -p "$OUT"
 export LD_LIBRARY_PATH=$INSTALL/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 CFG=e_bp_unicore_zynqparrot_prefetch16k_cfg
 opts=(TOP=$TOP ZP_INSTALL_DIR=$INSTALL ZP_IMPORT_DIR=$IMPORT BP_RTL_DIR=$BP CFG=$CFG
-      BP_RETAINED_BUFFER=${BUFFER:-1} BP_RETAINED_I_LINES=${I_LINES:-256} BP_RETAINED_D_LINES=${D_LINES:-256} BP_RETAINED_SETS=$sets BP_ZP_L2_SETS=${L2_SETS:-64} BP_ZP_DCACHE_PF_FULL=${PF_FULL:-0}
+      BP_RETAINED_BUFFER=${BUFFER:-1} BP_RETAINED_I_LINES=${I_LINES:-256} BP_RETAINED_D_LINES=${D_LINES:-256} BP_RETAINED_SETS=$sets BP_ZP_L2_SETS=${L2_SETS:-64} BP_ZP_DCACHE_PF_FULL=${PF_FULL:-0} BP_ZP_DCACHE_PF_ELS=${PF_ELS:-4}
       BP_AXI_RESPONSE_DELAY=$delay BP_CACHE_MISS_TRACE=0 BP_RETAINED_OBSERVE=1)
 if [[ ! -x $MODEL/design/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench ]]; then
   rm -rf "$MODEL"; mkdir -p "$MODEL/design/verilator" "$MODEL/program/bootrom"
@@ -26,7 +26,7 @@ if [[ ! -x $MODEL/design/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench ]]; then
   cp $TOP/cosim/black-parrot-example/verilator/Makefile $MODEL/design/verilator/Makefile
   cp /home/coyang/zynq-parrot-linux-research/riscv/bootrom/bootrom.none.riscv $MODEL/program/bootrom/
   ( cd $MODEL/design/verilator && /usr/bin/time -v make -j1 build "${opts[@]}" ZP_RISCV_DIR=$MODEL/program \
-      VERILATOR_BUILD_JOBS=${BUILD_JOBS:-10} EXTRA_DEFINES=BSG_HIDE_FROM_SYNTHESIS \
+      VERILATOR_BUILD_JOBS=${BUILD_JOBS:-10} EXTRA_DEFINES="BSG_HIDE_FROM_SYNTHESIS${PF_OUT:+ BP_PREFETCH_AXI_BYPASS BP_PREFETCH_OUTSTANDING=$PF_OUT}" \
       VERILATOR_SUPPORT_SOURCES=$TOP/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv ) > "$OUT/build.log" 2>&1 \
       || { echo "BUILD FAILED; see $OUT/build.log"; tail -30 "$OUT/build.log"; exit 1; }
 fi

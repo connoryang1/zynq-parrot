@@ -176,9 +176,14 @@ package bp_common_pkg;
 `ifndef BP_ZP_DCACHE_PF_FULL
 `define BP_ZP_DCACHE_PF_FULL 0
 `endif
+  // BP_ZP_DCACHE_PF_ELS: detached D-cache hint slots (replay parallelism).
+`ifndef BP_ZP_DCACHE_PF_ELS
+`define BP_ZP_DCACHE_PF_ELS 4
+`endif
   localparam bp_proc_param_s bp_unicore_zynqparrot_prefetch16k_cfg_override_p =
     '{l2_sets: `BP_ZP_L2_SETS
       ,dcache_prefetch_full_line: `BP_ZP_DCACHE_PF_FULL
+      ,dcache_prefetch_els: `BP_ZP_DCACHE_PF_ELS
       ,num_threads: 1
       ,num_contexts: 1
       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width

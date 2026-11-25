@@ -147,7 +147,7 @@ proc vivado_experiment_defines {} {
         error "incomplete retained-buffer Verilog configuration"
     }
     set result [list]
-    foreach name [concat $names {BP_RETAINED_OBSERVE BP_AXI_RESPONSE_DELAY BP_CACHE_MISS_TRACE BP_ZP_L2_SETS BP_ZP_DCACHE_PF_FULL}] {
+    foreach name [concat $names {BP_RETAINED_OBSERVE BP_AXI_RESPONSE_DELAY BP_CACHE_MISS_TRACE BP_ZP_L2_SETS BP_ZP_DCACHE_PF_FULL BP_ZP_DCACHE_PF_ELS}] {
         if {![info exists ::env($name)]} { continue }
         set value $::env($name)
         if {![regexp {^(0|[1-9][0-9]*)$} $value]} {

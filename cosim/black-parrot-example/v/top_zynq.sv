@@ -190,6 +190,11 @@ module top_zynq
      (bp_params_p == e_bp_unicore_zynqparrot_prefetch10_cfg)
      || (bp_params_p == e_bp_unicore_zynqparrot_prefetch5_cfg);
 `endif
+`ifdef BP_PREFETCH_OUTSTANDING
+   localparam integer prefetch_outstanding_lp = `BP_PREFETCH_OUTSTANDING;
+`else
+   localparam integer prefetch_outstanding_lp = 1;
+`endif
    localparam num_regs_ps_to_pl_lp  = 5;
    localparam retained_observe_lp = `BP_RETAINED_OBSERVE;
    localparam num_regs_pl_to_ps_lp  = retained_observe_lp ? 10 : 8;
@@ -833,7 +838,7 @@ module top_zynq
       ,.axi_id_width_p(6)
       ,.axi_core_clk_async_p(0)
       ,.prefetch_bypass_p(prefetch_axi_bypass_lp)
-      ,.prefetch_outstanding_p(1)
+      ,.prefetch_outstanding_p(prefetch_outstanding_lp)
       ,.cache_miss_trace_p(`BP_CACHE_MISS_TRACE)
       )
    blackparrot
