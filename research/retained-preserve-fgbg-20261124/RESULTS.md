@@ -12,6 +12,26 @@ Image top `464bfe1f4` / BlackParrot `6b3598d3d` (64 KiB I + 64 KiB D retained, 1
 
 Foreground wake-to-done latency improves 2.2–2.7x with both lanes. Foreground-size sweep (both lanes, scan): 12 KiB 1.692x, 32 KiB 1.536x, 48 KiB 1.531x, 64 KiB 1.463x. Instruction retention carries most of the gain. The retained lines are dominated by the Linux futex/scheduler switch path, which only kernel-switch-time gating captures fully.
 
+# Capacity ceiling: 1536 lines per side (96 KiB I + 96 KiB D)
+
+Image top `9709edeaa` (256 sets, 6-way), job `20261125T050849Z-9709edeaa`: WNS +0.726 ns, WHS +0.023 ns, 48,904 LUT, 133.5/140 BRAM (the device's BRAM limit), bit `c7b9bff89432314ebecd87ea0a83552917b358aec3e68754d6f4fcde9325fd11`. Kernel-gated, sessions `board-s13-c1536-kgate` (two cases, then an errant controller write ended it) and `board-s14-c1536-kgate`:
+
+| workload (bg 64 KiB scan) | off | I only | D only | both | fg latency (both) |
+|---|---|---|---|---|---|
+| scan 12 KiB | 1.00x | 1.588x [1.563, 1.680] | 1.036x [1.015, 1.115] | 1.744x [1.715, 1.840] | 2.51x |
+| chase 32 KiB | 1.00x | | | 1.793x [1.753, 1.880] | 2.92x |
+| lookup 32 KiB | 1.00x | | | 1.733x [1.680, 1.799] | 2.59x |
+
+Foreground size (both lanes, scan): 12 KiB 1.744x, 32 KiB 1.679x, 64 KiB 1.596x, 96 KiB 1.448x.
+
+Capacity scaling (kernel-gated, both lanes, whole):
+
+| lines per side | scan 12 KiB | chase 32 KiB | lookup 32 KiB |
+|---|---|---|---|
+| 768 | 1.579x | 1.624x | 1.559x |
+| 1024 | 1.692x / 1.653x | 1.714x / 1.704x | 1.671x / 1.649x |
+| 1536 | 1.744x | 1.793x | 1.733x |
+
 # FPGA/Linux application results
 
 Image: top `1eb904204` / BlackParrot `13c71ade6`, single-thread `prefetch16k` (16 KiB L2), 256+256 retained lines in 64 sets, HP0 response delay 160 (about 200-cycle DRAM latency), observer off. Routed job `20261124T201838Z-1eb904204`: WNS +0.763 ns, WHS +0.018 ns, 47,493 LUT, 94.5 BRAM. Bitstream SHA-256 `83f559229d560a62ff868f7c5d6606d008464461578b3a0fe586a687aa753553`. Linux: kernel29 with the timer64 firmware fix (NBF `5e6343cf…`), FCLK0 set to 50 MHz (core 20 MHz), controller `6caf` with the stdin EOF fix.
