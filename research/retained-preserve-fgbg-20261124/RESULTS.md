@@ -10,6 +10,23 @@ Image top `7997d361c` / BlackParrot `a7b509f40`: 1536+1536 retained lines (96 Ki
 | chase 32 KiB | 1.00x | 1.692x [1.648, 1.762] | 1.039x [1.005, 1.066] | 1.791x [1.737, 1.819] / 1.794x [1.752, 1.891] | 2.84x / 2.78x |
 | lookup 32 KiB | 1.00x | 1.657x [1.620, 1.785] | 1.037x [1.010, 1.077] | 1.728x [1.687, 1.792] / 1.748x [1.715, 1.820] | 2.43x / 2.52x |
 
+## Memory-latency sensitivity (HP0 delay 300, about 340-cycle DRAM)
+
+Same RTL and kernel, only `BP_AXI_RESPONSE_DELAY` 160 → 300. Top `03b676f3b`, job `20261125T090903Z-03b676f3b`: WNS +0.036 ns, WHS +0.023 ns, 50,057 LUT, 133.5/140 BRAM, bit `e10971e708d13edc443c71b6c6ff6ff3a8301ebbe142ab862c4dfccc5f01ee41`. Session `board-s18-c1536i-d300-kgate`. The first attempt, `board-s17`, hit the intermittent boot hang at kernel time 6 s; there was no output for 900 s, then recovery ran. The 300 delay is one point in a sweep, not the headline. About 340 cycles matches a 2–3 GHz core behind a loaded DRAM controller. 200 cycles is the conservative point.
+
+| workload (bg 64 KiB scan) | delay | I only | D only | both | fg latency (both) | off cycles/loop |
+|---|---|---|---|---|---|---|
+| scan 12 KiB | 160 | 1.569x | 1.040x | 1.812x | 2.61x | 998k |
+| scan 12 KiB | 300 | 2.111x [2.022, 2.147] | 1.077x [1.010, 1.101] | 2.230x [2.178, 2.402] | 3.50x | 1937k |
+| chase 32 KiB | 160 | | | 1.791x | 2.84x | 915k |
+| chase 32 KiB | 300 | | | 2.292x [2.244, 2.521] | 4.13x | 1836k |
+| lookup 32 KiB | 160 | | | 1.728x | 2.43x | 938k |
+| lookup 32 KiB | 300 | | | 2.268x [2.161, 2.403] | 3.64x | 1862k |
+| scan 32 KiB | 160 | | | 1.666x | 2.00x | 1116k |
+| scan 32 KiB | 300 | | | 2.127x [2.078, 2.247] | 2.71x | 2177k |
+
+The off baseline roughly doubles, but the retained (on) configuration slows only about 1.5–1.6x, because retained hits are served from on-chip BRAM. The speedup therefore grows with memory latency. A delay-0 floor point has not been built, because of host disk space.
+
 # Headline (1024 lines per side, kernel-gated capture)
 
 Image top `464bfe1f4` / BlackParrot `6b3598d3d` (64 KiB I + 64 KiB D retained, 128 sets, per-way shadow filter), job `20261125T024513Z-464bfe1f4`: WNS +0.388 ns, WHS +0.036 ns, 48,383 LUT, 116.5 BRAM, bit `678eacb92acf495bc04173222e3fca360f8ac1a7144bdd7ef5c076f594e86970`. Kernel29 plus patch 0030, timer64 fix. Sessions `board-s11-c1024-kgate` and `board-s12-c1024-kgate`. Whole-transaction speedup, off cells with no extra system calls:
