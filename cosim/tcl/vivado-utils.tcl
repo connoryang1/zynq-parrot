@@ -147,7 +147,7 @@ proc vivado_experiment_defines {} {
         error "incomplete retained-buffer Verilog configuration"
     }
     set result [list]
-    foreach name [concat $names {BP_RETAINED_OBSERVE BP_AXI_RESPONSE_DELAY BP_CACHE_MISS_TRACE}] {
+    foreach name [concat $names {BP_RETAINED_OBSERVE BP_AXI_RESPONSE_DELAY BP_CACHE_MISS_TRACE BP_ZP_L2_SETS}] {
         if {![info exists ::env($name)]} { continue }
         set value $::env($name)
         if {![regexp {^(0|[1-9][0-9]*)$} $value]} {
@@ -161,6 +161,9 @@ proc vivado_experiment_defines {} {
         }
         if {$name in {BP_RETAINED_I_LINES BP_RETAINED_D_LINES} && $value > 65535} {
             error "$name exceeds the 16-bit reported line count"
+        }
+        if {$name eq "BP_ZP_L2_SETS" && ($value < 1 || $value > 4096 || ($value & ($value-1)) != 0)} {
+            error "$name must be a power of two in 1..4096"
         }
         if {$name eq "BP_RETAINED_SETS" && ($value < 1 || $value > 32768 || ($value & ($value-1)) != 0)} {
             error "$name must be a power of two in 1..32768"
