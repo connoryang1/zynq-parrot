@@ -129,7 +129,17 @@ static void rec_d(const volatile void *p, unsigned bytes) {
     /* slot 0; index bits 4:0 -> 44:40, 9:5 -> 52:48 */
     CSRW(0x9c1, ((uint64_t)((n_d >> 5) & 0x1f) << 48) | ((uint64_t)(n_d & 0x1f) << 40) | a);
 }
-static void trigger(void) { CSRW(0x9c3, 0 | 4); }  /* slot 0, follow (I prefix first) */
+#ifndef TRIG
+#define TRIG 0  /* 0: I prefix then D slot (follow); 1: D slot only; 2: I prefix only */
+#endif
+#ifndef MODES
+#define MODES 0xf
+#endif
+static void trigger(void) {
+  if (TRIG == 0) CSRW(0x9c3, 0 | 4);           /* slot 0, follow (I prefix first) */
+  else if (TRIG == 1) CSRW(0x9c3, 0);
+  else CSRW(0x5c0, (1ULL << 63) | ((uint64_t)n_i << 8));  /* I range [0, n_i) */
+}
 
 int main(void) {
   for (unsigned i = 0; i < FG_WORDS; ++i) { fg[i] = i * 0x9e3779b97f4a7c15ULL; fg_sum += fg[i]; }
@@ -151,6 +161,7 @@ int main(void) {
 
   static const char *names[4] = {"off", "wake", "early", "warm"};
   for (unsigned mode = 0; mode < 4; ++mode) {
+    if (!((MODES >> mode) & 1)) continue;
     uint64_t fgc = 0, bgc = 0;
     uint64_t is0 = CSRR(0x5c0), ds0 = CSRR(0x9c3);
     for (unsigned r = 0; r < ROUNDS; ++r) {
