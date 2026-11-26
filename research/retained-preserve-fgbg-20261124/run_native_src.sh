@@ -26,7 +26,7 @@ if [[ ! -x $MODEL/design/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench ]]; then
   cp $TOP/cosim/black-parrot-example/verilator/Makefile $MODEL/design/verilator/Makefile
   cp /home/coyang/zynq-parrot-linux-research/riscv/bootrom/bootrom.none.riscv $MODEL/program/bootrom/
   ( cd $MODEL/design/verilator && /usr/bin/time -v make -j1 build "${opts[@]}" ZP_RISCV_DIR=$MODEL/program \
-      VERILATOR_BUILD_JOBS=${BUILD_JOBS:-10} EXTRA_DEFINES="BSG_HIDE_FROM_SYNTHESIS${PF_OUT:+ BP_PREFETCH_AXI_BYPASS BP_PREFETCH_OUTSTANDING=$PF_OUT}" \
+      VERILATOR_BUILD_JOBS=${BUILD_JOBS:-10} EXTRA_DEFINES="BSG_HIDE_FROM_SYNTHESIS${PF_OUT:+ BP_PREFETCH_AXI_BYPASS BP_PREFETCH_OUTSTANDING=$PF_OUT}${DBG_DEFINES:+ $DBG_DEFINES}" \
       VERILATOR_SUPPORT_SOURCES=$TOP/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv ) > "$OUT/build.log" 2>&1 \
       || { echo "BUILD FAILED; see $OUT/build.log"; tail -30 "$OUT/build.log"; exit 1; }
 fi

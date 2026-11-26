@@ -130,7 +130,7 @@ static void rec_d(const volatile void *p, unsigned bytes) {
     CSRW(0x9c1, ((uint64_t)((n_d >> 5) & 0x1f) << 48) | ((uint64_t)(n_d & 0x1f) << 40) | a);
 }
 #ifndef TRIG
-#define TRIG 0  /* 0: I prefix then D slot (follow); 1: D slot only; 2: I prefix only */
+#define TRIG 0  /* 0: I prefix then D slot (follow); 1: D only; 2: I only; 3: both concurrently */
 #endif
 #ifndef MODES
 #define MODES 0xf
@@ -138,7 +138,8 @@ static void rec_d(const volatile void *p, unsigned bytes) {
 static void trigger(void) {
   if (TRIG == 0) CSRW(0x9c3, 0 | 4);           /* slot 0, follow (I prefix first) */
   else if (TRIG == 1) CSRW(0x9c3, 0);
-  else CSRW(0x5c0, (1ULL << 63) | ((uint64_t)n_i << 8));  /* I range [0, n_i) */
+  else if (TRIG == 2) CSRW(0x5c0, (1ULL << 63) | ((uint64_t)n_i << 8));  /* I range [0, n_i) */
+  else { CSRW(0x9c3, 0); CSRW(0x5c0, (1ULL << 63) | ((uint64_t)n_i << 8)); }  /* 3: both lanes at once */
 }
 
 int main(void) {
