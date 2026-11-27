@@ -57,7 +57,7 @@ DEFINES += BP_NCPUS=$(BP_NCPUS)
 # BRAM store; ordinary L1 and L2 dimensions stay in the named configuration.
 # This dedicated experiment builds real retention by default. Set 0 to
 # reproduce the legacy replay datapath; the accepted source branch is intact.
-BP_RETAINED_BUFFER ?= 1
+BP_RETAINED_BUFFER ?= 0
 BP_RETAINED_I_LINES ?= 0
 BP_RETAINED_D_LINES ?= 0
 BP_RETAINED_SETS ?= 256
@@ -66,24 +66,32 @@ DEFINES += BP_RETAINED_I_LINES=$(BP_RETAINED_I_LINES)
 DEFINES += BP_RETAINED_D_LINES=$(BP_RETAINED_D_LINES)
 DEFINES += BP_RETAINED_SETS=$(BP_RETAINED_SETS)
 # L2 sets per bank for the prefetch16k cfg (64 = 16 KiB; 512 = 128 KiB).
-BP_ZP_L2_SETS ?= 512
+BP_ZP_L2_SETS ?= 64
 DEFINES += BP_ZP_L2_SETS=$(BP_ZP_L2_SETS)
-BP_ZP_DCACHE_PF_FULL ?= 0
+BP_ZP_DCACHE_PF_FULL ?= 1
 DEFINES += BP_ZP_DCACHE_PF_FULL=$(BP_ZP_DCACHE_PF_FULL)
-BP_ZP_DCACHE_PF_ELS ?= 4
+BP_ZP_DCACHE_PF_ELS ?= 24
 DEFINES += BP_ZP_DCACHE_PF_ELS=$(BP_ZP_DCACHE_PF_ELS)
 BP_ZP_L2_BANKS ?= 2
 DEFINES += BP_ZP_L2_BANKS=$(BP_ZP_L2_BANKS)
 # Address-replay hybrid (BlackParrot experiment/replay-hybrid): install
 # replayed I lines into L1, I hint slots, D replay lines per task slot.
-BP_REPLAY_INSTALL ?= 0
-BP_ICACHE_PF_ELS ?= 4
-BP_DREPLAY_ENTRIES ?= 32
+BP_REPLAY_INSTALL ?= 1
+BP_ICACHE_PF_ELS ?= 24
+BP_DREPLAY_ENTRIES ?= 256
 DEFINES += BP_REPLAY_INSTALL=$(BP_REPLAY_INSTALL) BP_ICACHE_PF_ELS=$(BP_ICACHE_PF_ELS) BP_DREPLAY_ENTRIES=$(BP_DREPLAY_ENTRIES)
+
+# Address-replay FPGA candidate: the RTL feature defines of the simulated
+# final configuration (research/retained-preserve-fgbg-20261124/tools/matrix.sh
+# plus RESULTS.md). The Vivado flow reads DEFINES, not EXTRA_DEFINES.
+BP_REPLAY_RTL_DEFINES ?= BP_PREFETCH_AXI_BYPASS BP_PREFETCH_OUTSTANDING=24 \
+  BP_ICACHE_PREFETCH_BYPASS BP_REPLAY_HOLD_ON_DEMAND BP_REPLAY_FAST_SCAN \
+  BP_REPLAY_PROTECT BP_REPLAY_CHAIN BP_REPLAY_ICACHE_NODRAIN
+DEFINES += $(BP_REPLAY_RTL_DEFINES)
 
 # Accepted physical-demand-miss history, separate from retained payload and
 # ordinary cache geometry. Keep existing traced images as the default.
-BP_CACHE_MISS_TRACE ?= 1
+BP_CACHE_MISS_TRACE ?= 0
 ifneq ($(words $(BP_CACHE_MISS_TRACE)),1)
 $(error BP_CACHE_MISS_TRACE must be exactly 0 or 1)
 endif
@@ -98,7 +106,7 @@ DEFINES += BP_CACHE_MISS_TRACE=$(BP_CACHE_MISS_TRACE)
 # Optional actual retained-use GP0 observation. Included in MODEL_RETAINED_TAG;
 # This r2 capacity candidate includes observation in its actual fit cost;
 # explicit0 remains available for matched diagnostic comparison only.
-BP_RETAINED_OBSERVE ?= 0
+BP_RETAINED_OBSERVE ?= 1
 ifneq ($(filter $(BP_RETAINED_OBSERVE),0 1),$(BP_RETAINED_OBSERVE))
 $(error BP_RETAINED_OBSERVE must be 0 or 1)
 endif
