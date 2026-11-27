@@ -1,5 +1,30 @@
 This file summarizes the measured results of the per-task retained-line experiment: native RTL simulation of the mechanism, and FPGA/Linux application measurements on the routed candidate. It separates mechanism evidence (simulation) from complete-application evidence (board) and records exact identities, so each number can be traced to its raw log.
 
+# Address record/replay: larger-L2 baseline (simulation, 2026-11-26)
+
+The address-replay design (see WORK_LOG, 2026-11-25 onward) stores line addresses instead of line data. Its storage is about 8.5 KiB: a 256-entry code table (~1.1 KiB), four 256-entry data slots (~4.4 KiB) and 2x24 fill buffers (3 KiB). The matched baseline spends that area on L2 instead. Set counts must be powers of two, so it doubles the 16 KiB simulated L2 to 32 KiB, which is more than the replay storage. Native full-core simulation, `e_bp_unicore_zynqparrot_prefetch16k_cfg`, delay 160, cycles per round (3 measured rounds after 1 warmup), runs `l2x2-*` (`run_l2x2_base.sh`):
+
+| benchmark | 16 KiB L2, no replay | 32 KiB L2, no replay | warm reference (32 KiB) |
+|---|---|---|---|
+| single-direction foreground switch-in + work | 95.9k | 95.8k | 7.9k |
+| single-direction background turn | 380.1k | 380.1k | — |
+| ping-pong switch-in (per side) | 59.9k | 59.9k | 6.2k |
+| ping-pong whole round | 600.7k | 600.6k | — |
+
+Doubling the L2 changes nothing: each background turn (64 KiB scan plus 48 KiB of code) flushes a 32 KiB L2 as completely as a 16 KiB one. Replay on the 16 KiB L2 (fix13 RTL, BP `32d44f8df`+`1862708bc`, 24 in flight, hold, code on the direct path; runs `h13-*`/`pp13-*`):
+
+| benchmark | trigger | switch-in | whole round | speedup vs cold |
+|---|---|---|---|---|
+| single-direction | wake, code then data | 30.2k | 409.4k | 1.163x |
+| single-direction | wake, both lanes at once | 32.5k | 413.2k | 1.152x |
+| single-direction | early, code then data | 26.4k | 411.9k | 1.156x |
+| single-direction | early, both lanes at once | 16.7k | 401.2k | 1.186x |
+| single-direction | wake, data only / code only | 56.1k / 85.9k | 436.2k / 463.3k | 1.091x / 1.027x |
+| ping-pong | wake | 11.3k / 12.2k | 502.5k | 1.195x |
+| ping-pong | early | 8.6k / 8.8k | 511.4k | 1.175x |
+
+Earlier replay numbers (22.7k single-direction wake) came from RTL with a frontend bug that assembled instructions from unrelated fetches (WORK_LOG, 2026-11-26) and are superseded.
+
 # Final configuration (best measured)
 
 Image top `7997d361c` / BlackParrot `a7b509f40`: 1536+1536 retained lines (96 KiB I + 96 KiB D) in 256 sets, per-way shadow-tag filter on both lanes, preserve-on-capture-toggle control, single-thread prefetch16k core, HP0 response delay 160 (about 200-cycle DRAM). Job `20261125T071606Z-7997d361c`: WNS +0.909 ns, WHS +0.035 ns, 49,971 LUT, 133.5/140 BRAM. Kernel29 with patch 0030 (kernel-gated capture) and the timer64 fix. Sessions `board-s15-c1536i-kgate` and `board-s16-c1536i-kgate`; whole-transaction speedup, off cells with no extra system calls:
