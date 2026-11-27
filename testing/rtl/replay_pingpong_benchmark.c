@@ -14,6 +14,8 @@
  *   wake  : at the end of its turn a program triggers the other's list (the
  *           point where the OS knows who runs next).
  *   early : trigger before the last TAIL_KIB of streaming work.
+ *   warm  : reference; the program's switch-in and hot work run once, untimed,
+ *           immediately before the measured switch-in.
  * Reports per-turn switch-in latency and total cycles for both programs.
  */
 #include <stdint.h>
@@ -48,6 +50,9 @@
 #endif
 #ifndef MODES
 #define MODES 0x7
+#endif
+#ifndef TAIL_SPIN
+#define TAIL_SPIN 0  /* diagnostic: >0 replaces the tail scan by an idle wait of this many cycles */
 #endif
 
 #define STR_(x) #x
@@ -141,24 +146,34 @@ int main(void) {
   print_kv("PINGPONG lists i_a=", i_count[0]); print_kv("i_b=", i_count[1]);
   print_kv("d_a=", d_count[0]); print_kv("d_b=", d_count[1]); bp_print_string("\n");
 
-  static const char *names[3] = {"off", "wake", "early"};
-  for (unsigned mode = 0; mode < 3; ++mode) {
+  static const char *names[4] = {"off", "wake", "early", "warm"};
+  for (unsigned mode = 0; mode < 4; ++mode) {
     if (!((MODES >> mode) & 1)) continue;
-    uint64_t lat[2] = {0, 0}, total = 0;
+    uint64_t lat[2] = {0, 0}, total = 0, ph_sw = 0, ph_code = 0, ph_data = 0;
     uint64_t is0 = CSRR(0x5c0), ds0 = CSRR(0x9c3);
     for (unsigned r = 0; r < ROUNDS; ++r) {
       uint64_t r0 = cycles();
       for (unsigned p = 0; p < 2; ++p) {
+        if (mode == 3) {
+          check(sw_code(r) == r + 5ULL * SW_CODE_KIB * 256, 1);
+          check(scan(sw, W(SW_KIB)) == sw_sum, 2);
+          check(hot_code[p](r) == r + hot_imm[p] * HOT_CODE_KIB * 256, 3);
+          check(scan(hot[p], W(HOT_KIB)) == hot_sum[p], 4);
+        }
         uint64_t t0 = cycles();
         check(sw_code(r) == r + 5ULL * SW_CODE_KIB * 256, 1);
         check(scan(sw, W(SW_KIB)) == sw_sum, 2);
+        uint64_t ta = cycles();
         check(hot_code[p](r) == r + hot_imm[p] * HOT_CODE_KIB * 256, 3);
+        uint64_t tb = cycles();
         check(scan(hot[p], W(HOT_KIB)) == hot_sum[p], 4);
         uint64_t t1 = cycles();
+        if (r >= WARMUP) { ph_sw += ta - t0; ph_code += tb - ta; ph_data += t1 - tb; }
         check(stream_code[p](r) == r + stream_imm[p] * STREAM_CODE_KIB * 256, 5);
         check(scan(stream[p], STREAM_HEAD_WORDS) == head_sum[p], 6);
         if (mode == 2) replay(p ^ 1);
-        check(scan(stream[p] + STREAM_HEAD_WORDS, W(STREAM_KIB) - STREAM_HEAD_WORDS) == tail_sum[p], 7);
+        if (TAIL_SPIN) { uint64_t s0 = cycles(); while (cycles() - s0 < TAIL_SPIN) ; }
+        else check(scan(stream[p] + STREAM_HEAD_WORDS, W(STREAM_KIB) - STREAM_HEAD_WORDS) == tail_sum[p], 7);
         if (mode == 1) replay(p ^ 1);
         if (r >= WARMUP) lat[p] += t1 - t0;
       }
@@ -168,6 +183,7 @@ int main(void) {
     bp_print_string("PINGPONG mode="); bp_print_string((char *)names[mode]); bp_print_string(" ");
     print_kv("lat_a=", lat[0]); print_kv("lat_b=", lat[1]); print_kv("total=", total);
     print_kv("rounds=", ROUNDS - WARMUP);
+    print_kv("ph_sw=", ph_sw); print_kv("ph_code=", ph_code); print_kv("ph_data=", ph_data);
     print_kv("istat0=", is0); print_kv("istat1=", is1); print_kv("dstat0=", ds0); print_kv("dstat1=", ds1);
     bp_print_string("\n");
   }

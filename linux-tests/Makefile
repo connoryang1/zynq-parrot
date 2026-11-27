@@ -39,6 +39,7 @@ TRACE_CAPTURE_DYNAMIC_APP := $(OUT)/cache_miss_trace_capture_dynamic
 PHYSICAL_PREVIEW_BENCH_APP := $(OUT)/scheduler_physical_preview_benchmark
 PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP := $(OUT)/scheduler_physical_preview_benchmark_dynamic
 TAGGED_REPLAY_BENCH_APP := $(OUT)/scheduler_tagged_replay_benchmark
+REPLAY_FOOTPRINT_BENCH_APP := $(OUT)/scheduler_replay_footprint_benchmark
 TAGGED_REPLAY_BENCH_DYNAMIC_APP := $(OUT)/scheduler_tagged_replay_benchmark_dynamic
 PIPE_HINT_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_dynamic
 PIPE_HINT_ZLIB_BENCH_DYNAMIC_APP := $(OUT)/scheduler_pipe_hint_benchmark_zlib_dynamic
@@ -176,6 +177,7 @@ cache-miss-trace-capture-dynamic: $(TRACE_CAPTURE_DYNAMIC_APP)
 physical-preview-benchmark: $(PHYSICAL_PREVIEW_BENCH_APP)
 physical-preview-benchmark-dynamic: $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP)
 tagged-replay-benchmark: $(TAGGED_REPLAY_BENCH_APP)
+replay-footprint-benchmark: $(REPLAY_FOOTPRINT_BENCH_APP)
 tagged-replay-benchmark-dynamic: $(TAGGED_REPLAY_BENCH_DYNAMIC_APP)
 physical-preview-trace: $(PHYSICAL_PREVIEW_TRACE_APP)
 physical-preview-trace-dynamic: $(PHYSICAL_PREVIEW_TRACE_DYNAMIC_APP)
@@ -218,6 +220,11 @@ $(PHYSICAL_PREVIEW_BENCH_DYNAMIC_APP): scheduler_physical_preview_benchmark.c Ma
 $(TAGGED_REPLAY_BENCH_APP): scheduler_tagged_replay_benchmark.c Makefile FORCE
 	@mkdir -p $(OUT)
 	@$(BP_LINUX_CC) $(PHYSICAL_PREVIEW_CFLAGS) -std=c11 -o $@ $< >&2
+
+# Draft 0031 footprint replay (prctl 0x42505066, modes 10/16).
+$(REPLAY_FOOTPRINT_BENCH_APP): scheduler_replay_footprint_benchmark.c resume_workload.h Makefile FORCE
+	@mkdir -p $(OUT)
+	@$(BP_LINUX_CC) $(CFLAGS) -std=gnu11 -o $@ $< >&2
 
 $(TAGGED_REPLAY_BENCH_DYNAMIC_APP): scheduler_tagged_replay_benchmark.c Makefile FORCE | check-linux-dynamic-cc
 	@mkdir -p $(OUT)

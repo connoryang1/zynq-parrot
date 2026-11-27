@@ -10,7 +10,7 @@ BP=/home/coyang/bp-retained-preserve-20261124
 INSTALL=/home/coyang/zynq-parrot-linux-research/install
 IMPORT=/home/coyang/zynq-parrot-linux-research/import
 HERE=$TOP/research/retained-preserve-fgbg-20261124
-MODEL=${MODEL_ROOT:-/run/user/1001}/zp-retained-fgbg-model-d${delay}-s${sets}-i${I_LINES:-256}-d${D_LINES:-256}-l2s${L2_SETS:-64}${BUFFER:+-b$BUFFER}${PF_FULL:+-pf$PF_FULL}${PF_OUT:+-po$PF_OUT}${PF_ELS:+-pe$PF_ELS}${L2_BANKS:+-l2b$L2_BANKS}${RINST:+-ri$RINST}${IPF_ELS:+-ie$IPF_ELS}${DRE:+-dr$DRE}
+MODEL=${MODEL_ROOT:-/run/user/1001}/zp-retained-fgbg-model-d${delay}-s${sets}-i${I_LINES:-256}-d${D_LINES:-256}-l2s${L2_SETS:-64}${BUFFER:+-b$BUFFER}${PF_FULL:+-pf$PF_FULL}${PF_OUT:+-po$PF_OUT}${PF_ELS:+-pe$PF_ELS}${L2_BANKS:+-l2b$L2_BANKS}${RINST:+-ri$RINST}${IPF_ELS:+-ie$IPF_ELS}${DRE:+-dr$DRE}${IBYP:+-ib$IBYP}${HOLD:+-hd$HOLD}${CAP:+-dc$CAP}${DBG_DEFINES:+-dbg}
 OUT=$HERE/$label
 mkdir -p "$OUT"
 export LD_LIBRARY_PATH=$INSTALL/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
@@ -26,7 +26,7 @@ if [[ ! -x $MODEL/design/verilator/obj_dir/Vbsg_nonsynth_zynq_testbench ]]; then
   cp $TOP/cosim/black-parrot-example/verilator/Makefile $MODEL/design/verilator/Makefile
   cp /home/coyang/zynq-parrot-linux-research/riscv/bootrom/bootrom.none.riscv $MODEL/program/bootrom/
   ( cd $MODEL/design/verilator && /usr/bin/time -v make -j1 build "${opts[@]}" ZP_RISCV_DIR=$MODEL/program \
-      VERILATOR_BUILD_JOBS=${BUILD_JOBS:-10} EXTRA_DEFINES="BSG_HIDE_FROM_SYNTHESIS${PF_OUT:+ BP_PREFETCH_AXI_BYPASS BP_PREFETCH_OUTSTANDING=$PF_OUT}${DBG_DEFINES:+ $DBG_DEFINES}" \
+      VERILATOR_BUILD_JOBS=${BUILD_JOBS:-10} EXTRA_DEFINES="BSG_HIDE_FROM_SYNTHESIS${PF_OUT:+ BP_PREFETCH_AXI_BYPASS BP_PREFETCH_OUTSTANDING=$PF_OUT}${IBYP:+ BP_ICACHE_PREFETCH_BYPASS}${HOLD:+ BP_REPLAY_HOLD_ON_DEMAND}${CAP:+ BP_REPLAY_DEMAND_CAP=$CAP}${DBG_DEFINES:+ $DBG_DEFINES}" \
       VERILATOR_SUPPORT_SOURCES=$TOP/testing/rtl/scoped-assertions/bsg_clkgate_optional.sv ) > "$OUT/build.log" 2>&1 \
       || { echo "BUILD FAILED; see $OUT/build.log"; tail -30 "$OUT/build.log"; exit 1; }
 fi

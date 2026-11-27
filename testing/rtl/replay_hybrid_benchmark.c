@@ -98,11 +98,12 @@ static uint64_t scan(volatile uint64_t *a, unsigned words) {
   return s;
 }
 static uint64_t sw_sum, fg_sum, bg_sum, bg_head_sum, bg_tail_sum;
-static void check(int ok, unsigned mode, unsigned r) {
+static void check_at(int ok, unsigned mode, unsigned r, unsigned line) {
   if (ok) return;
-  bp_print_string("[BSG-FAIL] check mode/round "); bp_hprint_uint64(mode);
-  bp_hprint_uint64(r); bp_print_string("\n"); bp_finish(1);
+  bp_print_string("[BSG-FAIL] check mode/round/line "); bp_hprint_uint64(mode);
+  bp_hprint_uint64(r); bp_hprint_uint64(line); bp_print_string("\n"); bp_finish(1);
 }
+#define check(ok, mode, r) check_at((ok), (mode), (r), __LINE__)
 static void switch_path(unsigned mode, unsigned r, uint64_t tag) {
   check(sw_code(r) == r + 5ULL * SW_CODE_KIB * 256, mode, r);
   check(scan(sw, SW_WORDS) == sw_sum, mode, r);
@@ -175,7 +176,17 @@ int main(void) {
       check(bg_code(r) == r + 3ULL * BG_CODE_KIB * 256, mode, r);
       check(scan(bg, BG_HEAD_WORDS) == bg_head_sum, mode, r);
       if (mode == 2) trigger();                  /* early: scheduler knows fg is next */
-      check(scan(bg + BG_HEAD_WORDS, BG_WORDS - BG_HEAD_WORDS) == bg_tail_sum, mode, r);
+      if (scan(bg + BG_HEAD_WORDS, BG_WORDS - BG_HEAD_WORDS) != bg_tail_sum) {
+        /* Diagnostic: report the first word that differs from its initial value. */
+        for (unsigned i = BG_HEAD_WORDS; i < BG_WORDS; ++i)
+          if (bg[i] != (i ^ 0xc8f72015ULL)) {
+            bp_print_string("BGBAD idx/addr/val/time ");
+            bp_hprint_uint64(i); bp_hprint_uint64((uint64_t)&bg[i]); bp_hprint_uint64(bg[i]);
+            bp_hprint_uint64(cycles()); bp_print_string("\n");
+            break;
+          }
+        check(0, mode, r);
+      }
       if (mode == 1) trigger();                  /* wake: futex wake of the fg */
       uint64_t t2 = cycles();
       if (r >= WARMUP) { fgc += t1 - t0; bgc += t2 - t1; }

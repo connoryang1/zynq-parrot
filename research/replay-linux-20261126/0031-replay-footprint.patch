@@ -1,0 +1,255 @@
+--- a/arch/riscv/include/asm/processor.h
++++ b/arch/riscv/include/asm/processor.h
+@@ -92,6 +92,9 @@
+ 	unsigned char bp_preview_phys_mode;
+ 	unsigned char bp_preview_replay_slot;
+ 	unsigned char bp_preview_replay_state;
++	/* PR_BP_REPLAY_FOOTPRINT: pinned user pages backing the slot entries. */
++	struct page **bp_replay_pages;
++	unsigned int bp_replay_npages;
+ 	unsigned long bp_preview_hook_count;
+ 	unsigned long bp_preview_last_hook_cycles;
+ 	/* Diagnostic counts for each incoming context-switch guard outcome. */
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -227,6 +227,26 @@
+ 		   READ_ONCE(task->thread.bp_preview_hook_count) + 1);
+ }
+ 
++/* Mode sixteen launches the same tagged data slot plus the firmware code
++ * prefix as mode ten, but at the final switch to the task (end of the
++ * previous task's turn) instead of at its wakeup. It measures the trigger
++ * point alone: the footprint and the hardware path are identical.
++ */
++static __always_inline void riscv_bp_replay_switch(struct task_struct *next)
++{
++	if (READ_ONCE(next->thread.bp_preview_phys_mode) != 16
++	    || READ_ONCE(next->thread.bp_preview_replay_state) != 1
++	    || READ_ONCE(next->thread.bp_preview_phys_mm) != next->mm
++	    || !next->mm)
++		return;
++	asm volatile("csrw 0x5c0, zero" ::: "memory");
++	asm volatile("csrw 0x9c3, %0"
++		     : : "r"((unsigned long)READ_ONCE(next->thread.bp_preview_replay_slot))
++		     : "memory");
++	WRITE_ONCE(next->thread.bp_preview_hook_count,
++		   READ_ONCE(next->thread.bp_preview_hook_count) + 1);
++}
++
+ /* Arm mode eleven only after a successful wake. A configured-but-unarmed task
+  * can be preempted before it blocks without consuming its future replay.
+  */
+--- a/arch/riscv/kernel/process.c
++++ b/arch/riscv/kernel/process.c
+@@ -98,6 +98,7 @@
+ 
+ 	for (i = 0; i < BP_PREVIEW_ADDRS; i++)
+ 		pinned |= !!task->thread.bp_preview_pin[i];
++	pinned |= !!task->thread.bp_replay_npages;
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mode, 0);
+ 	WRITE_ONCE(task->thread.bp_preview_replay_state, 0);
+ 	WRITE_ONCE(task->thread.bp_preview_phys_mm, NULL);
+@@ -142,6 +143,17 @@
+ 		if (page)
+ 			unpin_user_page(page);
+ 	}
++	/* The footprint's slot entries may still name these pages, but the
++	 * replay state above is cleared, so no hook can trigger the slot again;
++	 * a later owner reprograms the entries before arming it.
++	 */
++	if (task->thread.bp_replay_npages) {
++		unpin_user_pages(task->thread.bp_replay_pages,
++				 task->thread.bp_replay_npages);
++		kfree(task->thread.bp_replay_pages);
++		task->thread.bp_replay_pages = NULL;
++		task->thread.bp_replay_npages = 0;
++	}
+ 	return 0;
+ }
+ 
+@@ -276,6 +288,8 @@
+ 	dst->thread.bp_preview_phys_mode = 0;
+ 	dst->thread.bp_preview_replay_slot = 0;
+ 	dst->thread.bp_preview_replay_state = 0;
++	dst->thread.bp_replay_pages = NULL;
++	dst->thread.bp_replay_npages = 0;
+ 	/* clear entire V context, including datap for a new task */
+ 	memset(&dst->thread.vstate, 0, sizeof(struct __riscv_v_ext_state));
+ 
+@@ -300,6 +314,8 @@
+ 	p->thread.bp_preview_phys_mode = 0;
+ 	p->thread.bp_preview_replay_slot = 0;
+ 	p->thread.bp_preview_replay_state = 0;
++	p->thread.bp_replay_pages = NULL;
++	p->thread.bp_replay_npages = 0;
+ 	p->thread.bp_preview_hook_count = 0;
+ 	p->thread.bp_preview_last_hook_cycles = 0;
+ 	memset(p->thread.bp_preview_guard_count, 0,
+--- a/include/uapi/linux/prctl.h
++++ b/include/uapi/linux/prctl.h
+@@ -356,6 +356,18 @@
+  * Busy is not a lower-L2/AXI/DRAM quiescence guarantee. Other bits reserved.
+  */
+ #define PR_BP_RETAINED_STATUS		0x42505064
++/*
++ * Program one replay footprint slot from a user list of line addresses.
++ * arg2: slot (0-3). arg3: user pointer to an array of unsigned long virtual
++ * addresses (each rounded down to its 64-byte line). arg4: count, 0-256
++ * including any kernel lines added by arg5. arg5 flags: bit 0 appends this
++ * task's kernel switch state (top of kernel stack and start of task_struct)
++ * so the switch-in path's own data is replayed too. Every user page is
++ * pinned until the task reconfigures, releases or exits. Requires a single
++ * possible CPU (the hardware table and its drain are CPU-local).
++ */
++#define PR_BP_REPLAY_FOOTPRINT		0x42505066
++# define PR_BP_REPLAY_FP_KERNEL		(1UL << 0)
+ 
+ 
+ #endif /* _LINUX_PRCTL_H */
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -5367,6 +5367,7 @@
+ 	/* The incoming task is known and the same-mm translation is still active. */
+ #ifdef CONFIG_RISCV
+ 	riscv_bp_preview_next(prev, next);
++	riscv_bp_replay_switch(next);
+ 	/*
+ 	 * Kernel-managed retained-line capture (prctl PR_BP_RETAINED_OWNER).
+ 	 * Switching to the owner turns demand capture on for the rest of its
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -3030,7 +3030,7 @@
+ 		break;
+ 	}
+ 	case PR_BP_PREVIEW_ENABLE:
+-		if (arg2 > 14 || arg3 || arg4 || arg5) {
++		if ((arg2 > 14 && arg2 != 16) || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
+ 			break;
+ 		}
+@@ -3039,7 +3039,7 @@
+ 			error = -ENOENT;
+ 			break;
+ 		}
+-		if (arg2 >= 9 && arg2 <= 12
++		if (((arg2 >= 9 && arg2 <= 12) || arg2 == 16)
+ 		    && !READ_ONCE(me->thread.bp_preview_replay_state)) {
+ 			error = -ENOENT;
+ 			break;
+@@ -3119,6 +3119,116 @@
+ replay_config_out:
+ 		break;
+ 	}
++	case PR_BP_REPLAY_FOOTPRINT: {
++		unsigned int slot = arg2, n = arg4, nk = 0, i, npages = 0;
++		unsigned long __user *uaddrs = (unsigned long __user *)arg3;
++		unsigned long *paddr = NULL, flags, status, kline[12];
++		struct page **pages = NULL;
++
++		if (!me->mm || num_possible_cpus() != 1) {
++			error = -EOPNOTSUPP;
++			break;
++		}
++		if (slot >= 4 || (arg5 & ~PR_BP_REPLAY_FP_KERNEL)) {
++			error = -EINVAL;
++			break;
++		}
++		if (arg5 & PR_BP_REPLAY_FP_KERNEL) {
++			/* Switch-in reads the top of the kernel stack (saved
++			 * context) and the head of task_struct (thread state,
++			 * scheduling fields). Both are in the linear map. */
++			unsigned long top = (unsigned long)task_stack_page(me)
++					    + THREAD_SIZE;
++			for (i = 0; i < 4; i++) {
++				unsigned long va = top - (i + 1) * 64;
++
++				kline[nk++] = is_vmalloc_addr((void *)va)
++					? page_to_phys(vmalloc_to_page((void *)va))
++					  + offset_in_page(va)
++					: __pa(va);
++			}
++			for (i = 0; i < 8; i++)
++				kline[nk++] = __pa((unsigned long)me + i * 64)
++					      & ~63UL;
++		}
++		if (n < nk || n - nk > 256 || n > 256) {
++			error = -EINVAL;
++			break;
++		}
++		n -= nk;
++		/* Kernel switch state first: the switch-in path runs first. */
++		paddr = kcalloc(n + nk, sizeof(*paddr), GFP_KERNEL);
++		pages = kcalloc(n ? n : 1, sizeof(*pages), GFP_KERNEL);
++		if (!paddr || !pages) {
++			error = -ENOMEM;
++			goto fp_out;
++		}
++		for (i = 0; i < n; i++) {
++			unsigned long va;
++			struct page *page;
++			int pinned;
++
++			if (get_user(va, uaddrs + i)) {
++				error = -EFAULT;
++				goto fp_unpin;
++			}
++			va &= ~63UL;
++			/* One pin per line; pins are reference counted, so lines
++			 * sharing a page are released correctly. */
++			pinned = pin_user_pages_fast(va, 1, FOLL_LONGTERM, &page);
++			if (pinned != 1) {
++				error = pinned < 0 ? pinned : -EFAULT;
++				goto fp_unpin;
++			}
++			pages[npages++] = page;
++			paddr[nk + i] = page_to_phys(page) + offset_in_page(va);
++			if (paddr[nk + i] >> 34) {
++				error = -ERANGE;
++				goto fp_unpin;
++			}
++		}
++		for (i = 0; i < nk; i++)
++			paddr[i] = kline[i];
++		n += nk;
++
++		/* Drop the old footprint (drains any queued replay first). */
++		error = riscv_bp_preview_release(me);
++		if (error)
++			goto fp_unpin;
++		local_irq_save(flags);
++		asm volatile("csrr %0, 0x9c3" : "=r"(status) : : "memory");
++		if (status & (0xfUL | (7UL << 60))) {
++			local_irq_restore(flags);
++			error = -EBUSY;
++			goto fp_unpin;
++		}
++		for (i = 0; i < n; i++) {
++			unsigned long entry = ((unsigned long)slot << 45)
++				| ((unsigned long)(i >> 5) << 48)
++				| ((unsigned long)(i & 31) << 40) | paddr[i];
++
++			asm volatile("csrw 0x9c1, %0" : : "r"(entry) : "memory");
++		}
++		status = slot | ((unsigned long)(n & 63) << 2)
++			 | ((unsigned long)(n >> 6) << 32) | (1UL << 63);
++		asm volatile("csrw 0x9c2, %0" : : "r"(status) : "memory");
++		local_irq_restore(flags);
++		me->thread.bp_replay_pages = pages;
++		me->thread.bp_replay_npages = npages;
++		WRITE_ONCE(me->thread.bp_preview_phys_mm, me->mm);
++		WRITE_ONCE(me->thread.bp_preview_replay_slot, slot);
++		WRITE_ONCE(me->thread.bp_preview_replay_state, 1);
++		kfree(paddr);
++		error = 0;
++		break;
++fp_unpin:
++		if (npages)
++			unpin_user_pages(pages, npages);
++fp_out:
++		kfree(pages);
++		kfree(paddr);
++		break;
++	}
+ 	case PR_BP_PREVIEW_REPLAY_STATUS:
+ 		if (arg2 || arg3 || arg4 || arg5) {
+ 			error = -EINVAL;
