@@ -69,7 +69,26 @@ The final configuration combines fast scan, protect, chaining (`BP_REPLAY_CHAIN`
 | ping-pong, wake | 9.3k / 9.6k (6.4k / 6.1k), 99% | 8.7k / 9.2k, 102% | 8.5k / 9.1k (6.7k / 6.1k), 105% |
 | ping-pong, early | 7.0k / 7.1k, 91% | 7.3k / 7.6k, 94% | 8.3k / 7.3k, 97% |
 
+Revalidated on the frontend-fixed RTL (BP `4e0159bd3`): the I-cache no longer moves a request from TL to TV while an install holds the cache lock. Before this fix, an early IF2 consume could pair the half-instruction at 0x56e with an unrelated BTB-target fetch. The result was an illegal CSR trap that restarted the program, seen only in rare ping-pong wake runs at delays 100/240 (WORK_LOG, 2026-11-27). Runs `tf100`/`tf160`/`tf240` all pass, and every cell is within run-to-run noise of the table above. Pre-fix numbers in this section are therefore kept.
+
 Shares above 100% mean the replay also trimmed misses the outgoing program would have taken in the off reference. With a code footprint that fits the 256-entry I table (`FG_CODE_KIB=7`, runs `fit18`, fast scan + protect), early switch-in is 8.3k vs 7.7k warm (99.5%).
+
+## Wide installer fill (BP `ff3b75ec0`, opt-in `BP_REPLAY_WIDE_FILL`)
+
+The installer writes its buffered line in one cycle, rotated into the 8 way-banked data SRAMs, instead of one 64-bit beat per cycle. This cuts about 7 of the ~12 locked cycles per install. The runs are `wf100`/`wf160`/`wf240`: final configuration plus wide fill, with cold and warm references from the same build, 24/24 PASS. Each cell gives switch-in and its share of the ideal whole-round gain, with the final configuration without wide fill in brackets:
+
+| benchmark / trigger | delay 100 | delay 160 | delay 240 |
+|---|---|---|---|
+| single-direction, wake (2 cells) | 10.9–11.0k [12.0–12.1k], 93% | 11.2k [12.1–12.4k], 92–98% | 11.7–12.2k [13.2–13.5k], 91–92% [96–100%] |
+| single-direction, early (2 cells) | 8.6–8.7k, 100–101% | 9.1–9.3k, 102–104% | 9.6–9.7k, 105–107% |
+| ping-pong, wake | 7.9k / 8.2k [8.8k / 9.0k], 102% | 7.8k / 8.3k [8.7k / 8.9k], 105% | 8.0k / 8.5k [8.6k / 9.0k], 106% |
+| ping-pong, early | 6.6k / 6.5k [7.0k / 7.3k], 98% [91%] | 7.0k / 7.3k, 99% [95%] | 8.7k / 7.1k, 100% [97%] |
+
+The switch-in metric improves in every wake cell, by 1.0–1.5k cycles. The single-direction wake whole-round share at delay 240 does not improve: its background turn measured 533k against 522–527k, which is within the ±6k spread that background turns show across cells of one build. The define-off build is cycle-identical to the final configuration (`gt160` vs `tf160`). The cost is a 512-bit line export from the UCE and a 512-bit rotate and select per L1, so it needs a routed area check before it becomes the default.
+
+Remaining gap to warm, measured or bounded:
+- Single-direction wake still pays about 3k cycles (11k vs 8.0k warm). About 370 installs land in the foreground window. Each still holds the I-cache for about 5 cycles (tag-row read, check, invalidate, fill, publish), about 1.9k in all. Its tag-row read also marks the fetch waiting in TL stale, which forces a refetch. An attempt to re-read TL after the lock instead of refetching (`rc160`) passed but made single-direction switch-in worse, 14–18k, so it was reverted.
+- Early mode is at or above 100% of ideal, except for the 6 code lines that overflow the 256-entry I table (about 1k cycles when the footprint exceeds it).
 
 # Final configuration (best measured)
 
