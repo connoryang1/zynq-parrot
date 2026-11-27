@@ -90,6 +90,13 @@ static inline uint64_t cycles(void) {
 }
 #define CSRW(a, v) __asm__ volatile("csrw " #a ", %0" : : "r"((uint64_t)(v)) : "memory")
 #define CSRR(a) ({ uint64_t _v; __asm__ volatile("csrr %0, " #a : "=r"(_v) : : "memory"); _v; })
+/* -DEVMARK: window markers for the simulation event log (BP_REPLAY_EVLOG).
+ * value = mode<<16 | round<<8 | edge (1 fg start, 2 fg end, 3 trigger, 4 bg end). */
+#ifdef EVMARK
+#define MARK(m, r, e) CSRW(mscratch, ((uint64_t)(m) << 16) | ((uint64_t)(r) << 8) | (e))
+#else
+#define MARK(m, r, e) do { } while (0)
+#endif
 
 static uint64_t scan(volatile uint64_t *a, unsigned words) {
   uint64_t s = 0;
@@ -168,14 +175,16 @@ int main(void) {
     uint64_t is0 = CSRR(0x5c0), ds0 = CSRR(0x9c3);
     for (unsigned r = 0; r < ROUNDS; ++r) {
       if (mode == 3) { switch_path(mode, r, 1); fg_work(mode, r); }
+      MARK(mode, r, 1);
       uint64_t t0 = cycles();
       switch_path(mode, r, 2 * r);               /* foreground switch-in */
       fg_work(mode, r);
       uint64_t t1 = cycles();
+      MARK(mode, r, 2);
       switch_path(mode, r, 2 * r + 1);           /* background switch-in */
       check(bg_code(r) == r + 3ULL * BG_CODE_KIB * 256, mode, r);
       check(scan(bg, BG_HEAD_WORDS) == bg_head_sum, mode, r);
-      if (mode == 2) trigger();                  /* early: scheduler knows fg is next */
+      if (mode == 2) { MARK(mode, r, 3); trigger(); }                  /* early: scheduler knows fg is next */
       if (scan(bg + BG_HEAD_WORDS, BG_WORDS - BG_HEAD_WORDS) != bg_tail_sum) {
         /* Diagnostic: report the first word that differs from its initial value. */
         for (unsigned i = BG_HEAD_WORDS; i < BG_WORDS; ++i)
@@ -187,8 +196,9 @@ int main(void) {
           }
         check(0, mode, r);
       }
-      if (mode == 1) trigger();                  /* wake: futex wake of the fg */
+      if (mode == 1) { MARK(mode, r, 3); trigger(); }  /* wake: futex wake of the fg */
       uint64_t t2 = cycles();
+      MARK(mode, r, 4);
       if (r >= WARMUP) { fgc += t1 - t0; bgc += t2 - t1; }
     }
     uint64_t is1 = CSRR(0x5c0), ds1 = CSRR(0x9c3);

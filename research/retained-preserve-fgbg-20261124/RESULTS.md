@@ -38,6 +38,25 @@ Demand cap (`BP_REPLAY_DEMAND_CAP`, BP `18e3e8d00`): while either cache has an o
 
 Ping-pong whole rounds stay at 500–512k for every cap. The cap only moves cycles between the incoming and outgoing programs. The whole round stays within 400–412k, so it does not remove the outgoing program's cost, and it stays off by default.
 
+## Replay at near-warm switch cost (BP `f5ddc8552`, 2026-11-27)
+
+`tools/evlog_attr.py` uses a zero-perturbation event log of fills, installs, first uses and evictions. It showed that after fix14 almost every remaining foreground miss was a replayed line evicted before use. In early mode, the replay finished about 55k cycles before the switch. Pseudo-LRU then treats the replayed lines, which nothing has used yet, as old. Two installer changes close the gap: fast scan (`BP_REPLAY_FAST_SCAN`, a one-cycle duplicate scan that cuts an install from about 33 to about 17 locked cycles) and protect-until-first-use (`BP_REPLAY_PROTECT`, one bit per L1 way). Results are from runs `fp18-*` (no markers, delay 160, 3 measured rounds), with cold and warm references measured in the same build:
+
+| benchmark | trigger | switch-in (warm) | whole round | speedup (ideal) | share of ideal gain |
+|---|---|---|---|---|---|
+| single-direction | early, both lanes | 9.0k (8.0k) | 387.8k | 1.228x (1.229x) | 100% |
+| single-direction | early, code then data | 9.0k | 389.3k | 1.223x | 99% |
+| single-direction | wake, code then data / both lanes | 13.7k / 13.5k | 393.9k / 393.1k | 1.209x / 1.212x | 93% / 94% |
+| ping-pong | wake | 9.2k / 9.9k (6.5k / 6.1k) | 494.1k | 1.216x (1.217x) | 99.9% |
+| ping-pong | early | 7.9k / 7.5k | 502.3k | 1.197x | 92% |
+
+Ablation: protect alone (`p19`) reaches the same early switch-in, 9.0k. The outgoing program still pays 5–7k per turn for install lock time, and wake stays at 17.5k. Chaining back-to-back installs (`BP_REPLAY_CHAIN`, `fpc20`) brings ping-pong to 100.3% / 93.3% but leaves single-direction unchanged, so it stays optional.
+
+Limitations, measured:
+- The remaining early-mode gap, about 1k cycles, is 6 code lines per switch. They fall outside the recorded footprint, because a 258-line code footprint plus helper code exceeds the 256-entry I table.
+- Wake mode installs about 370 lines inside the foreground window. At about 17 locked cycles per I install, that costs about 4.4k cycles of fetch freeze. This is the wake gap.
+- Ping-pong early still charges the running side for install lock time (about 9k per round).
+
 # Final configuration (best measured)
 
 Image top `7997d361c` / BlackParrot `a7b509f40`: 1536+1536 retained lines (96 KiB I + 96 KiB D) in 256 sets, per-way shadow-tag filter on both lanes, preserve-on-capture-toggle control, single-thread prefetch16k core, HP0 response delay 160 (about 200-cycle DRAM). Job `20261125T071606Z-7997d361c`: WNS +0.909 ns, WHS +0.035 ns, 49,971 LUT, 133.5/140 BRAM. Kernel29 with patch 0030 (kernel-gated capture) and the timer64 fix. Sessions `board-s15-c1536i-kgate` and `board-s16-c1536i-kgate`; whole-transaction speedup, off cells with no extra system calls:
