@@ -1,0 +1,47 @@
+--- a/bp_me/src/v/cce/bp_uce.sv	2026-11-27 01:01:15.210450039 -0500
++++ b/bp_me/src/v/cce/bp_uce.sv	2026-11-27 01:01:15.234449440 -0500
+@@ -2261,6 +2261,44 @@
+       else $error("writethrough cache should not be in writeback states");
+   // synopsys translate_on
+ 
++`ifdef BP_REPLAY_DATA_TRACE
++  // Simulation-only trace of everything that can write two watched lines
++  // (BP_DT_W0/BP_DT_W1, physical line addresses): memory requests and
++  // replies for those lines, and every L1 data/tag write to their sets.
++  // Debugging aid for the cap-8 early-trigger data corruption; not committed.
++  // BP_DT_W0/W1 are 64-byte line numbers (paddr >> 6) in decimal.
++  wire [paddr_width_p-1:0] dt_w0 = paddr_width_p'(64'(`BP_DT_W0) << 6);
++  wire [paddr_width_p-1:0] dt_w1 = paddr_width_p'(64'(`BP_DT_W1) << 6);
++  function automatic logic dt_line(input logic [paddr_width_p-1:0] a);
++    return (a[paddr_width_p-1:block_offset_width_lp] == dt_w0[paddr_width_p-1:block_offset_width_lp])
++         | (a[paddr_width_p-1:block_offset_width_lp] == dt_w1[paddr_width_p-1:block_offset_width_lp]);
++  endfunction
++  function automatic logic dt_set(input logic [index_width_lp-1:0] i);
++    return (i == dt_w0[block_offset_width_lp+:index_width_lp])
++         | (i == dt_w1[block_offset_width_lp+:index_width_lp]);
++  endfunction
++  always_ff @(negedge clk_i) if (!reset_i) begin
++    if (fsm_fwd_v_lo & fsm_fwd_ready_then_li & dt_line(fsm_fwd_header_lo.addr))
++      $display("DTRACE %m t=%0t fwd type=%0d addr=%h pf=%0d slot=%0d state=%0d", $time,
++               fsm_fwd_header_lo.msg_type, fsm_fwd_header_lo.addr, fsm_fwd_header_lo.payload.prefetch,
++               fsm_fwd_header_lo.payload.way_id, state_r);
++    if (fsm_rev_v_li & fsm_rev_yumi_lo & dt_line(fsm_rev_addr_li))
++      $display("DTRACE %m t=%0t rev type=%0d hdr=%h beat=%h pf=%0d id=%0d data=%h", $time,
++               fsm_rev_header_li.msg_type, fsm_rev_header_li.addr, fsm_rev_addr_li,
++               fsm_rev_header_li.payload.prefetch, prefetch_response_id, fsm_rev_data_li);
++    if (data_mem_pkt_v_o & data_mem_pkt_yumi_i & dt_set(data_mem_pkt_cast_o.index))
++      $display("DTRACE %m t=%0t dwr op=%0d addr=%h idx=%0d way=%0d fi=%b state=%0d data=%h", $time,
++               data_mem_pkt_cast_o.opcode, data_mem_pkt_cast_o.addr, data_mem_pkt_cast_o.index,
++               data_mem_pkt_cast_o.way_id, data_mem_pkt_cast_o.fill_index, state_r, data_mem_pkt_cast_o.data);
++    if (tag_mem_pkt_v_o & tag_mem_pkt_yumi_i & dt_set(tag_mem_pkt_cast_o.index))
++      $display("DTRACE %m t=%0t twr op=%0d idx=%0d way=%0d tag=%h state=%0d", $time,
++               tag_mem_pkt_cast_o.opcode, tag_mem_pkt_cast_o.index, tag_mem_pkt_cast_o.way_id,
++               tag_mem_pkt_cast_o.tag, state_r);
++    if (cache_req_yumi_o & dt_line(cache_req_cast_i.addr))
++      $display("DTRACE %m t=%0t req type=%0d addr=%h", $time, cache_req_cast_i.msg_type, cache_req_cast_i.addr);
++  end
++`endif
++
+ endmodule
+ 
+ `BSG_ABSTRACT_MODULE(bp_uce)

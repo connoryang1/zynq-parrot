@@ -25,6 +25,19 @@ Doubling the L2 changes nothing: each background turn (64 KiB scan plus 48 KiB o
 
 Earlier replay numbers (22.7k single-direction wake) came from RTL with a frontend bug that assembled instructions from unrelated fetches (WORK_LOG, 2026-11-26) and are superseded.
 
+The fix13 numbers are unchanged on BP `d70ec851e` (fix14, runs `f14-*`). That fix stops replay replies from taking the L1 data port from an ordinary eviction (WORK_LOG, 2026-11-27). The race did not fire in these runs, so every cycle count is identical.
+
+Demand cap (`BP_REPLAY_DEMAND_CAP`, BP `18e3e8d00`): while either cache has an ordinary miss outstanding, at most N replay reads stay in flight. Single-direction foreground / whole round, in thousands of cycles. Caps 4 and 16 use runs `c13-*`; cap 8 uses runs `f14c8-*` on fix14, because its early code-then-data cell exposed the race above:
+
+| cap | wake, code then data | early, code then data | early, both lanes |
+|---|---|---|---|
+| none (24) | 30.2 / 409.4 | 26.4 / 411.9 | 16.7 / 401.2 |
+| 16 | 29.7 / 408.5 | 14.6 / 401.0 | 17.2 / 402.4 |
+| 8 | 23.2 / 405.7 | 22.4 / 409.1 | 23.4 / 409.6 |
+| 4 | 23.3 / 408.1 | 19.6 / 404.9 | 16.3 / 400.5 |
+
+Ping-pong whole rounds stay at 500–512k for every cap. The cap only moves cycles between the incoming and outgoing programs. The whole round stays within 400–412k, so it does not remove the outgoing program's cost, and it stays off by default.
+
 # Final configuration (best measured)
 
 Image top `7997d361c` / BlackParrot `a7b509f40`: 1536+1536 retained lines (96 KiB I + 96 KiB D) in 256 sets, per-way shadow-tag filter on both lanes, preserve-on-capture-toggle control, single-thread prefetch16k core, HP0 response delay 160 (about 200-cycle DRAM). Job `20261125T071606Z-7997d361c`: WNS +0.909 ns, WHS +0.035 ns, 49,971 LUT, 133.5/140 BRAM. Kernel29 with patch 0030 (kernel-gated capture) and the timer64 fix. Sessions `board-s15-c1536i-kgate` and `board-s16-c1536i-kgate`; whole-transaction speedup, off cells with no extra system calls:
