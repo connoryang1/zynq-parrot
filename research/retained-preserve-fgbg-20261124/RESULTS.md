@@ -57,6 +57,20 @@ Limitations, measured:
 - Wake mode installs about 370 lines inside the foreground window. At about 17 locked cycles per I install, that costs about 4.4k cycles of fetch freeze. This is the wake gap.
 - Ping-pong early still charges the running side for install lock time (about 9k per round).
 
+## Final replay configuration across memory latency (BP `8ae6263c9`)
+
+The final configuration combines fast scan, protect, chaining (`BP_REPLAY_CHAIN`) and skipping the I-cache installer drain (`BP_REPLAY_ICACHE_NODRAIN`). Runs are `fpn21` at delay 160, and `fn100`/`fn240` with cold and warm references from the same build. All 24 runs pass. Each cell gives switch-in (warm) and the share of the ideal whole-round gain:
+
+| benchmark / trigger | delay 100 | delay 160 | delay 240 |
+|---|---|---|---|
+| single-direction, early, both lanes | 8.7k (8.0k), 96% | 9.2k (8.0k), 102% | 9.4k (8.0k), 101% |
+| single-direction, early, code then data | 8.8k, 99% | 8.9k, 99% | 9.5k, 105% |
+| single-direction, wake | 12.1–12.2k, 91–92% | 12.4–12.6k, 90–95% | 13.2–13.4k, 96–97% |
+| ping-pong, wake | 9.3k / 9.6k (6.4k / 6.1k), 99% | 8.7k / 9.2k, 102% | 8.5k / 9.1k (6.7k / 6.1k), 105% |
+| ping-pong, early | 7.0k / 7.1k, 91% | 7.3k / 7.6k, 94% | 8.3k / 7.3k, 97% |
+
+Shares above 100% mean the replay also trimmed misses the outgoing program would have taken in the off reference. With a code footprint that fits the 256-entry I table (`FG_CODE_KIB=7`, runs `fit18`, fast scan + protect), early switch-in is 8.3k vs 7.7k warm (99.5%).
+
 # Final configuration (best measured)
 
 Image top `7997d361c` / BlackParrot `a7b509f40`: 1536+1536 retained lines (96 KiB I + 96 KiB D) in 256 sets, per-way shadow-tag filter on both lanes, preserve-on-capture-toggle control, single-thread prefetch16k core, HP0 response delay 160 (about 200-cycle DRAM). Job `20261125T071606Z-7997d361c`: WNS +0.909 ns, WHS +0.035 ns, 49,971 LUT, 133.5/140 BRAM. Kernel29 with patch 0030 (kernel-gated capture) and the timer64 fix. Sessions `board-s15-c1536i-kgate` and `board-s16-c1536i-kgate`; whole-transaction speedup, off cells with no extra system calls:
