@@ -81,7 +81,21 @@ module bp_prefetch_axi_master
   end
 
   assign axi_araddr_o = mem_fwd_header_cast_i.addr[0+:axi_addr_width_p];
-  assign axi_arid_o = axi_id_width_p'(free_slot + 1'b1);
+  // BP_PREFETCH_SINGLE_ID: issue every prefetch with AXI ID 1 and match
+  // responses to slots by issue order (AXI keeps same-ID reads in order).
+  // The PYNQ-Z2 HP0 path (SmartConnect, AXI4->AXI3, Zynq HP port) serialized
+  // the per-slot IDs 1..N: a board microbenchmark measured ~195 cycles per
+  // replayed line, the same as one demand miss at a time, while the same RTL
+  // overlaps N lines in simulation.
+`ifdef BP_PREFETCH_SINGLE_ID
+  localparam bit single_id_lp = 1'b1;
+`else
+  localparam bit single_id_lp = 1'b0;
+`endif
+  logic [outstanding_p-1:0][slot_width_lp-1:0] order_q;
+  logic [slot_width_lp-1:0] order_rd_r, order_wr_r;
+  logic [slot_width_lp:0] order_count_r;
+  assign axi_arid_o = single_id_lp ? axi_id_width_p'(1) : axi_id_width_p'(free_slot + 1'b1);
   wire [7:0] request_axi_beats
     = (8'(1) << mem_fwd_header_cast_i.size) >> $clog2(axi_bytes_lp);
   assign axi_arlen_o = request_axi_beats - 1'b1;
@@ -91,8 +105,28 @@ module bp_prefetch_axi_master
   assign mem_fwd_ready_and_o = axi_arready_i & free_v;
   wire request_accept = mem_fwd_v_i & mem_fwd_ready_and_o;
 
-  wire response_id_valid = (axi_rid_i > 0) && (axi_rid_i <= outstanding_p);
-  wire [slot_width_lp-1:0] response_slot = slot_width_lp'(axi_rid_i - 1'b1);
+  wire response_id_valid = single_id_lp
+    ? ((axi_rid_i == axi_id_width_p'(1)) && (order_count_r != '0))
+    : ((axi_rid_i > 0) && (axi_rid_i <= outstanding_p));
+  wire [slot_width_lp-1:0] response_slot = single_id_lp
+    ? order_q[order_rd_r] : slot_width_lp'(axi_rid_i - 1'b1);
+  wire order_push = single_id_lp & request_accept;
+  wire order_pop = single_id_lp & axi_rvalid_i & axi_rready_o & axi_rlast_i;
+  always_ff @(posedge clk_i) begin
+    if (reset_i) begin
+      order_rd_r <= '0;
+      order_wr_r <= '0;
+      order_count_r <= '0;
+    end else begin
+      if (order_push) begin
+        order_q[order_wr_r] <= free_slot;
+        order_wr_r <= (order_wr_r == slot_width_lp'(outstanding_p-1)) ? '0 : order_wr_r + 1'b1;
+      end
+      if (order_pop)
+        order_rd_r <= (order_rd_r == slot_width_lp'(outstanding_p-1)) ? '0 : order_rd_r + 1'b1;
+      order_count_r <= order_count_r + order_push - order_pop;
+    end
+  end
   logic response_slot_valid;
   always_comb begin
     response_slot_valid = 1'b0;
