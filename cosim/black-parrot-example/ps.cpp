@@ -477,6 +477,19 @@ int ps_main(bsg_zynq_pl *zpl, int argc, char **argv) {
                 retained_published & 0xffffU, retained_published >> 16,
                 retained_writes & 0xffffU, retained_writes >> 16);
 #endif
+#if defined(BP_PREFETCH_OBSERVE)
+    {
+        static const char *names[13] = {"pf_ar", "dm_ar", "ar_stall", "ar_stall_pf",
+            "pf_pre_sum", "pf_post_sum", "pf_busy", "pf_max", "r_pre_stall",
+            "r_post_pf_stall", "pf_beats", "pf_gap", "dm_pre_sum"};
+        char line[512];
+        int n = snprintf(line, sizeof(line), "PREFETCH_OBSERVE version=1");
+        for (int i = 0; i < 13 && n > 0 && n < (int)sizeof(line); i++)
+            n += snprintf(line + n, sizeof(line) - n, " %s=%u", names[i],
+                          (unsigned)zpl->shell_read(GP0_RD_PREFETCH_OBSERVE + 4 * i));
+        bsg_pr_info("%s\n", line);
+    }
+#endif
     zpl->free_dram((void *)buf);
     zpl->shell_write(GP0_WR_CSR_DRAM_INITED, 0x0, mask2);
 

@@ -197,7 +197,14 @@ module top_zynq
 `endif
    localparam num_regs_ps_to_pl_lp  = 5;
    localparam retained_observe_lp = `BP_RETAINED_OBSERVE;
-   localparam num_regs_pl_to_ps_lp  = retained_observe_lp ? 10 : 8;
+`ifdef BP_PREFETCH_OBSERVE
+   localparam bit prefetch_observe_lp = 1'b1;
+`else
+   localparam bit prefetch_observe_lp = 1'b0;
+`endif
+   // Prefetch observation appends 13 words (indices 10..22, GP0 0x48..0x78)
+   // after the retained words, so it requires BP_RETAINED_OBSERVE=1.
+   localparam num_regs_pl_to_ps_lp  = prefetch_observe_lp ? 23 : retained_observe_lp ? 10 : 8;
    localparam num_fifos_ps_to_pl_lp = 1;
    localparam num_fifos_pl_to_ps_lp = 1;
 
@@ -510,6 +517,67 @@ module top_zynq
    if (retained_observe_lp && (cce_type_p != e_cce_uce)) begin : unsupported_retained_observe
      assign csr_data_li[8+:2] = '0;
      initial $error("BP_RETAINED_OBSERVE requires the unicore UCE endpoint");
+   end
+
+   // HP0 read-path observation (FPGA-wrapper only, read-only GP0 words). All
+   // probes sit at this wrapper's HP0 boundary: "pre" is the board side of the
+   // response-delay FIFO, "post" is the BlackParrot side. Nonzero AXI IDs are
+   // prefetch/replay reads, ID 0 is demand. Counters clear on BP reset and hold
+   // after the run, so the PS can read them once the target stops. Sums of
+   // outstanding reads per cycle give mean latency by Little's law
+   // (sum / accepts). Distinguishes AR backpressure from the interconnect, slow
+   // HP0 returns, delay-FIFO backpressure, and BlackParrot not issuing.
+   if (prefetch_observe_lp) begin : prefetch_observe
+     initial if (!retained_observe_lp) $error("BP_PREFETCH_OBSERVE requires BP_RETAINED_OBSERVE=1");
+     wire ar_hs   = hp0_axi_arvalid & hp0_axi_arready;
+     wire ar_pf   = hp0_axi_arid != '0;
+     wire rl_pre  = hp0_axi_rvalid & hp0_axi_rready & hp0_axi_rlast;
+     wire r_pre_pf = hp0_axi_rid != '0;
+     wire rl_post = bp_hp0_rvalid & bp_hp0_rready & bp_hp0_rlast;
+     wire r_post_pf = bp_hp0_rid != '0;
+     logic [7:0] pf_pre_n, pf_post_n, dm_pre_n, pf_pre_max, pf_post_max;
+     logic [31:0] pf_ar, dm_ar, ar_stall, ar_stall_pf, pf_pre_sum, pf_post_sum,
+                  pf_busy, r_pre_stall, r_post_pf_stall, pf_beats, pf_gap, dm_pre_sum;
+     wire [7:0] pf_pre_nxt  = pf_pre_n  + 8'(ar_hs & ar_pf)  - 8'(rl_pre & r_pre_pf);
+     wire [7:0] pf_post_nxt = pf_post_n + 8'(ar_hs & ar_pf)  - 8'(rl_post & r_post_pf);
+     wire [7:0] dm_pre_nxt  = dm_pre_n  + 8'(ar_hs & ~ar_pf) - 8'(rl_pre & ~r_pre_pf);
+     always_ff @(posedge aclk) begin
+       if (bp_reset_li) begin
+         {pf_pre_n, pf_post_n, dm_pre_n, pf_pre_max, pf_post_max} <= '0;
+         {pf_ar, dm_ar, ar_stall, ar_stall_pf, pf_pre_sum, pf_post_sum} <= '0;
+         {pf_busy, r_pre_stall, r_post_pf_stall, pf_beats, pf_gap, dm_pre_sum} <= '0;
+       end else begin
+         pf_pre_n <= pf_pre_nxt; pf_post_n <= pf_post_nxt; dm_pre_n <= dm_pre_nxt;
+         if (pf_pre_nxt > pf_pre_max) pf_pre_max <= pf_pre_nxt;
+         if (pf_post_nxt > pf_post_max) pf_post_max <= pf_post_nxt;
+         pf_ar <= pf_ar + (ar_hs & ar_pf);
+         dm_ar <= dm_ar + (ar_hs & ~ar_pf);
+         ar_stall <= ar_stall + (hp0_axi_arvalid & ~hp0_axi_arready);
+         ar_stall_pf <= ar_stall_pf + (hp0_axi_arvalid & ~hp0_axi_arready & ar_pf);
+         pf_pre_sum <= pf_pre_sum + pf_pre_n;
+         pf_post_sum <= pf_post_sum + pf_post_n;
+         pf_busy <= pf_busy + (pf_post_n != '0);
+         r_pre_stall <= r_pre_stall + (hp0_axi_rvalid & ~hp0_axi_rready);
+         r_post_pf_stall <= r_post_pf_stall + (bp_hp0_rvalid & ~bp_hp0_rready & r_post_pf);
+         pf_beats <= pf_beats + (hp0_axi_rvalid & hp0_axi_rready & r_pre_pf);
+         // Replay reads in flight but no read request offered at all.
+         pf_gap <= pf_gap + ((pf_post_n != '0) & ~hp0_axi_arvalid);
+         dm_pre_sum <= dm_pre_sum + dm_pre_n;
+       end
+     end
+     assign csr_data_li[10] = pf_ar;
+     assign csr_data_li[11] = dm_ar;
+     assign csr_data_li[12] = ar_stall;
+     assign csr_data_li[13] = ar_stall_pf;
+     assign csr_data_li[14] = pf_pre_sum;
+     assign csr_data_li[15] = pf_post_sum;
+     assign csr_data_li[16] = pf_busy;
+     assign csr_data_li[17] = {8'(0), pf_post_max, 8'(0), pf_pre_max};
+     assign csr_data_li[18] = r_pre_stall;
+     assign csr_data_li[19] = r_post_pf_stall;
+     assign csr_data_li[20] = pf_beats;
+     assign csr_data_li[21] = pf_gap;
+     assign csr_data_li[22] = dm_pre_sum;
    end
 
  `declare_bp_be_if(vaddr_width_p, paddr_width_p, asid_width_p, branch_metadata_fwd_width_p, fetch_ptr_p, issue_ptr_p);
