@@ -182,7 +182,7 @@ proc vivado_experiment_defines {} {
     # board images ran without the prefetch AXI bypass and the replay options.
     set flags {BP_PREFETCH_AXI_BYPASS BP_ICACHE_PREFETCH_BYPASS BP_REPLAY_HOLD_ON_DEMAND
                BP_REPLAY_FAST_SCAN BP_REPLAY_PROTECT BP_REPLAY_CHAIN BP_REPLAY_ICACHE_NODRAIN
-               BP_PREFETCH_SINGLE_ID BP_PREFETCH_OBSERVE}
+               BP_PREFETCH_SINGLE_ID BP_PREFETCH_OBSERVE BP_NO_FPU BP_ZP_LEAN}
     foreach name $flags {
         if {![info exists ::env($name)]} { continue }
         if {$::env($name) ne "DEFINED"} {

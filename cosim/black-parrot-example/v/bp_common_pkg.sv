@@ -195,6 +195,14 @@ package bp_common_pkg;
       ,num_contexts: 1
       ,branch_metadata_fwd_width: bp_default_cfg_p.branch_metadata_fwd_width
                                   - $clog2(bp_default_cfg_p.num_threads)
+`ifdef BP_ZP_LEAN
+      // FPGA fit (replay experiment): drop the catch-up integer pipe and the
+      // two-bit-per-iteration dividers. ISA-neutral; changes timing only, so
+      // compare against references measured on the same configuration.
+      ,integer_support: (1 << e_basic)
+      ,muldiv_support : (1 << e_idiv) | (1 << e_imul) | (1 << e_imulh)
+      ,fpu_support    : (1 << e_fma) | (1 << e_fdivsqrt)
+`endif
       ,default: "inv"
       };
   `bp_aviary_derive_cfg(bp_unicore_zynqparrot_prefetch16k_cfg_p
