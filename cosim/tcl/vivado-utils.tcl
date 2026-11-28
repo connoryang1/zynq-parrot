@@ -170,6 +170,32 @@ proc vivado_experiment_defines {} {
         }
         lappend result "$name=$value"
     }
+    if {[info exists ::env(BP_PREFETCH_OUTSTANDING)]} {
+        set value $::env(BP_PREFETCH_OUTSTANDING)
+        if {![regexp {^[1-9][0-9]*$} $value] || $value > 63} {
+            error "BP_PREFETCH_OUTSTANDING must be in 1..63, got '$value'"
+        }
+        lappend result "BP_PREFETCH_OUTSTANDING=$value"
+    }
+    # Boolean RTL feature flags (Makefile DEFINES without a value arrive as
+    # DEFINED). Before 2026-11-28 these were silently dropped, so three replay
+    # board images ran without the prefetch AXI bypass and the replay options.
+    set flags {BP_PREFETCH_AXI_BYPASS BP_ICACHE_PREFETCH_BYPASS BP_REPLAY_HOLD_ON_DEMAND
+               BP_REPLAY_FAST_SCAN BP_REPLAY_PROTECT BP_REPLAY_CHAIN BP_REPLAY_ICACHE_NODRAIN
+               BP_PREFETCH_SINGLE_ID BP_PREFETCH_OBSERVE}
+    foreach name $flags {
+        if {![info exists ::env($name)]} { continue }
+        if {$::env($name) ne "DEFINED"} {
+            error "$name is a flag; expected DEFINED, got '$::env($name)'"
+        }
+        lappend result $name
+    }
+    # Any other BP_* flag would be dropped the same way: fail instead.
+    foreach name [array names ::env BP_*] {
+        if {$::env($name) eq "DEFINED" && $name ni $flags} {
+            error "BP_* flag $name is not forwarded to Verilog; add it to vivado_experiment_defines"
+        }
+    }
     return $result
 }
 
